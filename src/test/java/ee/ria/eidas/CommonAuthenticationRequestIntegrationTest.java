@@ -9,6 +9,7 @@ import org.junit.Ignore;
 import org.junit.Test;
 import org.junit.experimental.categories.Category;
 import org.springframework.beans.factory.annotation.Value;
+import org.springframework.boot.test.context.SpringBootTest;
 
 import java.time.Duration;
 import java.time.Instant;
@@ -18,6 +19,7 @@ import static org.hamcrest.MatcherAssert.assertThat;
 import static org.hamcrest.Matchers.*;
 import static org.junit.Assert.assertEquals;
 
+@SpringBootTest(classes = CommonAuthenticationRequestIntegrationTest.class)
 @Category(IntegrationTest.class)
 public class CommonAuthenticationRequestIntegrationTest extends TestsBase {
 

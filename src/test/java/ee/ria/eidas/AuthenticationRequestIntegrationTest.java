@@ -4,12 +4,13 @@ package ee.ria.eidas;
 import ee.ria.eidas.config.IntegrationTest;
 import io.restassured.RestAssured;
 import io.restassured.path.xml.XmlPath;
-import org.apache.commons.lang.RandomStringUtils;
+import org.apache.commons.lang3.RandomStringUtils;
 import org.hamcrest.Matchers;
 import org.junit.Ignore;
 import org.junit.Test;
 import org.junit.experimental.categories.Category;
 import org.springframework.beans.factory.annotation.Value;
+import org.springframework.boot.test.context.SpringBootTest;
 
 import java.util.HashMap;
 import java.util.Map;
@@ -19,6 +20,7 @@ import static io.restassured.config.EncoderConfig.encoderConfig;
 import static org.hamcrest.Matchers.isEmptyOrNullString;
 import static org.junit.Assert.assertEquals;
 
+@SpringBootTest(classes = AuthenticationRequestIntegrationTest.class)
 @Category(IntegrationTest.class)
 public class AuthenticationRequestIntegrationTest extends TestsBase {
 

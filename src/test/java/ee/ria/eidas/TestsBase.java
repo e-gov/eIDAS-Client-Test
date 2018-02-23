@@ -1,13 +1,14 @@
 package ee.ria.eidas;
 
 import com.sun.org.apache.xerces.internal.dom.DOMInputImpl;
-import ee.ria.eidas.client.utils.XmlUtils;
-import ee.ria.eidas.client.webapp.EidasClientApplication;
-import ee.ria.eidas.config.SystemPropertyActiveProfileResolver;
+import ee.ria.eidas.config.IntegrationTest;
+import ee.ria.eidas.utils.SystemPropertyActiveProfileResolver;
+import ee.ria.eidas.utils.XmlUtils;
 import io.restassured.RestAssured;
 import io.restassured.config.XmlConfig;
 import io.restassured.path.xml.XmlPath;
 import org.junit.Before;
+import org.junit.experimental.categories.Category;
 import org.junit.runner.RunWith;
 import org.opensaml.saml.common.SignableSAMLObject;
 import org.opensaml.security.credential.CredentialSupport;
@@ -16,14 +17,14 @@ import org.opensaml.security.x509.X509Support;
 import org.opensaml.xmlsec.signature.support.SignatureException;
 import org.opensaml.xmlsec.signature.support.SignatureValidator;
 import org.springframework.beans.factory.annotation.Value;
-import org.springframework.boot.test.context.SpringBootTest;
 import org.springframework.test.context.ActiveProfiles;
-import org.springframework.test.context.TestPropertySource;
-import org.springframework.test.context.junit4.SpringJUnit4ClassRunner;
+import org.springframework.test.context.junit4.SpringRunner;
 import org.w3c.dom.ls.LSInput;
 import org.w3c.dom.ls.LSResourceResolver;
 
 import java.io.InputStream;
+import java.net.MalformedURLException;
+import java.net.URL;
 import java.nio.charset.StandardCharsets;
 import java.security.cert.CertificateException;
 import java.security.cert.CertificateExpiredException;
@@ -31,18 +32,17 @@ import java.security.cert.CertificateNotYetValidException;
 import java.util.Base64;
 import java.util.Map;
 
-import static io.restassured.RestAssured.given;
+import static io.restassured.RestAssured.*;
 import static io.restassured.config.EncoderConfig.encoderConfig;
 import static io.restassured.internal.matcher.xml.XmlXsdMatcher.matchesXsdInClasspath;
 
+@RunWith(SpringRunner.class)
+@Category(IntegrationTest.class)
+@ActiveProfiles( profiles = {"dev"}, resolver = SystemPropertyActiveProfileResolver.class)
+public abstract class TestsBase {
 
-@RunWith(SpringJUnit4ClassRunner.class)
-@SpringBootTest(classes = EidasClientApplication.class, webEnvironment= SpringBootTest.WebEnvironment.DEFINED_PORT)
-@ActiveProfiles( profiles={"test"}, resolver=SystemPropertyActiveProfileResolver.class)
-public class TestsBase {
-
-    @Value("${local.server.port}")
-    protected int serverPort;
+    @Value("${target.url}")
+    protected String testTargetUrl;
 
     @Value("${eidas.client.spMetadataUrl}")
     protected String spMetadataUrl;
@@ -51,13 +51,15 @@ public class TestsBase {
     protected String spStartUrl;
 
     @Before
-    public void setUp() {
-        RestAssured.port = serverPort;
+    public void setUp() throws MalformedURLException {
+        URL url = new URL(testTargetUrl);
+        port = url.getPort();
+        baseURI = url.getProtocol() + "://" + url.getHost();
     }
 
     protected String getMetadataBody() {
         return given()
-                .config(RestAssured.config().encoderConfig(encoderConfig().defaultContentCharset("UTF-8")))
+                .config(config().encoderConfig(encoderConfig().defaultContentCharset("UTF-8")))
                 .when()
                 .get(spMetadataUrl).then().log().ifError().statusCode(200).extract().body().asString();
     }
@@ -70,7 +72,7 @@ public class TestsBase {
 
     protected Boolean validateMetadataSchema() {
         given()
-        .config(RestAssured.config().xmlConfig(XmlConfig.xmlConfig().disableLoadingOfExternalDtd()))
+        .config(config().xmlConfig(XmlConfig.xmlConfig().disableLoadingOfExternalDtd()))
                 .when()
                 .get(spMetadataUrl)
                 .then().log().ifError()
@@ -104,7 +106,7 @@ public class TestsBase {
                 .formParam("loa",loa)
                 .formParam("country",country)
                 .contentType("application/x-www-form-urlencoded")
-                .config(RestAssured.config().encoderConfig(encoderConfig().defaultContentCharset("UTF-8")))
+                .config(config().encoderConfig(encoderConfig().defaultContentCharset("UTF-8")))
                 .when()
                 .post(spStartUrl).then().log().ifError().extract().body().asString();
     }
@@ -113,7 +115,7 @@ public class TestsBase {
         return given()
                 .formParams(values)
                 .contentType("application/x-www-form-urlencoded")
-                .config(RestAssured.config().encoderConfig(encoderConfig().defaultContentCharset("UTF-8")))
+                .config(config().encoderConfig(encoderConfig().defaultContentCharset("UTF-8")))
                 .when()
                 .post(spStartUrl).then().log().ifError().extract().body().asString();
     }
@@ -121,7 +123,7 @@ public class TestsBase {
     protected String getLoginPage() {
         return given()
                 .contentType("application/x-www-form-urlencoded")
-                .config(RestAssured.config().encoderConfig(encoderConfig().defaultContentCharset("UTF-8")))
+                .config(config().encoderConfig(encoderConfig().defaultContentCharset("UTF-8")))
                 .when()
                 .get(spStartUrl).then().log().ifError().extract().body().asString();
     }

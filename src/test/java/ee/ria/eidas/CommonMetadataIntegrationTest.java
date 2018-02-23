@@ -2,13 +2,13 @@ package ee.ria.eidas;
 
 
 import ee.ria.eidas.config.IntegrationTest;
-
 import io.restassured.path.xml.XmlPath;
 import org.junit.Assert;
 import org.junit.Ignore;
 import org.junit.Test;
 import org.junit.experimental.categories.Category;
 import org.springframework.beans.factory.annotation.Value;
+import org.springframework.boot.test.context.SpringBootTest;
 
 import static io.restassured.path.xml.config.XmlPathConfig.xmlPathConfig;
 import static org.hamcrest.MatcherAssert.assertThat;
@@ -16,6 +16,7 @@ import static org.hamcrest.Matchers.*;
 import static org.junit.Assert.assertEquals;
 import static org.junit.Assert.assertTrue;
 
+@SpringBootTest(classes = CommonMetadataIntegrationTest.class)
 @Category(IntegrationTest.class)
 public class CommonMetadataIntegrationTest extends TestsBase {
 

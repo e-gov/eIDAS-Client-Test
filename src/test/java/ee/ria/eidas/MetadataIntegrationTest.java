@@ -1,12 +1,6 @@
 package ee.ria.eidas;
 
 
-import static io.restassured.RestAssured.given;
-import static io.restassured.config.EncoderConfig.encoderConfig;
-import static org.hamcrest.MatcherAssert.assertThat;
-import static org.hamcrest.Matchers.*;
-import static org.junit.Assert.assertEquals;
-
 import ee.ria.eidas.config.IntegrationTest;
 import io.restassured.RestAssured;
 import io.restassured.path.xml.XmlPath;
@@ -15,10 +9,19 @@ import org.junit.Ignore;
 import org.junit.Test;
 import org.junit.experimental.categories.Category;
 import org.springframework.beans.factory.annotation.Value;
+import org.springframework.boot.test.context.SpringBootTest;
+
 import java.time.Duration;
 import java.time.Instant;
 import java.util.List;
 
+import static io.restassured.RestAssured.given;
+import static io.restassured.config.EncoderConfig.encoderConfig;
+import static org.hamcrest.MatcherAssert.assertThat;
+import static org.hamcrest.Matchers.*;
+import static org.junit.Assert.assertEquals;
+
+@SpringBootTest(classes = MetadataIntegrationTest.class)
 @Category(IntegrationTest.class)
 public class MetadataIntegrationTest extends TestsBase {
 
