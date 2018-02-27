@@ -106,12 +106,11 @@ public class CommonAuthenticationRequestIntegrationTest extends TestsBase {
                 anyOf(hasItem("http://eidas.europa.eu/LoA/low"), hasItem("http://eidas.europa.eu/LoA/substantial"), hasItem("http://eidas.europa.eu/LoA/high")));
     }
 
-    @Ignore //TODO: IsPassive value is missing
     @Test
     public void auth3_mandatoryValuesArePresentInEntityDescriptor() {
         XmlPath xmlPath = getDecodedSamlRequestBodyXml(getAuthenticationReqWithDefault());
-        assertEquals("The Destination must be the connected eIDAS node URL", idpStartUrl, xmlPath.getString("AuthnRequest.@Destination"));
-        assertThat("ID must be in NCName format" ,  xmlPath.getString("AuthnRequest.@ID"), MatchesPattern.matchesPattern("^[a-zA-Z_]*$"));//This regex may not be proper.
+        assertThat("The Destination must be the connected eIDAS node URL", xmlPath.getString("AuthnRequest.@Destination"), endsWith(idpStartUrl));
+        assertThat("ID must be in NCName format" ,  xmlPath.getString("AuthnRequest.@ID"), MatchesPattern.matchesPattern("^[a-zA-Z0-9_.]*$"));
         assertEquals("The ForceAuthn must be: true", "true", xmlPath.getString("AuthnRequest.@ForceAuthn"));
         assertEquals("The IsPassive must be: false", "false", xmlPath.getString("AuthnRequest.@IsPassive"));
         assertEquals("The Version must be: 2.0", "2.0", xmlPath.getString("AuthnRequest.@Version"));

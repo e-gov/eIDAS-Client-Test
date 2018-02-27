@@ -102,7 +102,6 @@ public class AuthenticationRequestIntegrationTest extends TestsBase {
         assertEquals("Country code is present","http://eidas.europa.eu/LoA/high", samlRequest.getString("AuthnRequest.RequestedAuthnContext.AuthnContextClassRef"));
     }
 
-    @Ignore //TODO: Currently Internal Server Error is returned
     @Test
     public void auth6_loaMissingValueShouldReturnDefault() {
         String body = given()
@@ -115,10 +114,9 @@ public class AuthenticationRequestIntegrationTest extends TestsBase {
                 .post(spStartUrl).then().log().ifValidationFails().statusCode(200).extract().body().asString();
 
         XmlPath samlRequest = getDecodedSamlRequestBodyXml(body);
-        assertEquals("Country code is present","http://eidas.europa.eu/LoA/high", samlRequest.getString("AuthnRequest.RequestedAuthnContext.AuthnContextClassRef"));
+        assertEquals("Country code is present","http://eidas.europa.eu/LoA/substantial", samlRequest.getString("AuthnRequest.RequestedAuthnContext.AuthnContextClassRef"));
     }
 
-    @Ignore //TODO: Currently there is no optional parameter support
     @Test
     public void auth6_optionalParametersMissingShouldReturnDefault() {
         String body = given()
@@ -129,7 +127,7 @@ public class AuthenticationRequestIntegrationTest extends TestsBase {
                 .post(spStartUrl).then().log().ifValidationFails().statusCode(200).extract().body().asString();
 
         XmlPath samlRequest = getDecodedSamlRequestBodyXml(body);
-        assertEquals("Country code is present","http://eidas.europa.eu/LoA/high", samlRequest.getString("AuthnRequest.RequestedAuthnContext.AuthnContextClassRef"));
+        assertEquals("Country code is present","http://eidas.europa.eu/LoA/substantial", samlRequest.getString("AuthnRequest.RequestedAuthnContext.AuthnContextClassRef"));
     }
 
     @Test
