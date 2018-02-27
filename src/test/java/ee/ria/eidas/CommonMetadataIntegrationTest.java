@@ -4,7 +4,6 @@ package ee.ria.eidas;
 import ee.ria.eidas.config.IntegrationTest;
 import io.restassured.path.xml.XmlPath;
 import org.junit.Assert;
-import org.junit.Ignore;
 import org.junit.Test;
 import org.junit.experimental.categories.Category;
 import org.springframework.beans.factory.annotation.Value;
@@ -44,7 +43,7 @@ public class CommonMetadataIntegrationTest extends TestsBase {
         assertTrue("Metadata must be based on urn:oasis:names:tc:SAML:2.0:metadata schema", validateMetadataSchema());
     }
 
-    @Test //TODO: Not needed, because we have schema check?
+    @Test
     public void metap1_verifySamlMetadataIdentifier() {
         String response = getMetadataBody();
         XmlPath xmlPath = new XmlPath(response).using(xmlPathConfig().namespaceAware(false));
@@ -91,7 +90,6 @@ public class CommonMetadataIntegrationTest extends TestsBase {
                 xmlPath.getString("EntityDescriptor.SPSSODescriptor.@protocolSupportEnumeration"));
     }
 
-    @Ignore //TODO: Signing and encryption certificates must be different
     @Test
     public void metap2_certificatesArePresentInSpssoDescriptorBlock() {
         XmlPath xmlPath = getMetadataBodyXML();

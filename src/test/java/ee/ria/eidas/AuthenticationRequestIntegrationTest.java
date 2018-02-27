@@ -17,6 +17,7 @@ import java.util.Map;
 
 import static io.restassured.RestAssured.given;
 import static io.restassured.config.EncoderConfig.encoderConfig;
+import static org.hamcrest.Matchers.equalTo;
 import static org.hamcrest.Matchers.isEmptyOrNullString;
 import static org.junit.Assert.assertEquals;
 
@@ -164,6 +165,22 @@ public class AuthenticationRequestIntegrationTest extends TestsBase {
                 .when()
                 .post(spStartUrl).then().log().ifValidationFails().statusCode(400).body("error", Matchers.equalTo("Invalid RelayState! Must match the following regexp: ^[a-zA-Z0-9-_]{0,80}$"));
 
+    }
+
+    @Test
+    public void auth6_caseSensitivityOnPost() {
+        given()
+                .config(RestAssured.config().encoderConfig(encoderConfig().defaultContentCharset("UTF-8")))
+                .when()
+                .post("/LoGiN").then().log().ifValidationFails().statusCode(404).body("error",equalTo("Not Found"));
+    }
+
+    @Test
+    public void auth6_caseSensitivityOnGet() {
+        given()
+                .config(RestAssured.config().encoderConfig(encoderConfig().defaultContentCharset("UTF-8")))
+                .when()
+                .get("/LoGiN").then().log().ifValidationFails().statusCode(404).body("error",equalTo("Not Found"));
     }
 
     @Test
