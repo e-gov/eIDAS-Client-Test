@@ -31,7 +31,7 @@ public class CommonMetadataIntegrationTest extends TestsBase {
     @Test
     public  void metap1_hasValidSignature() {
         try {
-            validateSignature(getMetadataBody());
+            validateMetadataSignature(getMetadataBody());
         } catch (Exception e) {
             e.printStackTrace();
             Assert.fail("Metadata must have valid signature:  " + e.getMessage());

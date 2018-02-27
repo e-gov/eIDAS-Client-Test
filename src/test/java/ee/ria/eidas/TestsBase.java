@@ -127,7 +127,17 @@ public abstract class TestsBase {
                 .get(spStartUrl).then().log().ifError().extract().body().asString();
     }
 
-    protected Boolean validateSignature(String body) {
+    protected String sendSamlResponse(String relayState, String response) {
+        return given()
+                .formParam("relayState",relayState)
+                .formParam("SAMLResponse", response)
+                .contentType("application/x-www-form-urlencoded")
+                .config(config().encoderConfig(encoderConfig().defaultContentCharset("UTF-8")))
+                .when()
+                .post(spStartUrl).then().log().ifError().extract().body().asString();
+    }
+
+    protected Boolean validateMetadataSignature(String body) {
         XmlPath metadataXml = new XmlPath(body);
         try {
             java.security.cert.X509Certificate x509 = X509Support.decodeCertificate(metadataXml.getString("EntityDescriptor.Signature.KeyInfo.X509Data.X509Certificate"));
@@ -138,6 +148,16 @@ public abstract class TestsBase {
         }
     }
 
+    protected Boolean validateSamlReqSignature(String body) {
+        XmlPath metadataXml = new XmlPath(body);
+        try {
+            java.security.cert.X509Certificate x509 = X509Support.decodeCertificate(metadataXml.getString("AuthnRequest.Signature.KeyInfo.X509Data.X509Certificate"));
+            validateSignature(body,x509);
+            return true;
+        } catch (CertificateException e) {
+            throw new RuntimeException("Certificate parsing in validateSignature() failed:" + e.getMessage(), e);
+        }
+    }
 
     protected Boolean validateSignature(String body, java.security.cert.X509Certificate x509) {
         try {
@@ -188,5 +208,4 @@ public abstract class TestsBase {
             return new DOMInputImpl(publicId, systemId, baseURI, resource, null);
         }
     }
-
 }

@@ -38,7 +38,7 @@ public class CommonAuthenticationRequestIntegrationTest extends TestsBase {
     @Test
     public  void auth1_hasValidSignature() {
         try {
-            validateSignature(getDecodedSamlRequestBody(getAuthenticationReqWithDefault()));
+            validateSamlReqSignature(getDecodedSamlRequestBody(getAuthenticationReqWithDefault()));
         } catch (Exception e) {
             e.printStackTrace();
             Assert.fail("Authentication request must have valid signature:  " + e.getMessage());
