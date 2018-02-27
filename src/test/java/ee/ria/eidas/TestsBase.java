@@ -4,7 +4,6 @@ import com.sun.org.apache.xerces.internal.dom.DOMInputImpl;
 import ee.ria.eidas.config.IntegrationTest;
 import ee.ria.eidas.utils.SystemPropertyActiveProfileResolver;
 import ee.ria.eidas.utils.XmlUtils;
-import io.restassured.RestAssured;
 import io.restassured.config.XmlConfig;
 import io.restassured.path.xml.XmlPath;
 import org.junit.Before;

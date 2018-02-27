@@ -52,6 +52,25 @@ public class CommonAuthenticationRequestIntegrationTest extends TestsBase {
         assertEquals("RelayState is present","relayState", html.getString("**.findAll { it.@name == 'RelayState' }.@value"));
     }
 
+    @Test
+    public void auth1_verifyUsedDigestAlgosInSignature() {
+        XmlPath xmlPath = getMetadataBodyXML();
+
+        List<String> digestMethods = xmlPath.getList("EntityDescriptor.Signature.SignedInfo.Reference.DigestMethod.@Algorithm");
+        assertThat("One of the accepted digest algorithms must be present", digestMethods,
+                anyOf(hasItem("http://www.w3.org/2001/04/xmlenc#sha512"), hasItem("http://www.w3.org/2001/04/xmlenc#sha256")));
+    }
+
+    @Test
+    public void auth1_verifyUsedSignatureAlgosInSignature() {
+        XmlPath xmlPath = getMetadataBodyXML();
+
+        List<String> signingMethods = xmlPath.getList("EntityDescriptor.Signature.SignedInfo.SignatureMethod.@Algorithm");
+        assertThat("One of the accepted signing algorithms must be present", signingMethods,
+                anyOf(hasItem("http://www.w3.org/2001/04/xmldsig-more#ecdsa-sha512"), hasItem("http://www.w3.org/2001/04/xmldsig-more#ecdsa-sha256"),
+                        hasItem("http://www.w3.org/2007/05/xmldsig-more#sha512-rsa-MGF1"), hasItem("http://www.w3.org/2007/05/xmldsig-more#sha256-rsa-MGF1")));
+    }
+
     @Ignore
     @Test //TODO: Does SAML request has also schema to validate against?
     public void auth1_verifySamlAuthRequestSchema() {
