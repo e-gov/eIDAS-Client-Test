@@ -54,7 +54,7 @@ public class CommonAuthenticationRequestIntegrationTest extends TestsBase {
 
     @Test
     public void auth1_verifyUsedDigestAlgosInSignature() {
-        XmlPath xmlPath = getMetadataBodyXML();
+        XmlPath xmlPath = getDecodedSamlRequestBodyXml(getAuthenticationReqWithDefault());
 
         List<String> digestMethods = xmlPath.getList("EntityDescriptor.Signature.SignedInfo.Reference.DigestMethod.@Algorithm");
         assertThat("One of the accepted digest algorithms must be present", digestMethods,
@@ -63,7 +63,7 @@ public class CommonAuthenticationRequestIntegrationTest extends TestsBase {
 
     @Test
     public void auth1_verifyUsedSignatureAlgosInSignature() {
-        XmlPath xmlPath = getMetadataBodyXML();
+        XmlPath xmlPath = getDecodedSamlRequestBodyXml(getAuthenticationReqWithDefault());
 
         List<String> signingMethods = xmlPath.getList("EntityDescriptor.Signature.SignedInfo.SignatureMethod.@Algorithm");
         assertThat("One of the accepted signing algorithms must be present", signingMethods,

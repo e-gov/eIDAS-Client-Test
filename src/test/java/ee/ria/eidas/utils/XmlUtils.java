@@ -19,15 +19,6 @@ import java.security.Security;
 public class XmlUtils {
 
 
-    static {
-        try {
-            Security.addProvider(new BouncyCastleProvider());
-            InitializationService.initialize();
-        } catch (Exception e) {
-            e.printStackTrace();
-        }
-    }
-
     public static <T extends org.opensaml.core.xml.XMLObject> T unmarshallElement(String xml) {
         try {
             final Document doc = parseXMLDocument(xml);
