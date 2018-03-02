@@ -74,6 +74,9 @@ public abstract class TestsBase {
     @Value("${eidas.client.spReturnUrl}")
     protected String spReturnUrl;
 
+    @Value("${eidas.client.keystore}")
+    protected String clienKeystore;
+
     @Value("${eidas.client.keystorePass}")
     protected String clienKeystorePass;
 
@@ -97,7 +100,7 @@ public abstract class TestsBase {
 
         try {
             KeyStore keystore = KeyStore.getInstance(KeyStore.getDefaultType());
-            Resource resource = resourceLoader.getResource("classpath:samlKeystore.jks");
+            Resource resource = resourceLoader.getResource(clienKeystore);
             keystore.load(resource.getInputStream(), clienKeystorePass.toCharArray());
             signatureCredential = getCredential(keystore, responseSigningKey, responseSigningPass );
             encryptionCredential = getEncryptionCredentialFromMetaData(getMetadataBody());
