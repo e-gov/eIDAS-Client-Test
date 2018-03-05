@@ -63,36 +63,35 @@ public abstract class TestsBase {
     @Autowired
     private ResourceLoader resourceLoader;
 
-    @Value("${target.url}")
+    @Value("${test.client.url}")
     protected String testTargetUrl;
 
-    @Value("${eidas.client.spMetadataUrl}")
+    @Value("${test.client.spMetadataUrl}")
     protected String spMetadataUrl;
 
-    @Value("${eidas.client.spStartUrl}")
+    @Value("${test.client.spStartUrl}")
     protected String spStartUrl;
 
-    @Value("${eidas.client.spReturnUrl}")
+    @Value("${test.client.spReturnUrl}")
     protected String spReturnUrl;
 
-    @Value("${eidas.client.keystore}")
-    protected String clientKeystore;
-
-    @Value("${eidas.client.keystorePass}")
-    protected String clienKeystorePass;
-
-    @Value("${eidas.node.responseSigningKeyId}")
-    protected String responseSigningKey;
-
-    @Value("${eidas.node.responseSigningKeyPass}")
-    protected String responseSigningPass;
-
-    @Value("${eidas.node.idpStartUrl}")
-    protected String idpStartUrl;
-
-    @Value("${eidas.client.spProviderName}")
+    @Value("${test.client.spProviderName}")
     protected String spProviderName;
 
+    @Value("${test.keystore}")
+    protected String clientKeystore;
+
+    @Value("${test.keystorePass}")
+    protected String clienKeystorePass;
+
+    @Value("${test.node.responseSigningKeyId}")
+    protected String responseSigningKey;
+
+    @Value("${test.node.responseSigningKeyPass}")
+    protected String responseSigningPass;
+
+    @Value("${test.node.idpStartUrl}")
+    protected String idpStartUrl;
 
     protected  Credential signatureCredential;
     protected  Credential encryptionCredential;
