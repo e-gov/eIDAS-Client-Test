@@ -1,6 +1,6 @@
 # eIDAS kliendi integratsioonitestid
 
-[eIDAS klient makettrakenduse](https://github.com/e-gov/eIDAS-Client) raames on loodud automaatsete testide komplekt mida on võimalik kasutada eIDAS sõlmega liidestumise testimiseks. Testid on mõeldud eIDAS klient makettrakenduse testimiseks kuid on osaliselt korduvkasutatavad (näiteks metaandmete publitseerimise kontrollimiseks). Samuti saab neid teste kasutada enda klientrakenduse testimiseks ideede allikana või enda klientrakenduse jaoks kohandada. 
+[eIDAS klient makettrakenduse](https://github.com/e-gov/eIDAS-Client) raames on loodud automaatsete testide komplekt mida on võimalik kasutada eIDAS sõlmega liidestumise testimiseks. Testid on mõeldud eIDAS klient makettrakenduse testimiseks, kuid on osaliselt korduvkasutatavad (näiteks metaandmete publitseerimise kontrollimiseks). Samuti saab neid teste kasutada enda klientrakenduse testimiseks ideede allikana või enda klientrakenduse jaoks kohandada. 
 
 **NB! Antud testid on arenduses ning  muutuvad projekti edenedes.**
 
@@ -10,10 +10,13 @@ Vajalik on Java VM eelnev installatsioon. Arenduseks on kasutatud Oracle Java jd
 
 1. Hangi eIDAS kliendi lähtekood ning käivita eIDAS klient (vajalik eIDAS kliendi makettrakendus testimiseks). eIDAS kliendi makettrakenduse koodi ja käivitamise juhendid leiab [GitHubist](https://github.com/e-gov/eIDAS-Client). NB! eIDAS klient vajab käivitamisel ka juurdepääsu eIDAS sõlmele (eIDAS Node). Kui kasutate teste enda klient lahenduse testimiseks peab klientrakendus töötama ning olema kättesaadav.
 2. Hangi eIDAS kliendi testid:
+
  `git clone https://github.com/e-gov/eIDAS-Client-Test.git`
 
 3. Seadista testid vastavaks testitava klient rakenduse otspunktidele. Selleks on kaks võimalust:
+
 a) Kasutades [application.properties](https://github.com/e-gov/eIDAS-Client-Test/blob/master/src/test/resources/application.properties) faili.
+
 b) Andes vastavad parameetrid ette testide käivitamisel (kirjeldus testide käivitamise punktis)
 
 Parameetrite kirjeldus:
@@ -32,16 +35,23 @@ Parameetrite kirjeldus:
 | test.node.responseSigningKeyPass | changeit | Ei | Võtme parool |
 
 4. Käivita testid:
+
 a) eIDAS klient makettrakenduse testimiseks käivita kõik testid
+
 `./mvnw clean test`
-b) enda eIDAS klient rakenduse testimiseks käivita ainult korduvkasutatavad testid ("common" prefiksiga testiklassid)
+
+b) Enda eIDAS klient rakenduse testimiseks käivita ainult korduvkasutatavad testid ("common" prefiksiga testiklassid)
+
 `./mvnw -Dtest=Common* clean test`
 
 Testidele parameetrite ette andmine käivitamisel:
+
 `./mvnw clean test -Dtarget.url=http://localhost:1881`
 
 5. Kontrolli testide tulemusi
+6. 
 a) Testid väljastavad raporti ja logi jooksvalt käivituskonsoolis
+
 b) Surefire pistikprogramm väljastab tulemuste raporti ../target/surefire-reports kausta. Võimalik on genereerida ka html kujul koondraport. Selleks käivitada peale testide käivitamist käsk:
 
 `./mvnw surefire-report:report-only`
