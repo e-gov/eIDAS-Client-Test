@@ -23,18 +23,6 @@ import static org.junit.Assert.assertEquals;
 @Category(IntegrationTest.class)
 public class CommonAuthenticationRequestIntegrationTest extends TestsBase {
 
-    @Value("${eidas.client.idpStartUrl}")
-    private String idpStartUrl;
-
-    @Value("${eidas.client.spProviderName}")
-    private String spProviderName;
-
-    @Value("${eidas.client.spStartUrl}")
-    private String spStartUrl;
-
-    @Value("${eidas.client.spReturnUrl}")
-    private String spReturnUrl;
-
     @Test
     public  void auth1_hasValidSignature() {
         try {

@@ -21,13 +21,6 @@ import static org.junit.Assert.assertTrue;
 @Category(IntegrationTest.class)
 public class CommonMetadataIntegrationTest extends TestsBase {
 
-    @Value("${eidas.client.spMetadataUrl}")
-    private String spMetadataUrl;
-
-    @Value("${eidas.client.spReturnUrl}")
-    private String spReturnUrl;
-
-
     @Test
     public  void metap1_hasValidSignature() {
         try {

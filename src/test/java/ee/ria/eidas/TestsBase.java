@@ -7,6 +7,7 @@ import ee.ria.eidas.utils.ResponseBuilderUtils;
 import ee.ria.eidas.utils.SystemPropertyActiveProfileResolver;
 import ee.ria.eidas.utils.XmlUtils;
 import io.restassured.config.XmlConfig;
+import io.restassured.path.json.JsonPath;
 import io.restassured.path.xml.XmlPath;
 import net.shibboleth.utilities.java.support.resolver.CriteriaSet;
 import net.shibboleth.utilities.java.support.resolver.Criterion;
@@ -85,6 +86,13 @@ public abstract class TestsBase {
 
     @Value("${eidas.node.responseSigningKeyPass}")
     protected String responseSigningPass;
+
+    @Value("${eidas.node.idpStartUrl}")
+    protected String idpStartUrl;
+
+    @Value("${eidas.client.spProviderName}")
+    protected String spProviderName;
+
 
     protected  Credential signatureCredential;
     protected  Credential encryptionCredential;
@@ -165,7 +173,7 @@ public abstract class TestsBase {
     }
 
     protected String getAuthenticationReqWithDefault() {
-        return getAuthenticationReq("CA", "LOW","relayState");
+        return getAuthenticationReq("CA", "","");
     }
 
     protected String getAuthenticationReq(String country, String loa, String relayState) {
@@ -196,14 +204,14 @@ public abstract class TestsBase {
                 .get(spStartUrl).then().log().ifError().extract().body().asString();
     }
 
-    protected String sendSamlResponse(String relayState, String response) {
+    protected JsonPath sendSamlResponse(String relayState, String response) {
         return given()
                 .formParam("relayState",relayState)
                 .formParam("SAMLResponse", response)
                 .contentType("application/x-www-form-urlencoded")
                 .config(config().encoderConfig(encoderConfig().defaultContentCharset("UTF-8")))
                 .when()
-                .post(spReturnUrl).then().log().ifError().statusCode(200).extract().body().asString();
+                .post(spReturnUrl).then().log().ifError().statusCode(200).extract().body().jsonPath();
     }
 
     protected void validateMetadataSignature(String body) {

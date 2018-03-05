@@ -25,12 +25,6 @@ import static org.junit.Assert.assertEquals;
 @Category(IntegrationTest.class)
 public class MetadataIntegrationTest extends TestsBase {
 
-    @Value("${eidas.client.spMetadataUrl}")
-    private String spMetadata;
-
-    @Value("${eidas.client.spReturnUrl}")
-    private String spReturnUrl;
-
     @Ignore
     @Test // This is optional block
     public void metap2_mandatoryValuesArePresentInExtensions() {
@@ -109,7 +103,7 @@ public class MetadataIntegrationTest extends TestsBase {
         given()
                 .config(RestAssured.config().encoderConfig(encoderConfig().defaultContentCharset("UTF-8")))
                 .when()
-                .options(spMetadata).then().log().ifValidationFails().statusCode(200).header("Allow","GET,HEAD");
+                .options(spMetadataUrl).then().log().ifValidationFails().statusCode(200).header("Allow","GET,HEAD");
     }
 
     @Test
@@ -117,7 +111,7 @@ public class MetadataIntegrationTest extends TestsBase {
         given()
                 .config(RestAssured.config().encoderConfig(encoderConfig().defaultContentCharset("UTF-8")))
                 .when()
-                .post(spMetadata).then().log().ifValidationFails().statusCode(405).header("Allow","GET").body("error",Matchers.equalTo("Method Not Allowed"));
+                .post(spMetadataUrl).then().log().ifValidationFails().statusCode(405).header("Allow","GET").body("error",Matchers.equalTo("Method Not Allowed"));
     }
 
     @Test
@@ -125,7 +119,7 @@ public class MetadataIntegrationTest extends TestsBase {
         given()
                 .config(RestAssured.config().encoderConfig(encoderConfig().defaultContentCharset("UTF-8")))
                 .when()
-                .put(spMetadata).then().log().ifValidationFails().statusCode(405).header("Allow","GET").body("error",Matchers.equalTo("Method Not Allowed"));
+                .put(spMetadataUrl).then().log().ifValidationFails().statusCode(405).header("Allow","GET").body("error",Matchers.equalTo("Method Not Allowed"));
     }
 
     @Test
@@ -133,7 +127,7 @@ public class MetadataIntegrationTest extends TestsBase {
         given()
                 .config(RestAssured.config().encoderConfig(encoderConfig().defaultContentCharset("UTF-8")))
                 .when()
-                .head(spMetadata).then().log().ifValidationFails().statusCode(200).body(isEmptyOrNullString());
+                .head(spMetadataUrl).then().log().ifValidationFails().statusCode(200).body(isEmptyOrNullString());
     }
 
     @Test
@@ -141,7 +135,7 @@ public class MetadataIntegrationTest extends TestsBase {
         given()
                 .config(RestAssured.config().encoderConfig(encoderConfig().defaultContentCharset("UTF-8")))
                 .when()
-                .delete(spMetadata).then().log().ifValidationFails().statusCode(405).header("Allow","GET").body("error", Matchers.equalTo("Method Not Allowed"));
+                .delete(spMetadataUrl).then().log().ifValidationFails().statusCode(405).header("Allow","GET").body("error", Matchers.equalTo("Method Not Allowed"));
     }
 
 
