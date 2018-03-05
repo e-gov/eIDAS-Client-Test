@@ -15,7 +15,7 @@ Vajalik on Java VM eelnev installatsioon. Arenduseks on kasutatud Oracle Java jd
 
 3. Seadista testid vastavaks testitava klient rakenduse otspunktidele. Selleks on kaks võimalust:
 
-a) Kasutades [application.properties](https://github.com/e-gov/eIDAS-Client-Test/blob/master/src/test/resources/application.properties) faili.
+a) Võimalik on ette anda kahe erineva "profiili" properties faile "dev" ja "test" - vastavad properties failid [application-dev.properties](https://github.com/e-gov/eIDAS-Client-Test/blob/master/src/test/resources/application-dev.properties) ja [application-test.properties](https://github.com/e-gov/eIDAS-Client-Test/blob/master/src/test/resources/application-test.properties). Vaikeväärtusena on kasutusel profiil "dev", kuid seda on võimalik käivitamisel muuta parameetriga. Vaikeväärtused on seadistatud [application.properties](https://github.com/e-gov/eIDAS-Client-Test/blob/master/src/test/resources/application.properties) failis.
 
 b) Andes vastavad parameetrid ette testide käivitamisel (kirjeldus testide käivitamise punktis)
 
