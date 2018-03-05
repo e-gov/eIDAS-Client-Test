@@ -49,7 +49,7 @@ Testidele parameetrite ette andmine käivitamisel:
 `./mvnw clean test -Dtarget.url=http://localhost:1881`
 
 5. Kontrolli testide tulemusi
-6. 
+
 a) Testid väljastavad raporti ja logi jooksvalt käivituskonsoolis
 
 b) Surefire pistikprogramm väljastab tulemuste raporti ../target/surefire-reports kausta. Võimalik on genereerida ka html kujul koondraport. Selleks käivitada peale testide käivitamist käsk:

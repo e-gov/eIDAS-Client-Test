@@ -8,7 +8,6 @@ import org.junit.Assert;
 import org.junit.Ignore;
 import org.junit.Test;
 import org.junit.experimental.categories.Category;
-import org.springframework.beans.factory.annotation.Value;
 import org.springframework.boot.test.context.SpringBootTest;
 
 import java.time.Duration;
@@ -19,9 +18,9 @@ import static org.hamcrest.MatcherAssert.assertThat;
 import static org.hamcrest.Matchers.*;
 import static org.junit.Assert.assertEquals;
 
-@SpringBootTest(classes = CommonAuthenticationRequestIntegrationTest.class)
+@SpringBootTest(classes = AuthenticationRequestTempIntegrationTest.class)
 @Category(IntegrationTest.class)
-public class CommonAuthenticationRequestIntegrationTest extends TestsBase {
+public class AuthenticationRequestTempIntegrationTest extends TestsBase {
 
     @Test
     public  void auth1_hasValidSignature() {
