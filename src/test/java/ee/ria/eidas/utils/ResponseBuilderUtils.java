@@ -63,6 +63,43 @@ public class ResponseBuilderUtils {
         }
     }
 
+    public Response buildFaultyAuthnResponse(Credential signCredential, Credential encCredential, String inResponseId, String recipient, String loa, String givenName, String familyName, String personIdentifier, String dateOfBirth, DateTime timeNow) {
+        try {
+            Signature signature = (Signature) XMLObjectProviderRegistrySupport.getBuilderFactory()
+                    .getBuilder(Signature.DEFAULT_ELEMENT_NAME).buildObject(Signature.DEFAULT_ELEMENT_NAME);
+            signature.setSigningCredential(signCredential);
+            signature.setSignatureAlgorithm(getSignatureAlgorithm(signCredential));
+            signature.setCanonicalizationAlgorithm(SignatureConstants.ALGO_ID_C14N_EXCL_OMIT_COMMENTS);
+
+            X509KeyInfoGeneratorFactory x509KeyInfoGeneratorFactory = new X509KeyInfoGeneratorFactory();
+            x509KeyInfoGeneratorFactory.setEmitEntityCertificate(true);
+            KeyInfo keyInfo = x509KeyInfoGeneratorFactory.newInstance().generate(signCredential);
+            signature.setKeyInfo(keyInfo);
+
+            if (timeNow == null) {
+                timeNow = new DateTime();
+            }
+
+            Response authnResponse = new ResponseBuilder().buildObject();
+            authnResponse.setIssueInstant(timeNow);
+            authnResponse.setDestination(recipient);
+            authnResponse.setInResponseTo(inResponseId);
+            authnResponse.setVersion(VERSION_20);
+            authnResponse.setID(OpenSAMLUtils.generateSecureRandomId());
+            authnResponse.setSignature(signature);
+            authnResponse.setStatus(buildSuccessStatus());
+            authnResponse.setIssuer(buildIssuer());
+            authnResponse.getEncryptedAssertions().add(buildEncrAssertion(signCredential, encCredential, inResponseId, recipient, timeNow, loa, givenName, familyName, personIdentifier, dateOfBirth));
+
+            XMLObjectProviderRegistrySupport.getMarshallerFactory().getMarshaller(authnResponse).marshall(authnResponse);
+            Signer.signObject(signature);
+
+            return authnResponse;
+        } catch (Exception e) {
+            throw new RuntimeException("SAML error:" + e.getMessage(), e);
+        }
+    }
+
     public Response buildAuthnResponseWithError(Credential credential, String inResponseId, String recipient, String error) {
         try {
             Signature signature = (Signature) XMLObjectProviderRegistrySupport.getBuilderFactory()
@@ -261,7 +298,9 @@ public class ResponseBuilderUtils {
 
     private AttributeStatement buildMinimalAttributeStatement(String givenName, String familyName, String personIdentifier, String dateOfBirth) {
         AttributeStatement attributeStatement = new AttributeStatementBuilder().buildObject();
-        attributeStatement.getAttributes().add(buildAttribute("FirstName", "http://eidas.europa.eu/attributes/naturalperson/CurrentGivenName", "urn:oasis:names:tc:SAML:2.0:attrname-format:uri", "eidas-natural:CurrentGivenNameType", givenName));
+        if(givenName != null) {
+            attributeStatement.getAttributes().add(buildAttribute("FirstName", "http://eidas.europa.eu/attributes/naturalperson/CurrentGivenName", "urn:oasis:names:tc:SAML:2.0:attrname-format:uri", "eidas-natural:CurrentGivenNameType", givenName));
+        }
         attributeStatement.getAttributes().add(buildAttribute("FamilyName", "http://eidas.europa.eu/attributes/naturalperson/CurrentFamilyName", "urn:oasis:names:tc:SAML:2.0:attrname-format:uri", "eidas-natural:CurrentFamilyNameType", familyName));
         attributeStatement.getAttributes().add(buildAttribute("PersonIdendifier", "http://eidas.europa.eu/attributes/naturalperson/PersonIdentifier", "urn:oasis:names:tc:SAML:2.0:attrname-format:uri", "eidas-natural:PersonIdentifierType", personIdentifier));
         attributeStatement.getAttributes().add(buildAttribute("DateOfBirth", "http://eidas.europa.eu/attributes/naturalperson/DateOfBirth", "urn:oasis:names:tc:SAML:2.0:attrname-format:uri", "eidas-natural:DateOfBirthType", dateOfBirth));

@@ -20,9 +20,8 @@ import static org.junit.Assert.assertEquals;
 @Category(IntegrationTest.class)
 public class AuthenticationResponseIntegrationTest extends TestsBase {
 
-    @Ignore
     @Test
-    public void resp1_happyPath() {
+    public void resp1_validMinimalInputAuthentication() {
         String base64Response = getBase64SamlResponseMinimalAttributes(getAuthenticationReqWithDefault(), "TestGiven","TestFamily","TestPNO", "TestDate", null);
         JsonPath loginResponseJson = sendSamlResponse("",base64Response );
         assertEquals("Expected statusCode: Success", STATUS_SUCCESS, loginResponseJson.getString(STATUS_CODE));
