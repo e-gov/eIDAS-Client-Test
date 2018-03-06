@@ -296,10 +296,13 @@ public abstract class TestsBase {
         return encryptionCredential;
     }
 
-    protected String getBase64SamlResponseMinimalAttributes(String requestBody, String givenName, String familyName, String personIdentifier, String dateOfBirth) {
+    protected String getBase64SamlResponseMinimalAttributes(String requestBody, String givenName, String familyName, String personIdentifier, String dateOfBirth, String loa) {
         XmlPath xmlPath = getDecodedSamlRequestBodyXml(requestBody);
+        if(loa == null) {
+            loa =  xmlPath.getString("AuthnRequest.RequestedAuthnContext.AuthnContextClassRef");
+        }
         Response response = new ResponseBuilderUtils().buildAuthnResponse(signatureCredential, encryptionCredential, xmlPath.getString("AuthnRequest.@ID"),
-                testTargetUrl+spReturnUrl, xmlPath.getString("AuthnRequest.RequestedAuthnContext.AuthnContextClassRef"), givenName, familyName, personIdentifier, dateOfBirth);
+                testTargetUrl+spReturnUrl, loa, givenName, familyName, personIdentifier, dateOfBirth);
         String stringResponse = OpenSAMLUtils.getXmlString(response);
         validateSamlResponseSignature(stringResponse);
         return new String(Base64.getEncoder().encode(stringResponse.getBytes()));
