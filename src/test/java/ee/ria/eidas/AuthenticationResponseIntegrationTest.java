@@ -73,7 +73,6 @@ public class AuthenticationResponseIntegrationTest extends TestsBase {
         assertEquals("Error message is expected", "", loginResponseJson.getString(STATUS_CODE));
     }
 
-    @Ignore
     @Test
     public void resp3_responseWithSameLoaShouldBeAcceptedLow() {
         String base64Response = getBase64SamlResponseMinimalAttributes(getAuthenticationReq("CA","LOW",""), "TestGiven","TestFamily","TestPNO", "TestDate", LOA_LOW);
@@ -82,7 +81,6 @@ public class AuthenticationResponseIntegrationTest extends TestsBase {
         assertEquals("Correct loa is returned", LOA_LOW, loginResponseJson.getString(STATUS_LOA));
     }
 
-    @Ignore
     @Test
     public void resp3_responseWithSameLoaShouldBeAcceptedSubstantial() {
         String base64Response = getBase64SamlResponseMinimalAttributes(getAuthenticationReq("CA","SUBSTANTIAL",""), "TestGiven","TestFamily","TestPNO", "TestDate", LOA_SUBSTANTIAL);
@@ -91,7 +89,6 @@ public class AuthenticationResponseIntegrationTest extends TestsBase {
         assertEquals("Correct loa is returned", LOA_SUBSTANTIAL, loginResponseJson.getString(STATUS_LOA));
     }
 
-    @Ignore
     @Test
     public void resp3_responseWithSameLoaShouldBeAcceptedHigh() {
         String base64Response = getBase64SamlResponseMinimalAttributes(getAuthenticationReq("CA","HIGH",""), "TestGiven","TestFamily","TestPNO", "TestDate", LOA_HIGH);
@@ -100,7 +97,6 @@ public class AuthenticationResponseIntegrationTest extends TestsBase {
         assertEquals("Correct loa is returned", LOA_HIGH, loginResponseJson.getString(STATUS_LOA));
     }
 
-    @Ignore
     @Test
     public void resp3_responseWithHigherLoaLowShouldBeAcceptedSubstantial() {
         String base64Response = getBase64SamlResponseMinimalAttributes(getAuthenticationReq("CA","LOW",""), "TestGiven","TestFamily","TestPNO", "TestDate", LOA_SUBSTANTIAL);
@@ -109,7 +105,6 @@ public class AuthenticationResponseIntegrationTest extends TestsBase {
         assertEquals("Correct loa is returned", LOA_SUBSTANTIAL, loginResponseJson.getString(STATUS_LOA));
     }
 
-    @Ignore
     @Test
     public void resp3_responseWithHigherLoaLowShouldBeAcceptedHigh() {
         String base64Response = getBase64SamlResponseMinimalAttributes(getAuthenticationReq("CA","LOW",""), "TestGiven","TestFamily","TestPNO", "TestDate", LOA_HIGH);
@@ -117,8 +112,7 @@ public class AuthenticationResponseIntegrationTest extends TestsBase {
         assertEquals("Expected statusCode: Success", STATUS_SUCCESS, loginResponseJson.getString(STATUS_CODE));
         assertEquals("Correct loa is returned", LOA_HIGH, loginResponseJson.getString(STATUS_LOA));
     }
-
-    @Ignore
+    
     @Test
     public void resp3_responseWithHigherLoaSubstantialShouldBeAcceptedHigh() {
         String base64Response = getBase64SamlResponseMinimalAttributes(getAuthenticationReq("CA","SUBSTANTIAL",""), "TestGiven","TestFamily","TestPNO", "TestDate", LOA_HIGH);
