@@ -22,14 +22,14 @@ public class AuthenticationResponseIntegrationTest extends TestsBase {
 
     @Test
     public void resp1_validMinimalInputAuthentication() {
-        String base64Response = getBase64SamlResponseMinimalAttributes(getAuthenticationReqWithDefault(), "TestGiven","TestFamily","TestPNO", "TestDate", null);
+        String base64Response = getBase64SamlResponseDefaultMinimalAttributes(getAuthenticationReqWithDefault());
         JsonPath loginResponseJson = sendSamlResponse("",base64Response );
         assertEquals("Expected statusCode: Success", STATUS_SUCCESS, loginResponseJson.getString(STATUS_CODE));
         assertEquals("Correct loa is returned", LOA_SUBSTANTIAL, loginResponseJson.getString(STATUS_LOA));
-        assertEquals("Correct person idendifier is returned", "TestPNO", loginResponseJson.getString(STATUS_PNO));
-        assertEquals("Correct date is returned", "TestDate", loginResponseJson.getString(STATUS_DATE));
-        assertEquals("Correct family name is returned", "TestFamily", loginResponseJson.getString(STATUS_FAMILY));
-        assertEquals("Correct first name is returned", "TestGiven", loginResponseJson.getString(STATUS_FIRST));
+        assertEquals("Correct person idendifier is returned", DEFATTR_PNO, loginResponseJson.getString(STATUS_PNO));
+        assertEquals("Correct date is returned", DEFATTR_DATE, loginResponseJson.getString(STATUS_DATE));
+        assertEquals("Correct family name is returned", DEFATTR_FAMILY, loginResponseJson.getString(STATUS_FAMILY));
+        assertEquals("Correct first name is returned", DEFATTR_FIRST, loginResponseJson.getString(STATUS_FIRST));
     }
 
     //TODO: We do not receive a proper JSON error response yet
@@ -112,7 +112,7 @@ public class AuthenticationResponseIntegrationTest extends TestsBase {
         assertEquals("Expected statusCode: Success", STATUS_SUCCESS, loginResponseJson.getString(STATUS_CODE));
         assertEquals("Correct loa is returned", LOA_HIGH, loginResponseJson.getString(STATUS_LOA));
     }
-    
+
     @Test
     public void resp3_responseWithHigherLoaSubstantialShouldBeAcceptedHigh() {
         String base64Response = getBase64SamlResponseMinimalAttributes(getAuthenticationReq("CA","SUBSTANTIAL",""), "TestGiven","TestFamily","TestPNO", "TestDate", LOA_HIGH);

@@ -15,4 +15,9 @@ public class EidasTestStrings {
     public static final String STATUS_FAMILY = "attributes.FamilyName";
     public static final String STATUS_FIRST = "attributes.FirstName";
 
+    //Test data strings
+    public static final String DEFATTR_FIRST = "Test-FirstName";
+    public static final String DEFATTR_FAMILY = "Test-FamilyName";
+    public static final String DEFATTR_PNO = "EE/CA/30011092212";
+    public static final String DEFATTR_DATE = "1900-11-09";
 }
