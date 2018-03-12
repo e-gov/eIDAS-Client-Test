@@ -1,31 +1,15 @@
 package ee.ria.eidas.utils;
 
 import org.joda.time.DateTime;
-import org.opensaml.core.xml.config.XMLObjectProviderRegistrySupport;
-import org.opensaml.core.xml.io.MarshallingException;
 import org.opensaml.core.xml.schema.XSAny;
 import org.opensaml.core.xml.schema.impl.XSAnyBuilder;
-import org.opensaml.saml.common.SAMLVersion;
 import org.opensaml.saml.saml2.core.*;
 import org.opensaml.saml.saml2.core.impl.*;
-import org.opensaml.saml.saml2.encryption.Encrypter;
-import org.opensaml.security.SecurityException;
 import org.opensaml.security.credential.Credential;
-import org.opensaml.xmlsec.encryption.support.DataEncryptionParameters;
-import org.opensaml.xmlsec.encryption.support.EncryptionConstants;
-import org.opensaml.xmlsec.encryption.support.EncryptionException;
-import org.opensaml.xmlsec.encryption.support.KeyEncryptionParameters;
-import org.opensaml.xmlsec.keyinfo.KeyInfoGenerator;
-import org.opensaml.xmlsec.keyinfo.impl.X509KeyInfoGeneratorFactory;
-import org.opensaml.xmlsec.signature.KeyInfo;
-import org.opensaml.xmlsec.signature.Signature;
 import org.opensaml.xmlsec.signature.support.SignatureConstants;
-import org.opensaml.xmlsec.signature.support.SignatureException;
-import org.opensaml.xmlsec.signature.support.Signer;
 
 import javax.xml.namespace.QName;
 
-import static ee.ria.eidas.config.EidasTestStrings.DEFATTR_PNO;
 import static org.opensaml.saml.common.SAMLVersion.VERSION_20;
 
 public class ResponseBuilderBase {
@@ -150,25 +134,6 @@ public class ResponseBuilderBase {
         return subject;
     }
 
-    protected Subject buildSubjectWithoutNameID(String inResponseId, String recipient, DateTime issueInstant) {
-        Subject subject = new SubjectBuilder().buildObject();
-        NameID nameID = new NameIDBuilder().buildObject();
-        nameID.setValue("NotAvailable");
-        nameID.setFormat("urn:oasis:names:tc:SAML:1.1:nameid-format:unspecified");
-        nameID.setNameQualifier("http://C-PEPS.gov.xx");
-        subject.setNameID(nameID);
-        SubjectConfirmation subjectConf = new SubjectConfirmationBuilder().buildObject();
-        subjectConf.setMethod("urn:oasis:names:tc:SAML:2.0:cm:bearer");
-        SubjectConfirmationData subConfData = new SubjectConfirmationDataBuilder().buildObject();
-        subConfData.setAddress("172.24.0.1");
-        subConfData.setInResponseTo(inResponseId);
-        subConfData.setNotOnOrAfter(issueInstant.plusMinutes(5));
-        subConfData.setRecipient(recipient);
-        subjectConf.setSubjectConfirmationData(subConfData);
-        subject.getSubjectConfirmations().add(subjectConf);
-        return subject;
-    }
-
     protected Conditions buildConditions(DateTime issueInstant) {
         Conditions conditions = new ConditionsBuilder().buildObject();
         conditions.setNotBefore(issueInstant);
@@ -204,6 +169,17 @@ public class ResponseBuilderBase {
         return attributeStatement;
     }
 
+    protected AttributeStatement buildMinimalAttributeStatementWithFaultyNameFormat(String givenName, String familyName, String personIdentifier, String dateOfBirth) {
+        AttributeStatement attributeStatement = new AttributeStatementBuilder().buildObject();
+        if(givenName != null) {
+            attributeStatement.getAttributes().add(buildAttribute("FirstName", "http://eidas.europa.eu/attributes/naturalperson/CurrentGivenName", "urn:oasis:names:tc:SAML:2.0:attrname:uri", "eidas-natural:CurrentGivenNameType", givenName));
+        }
+        attributeStatement.getAttributes().add(buildAttribute("FamilyName", "http://eidas.europa.eu/attributes/naturalperson/CurrentFamilyName", "urn:oasis:names:tc:SAML:2.0:format:uri", "eidas-natural:CurrentFamilyNameType", familyName));
+        attributeStatement.getAttributes().add(buildAttribute("PersonIdendifier", "http://eidas.europa.eu/attributes/naturalperson/PersonIdentifier", "urn:oasis:names:tc:SAML:7.0:attrname-format:uri", "eidas-natural:PersonIdentifierType", personIdentifier));
+        attributeStatement.getAttributes().add(buildAttribute("DateOfBirth", "http://eidas.europa.eu/attributes/naturalperson/DateOfBirth", "SAML:2.0:attrname-format:uri", "eidas-natural:DateOfBirthType", dateOfBirth));
+        return attributeStatement;
+    }
+
     protected Attribute buildAttribute(String friendlyName, String name, String nameFormat, String xsiType, String value) {
         Attribute attribute = new AttributeBuilder().buildObject();
         attribute.setFriendlyName(friendlyName);
@@ -213,7 +189,7 @@ public class ResponseBuilderBase {
         return attribute;
     }
 
-    protected XSAny buildAttributeValue(String xsiType, String value) {
+    private XSAny buildAttributeValue(String xsiType, String value) {
         XSAny attributevalue = new XSAnyBuilder().buildObject(AttributeValue.DEFAULT_ELEMENT_NAME);
         attributevalue.getUnknownAttributes().put(new QName("http://www.w3.org/2001/XMLSchema-instance", "type", "xsi"), xsiType);
         attributevalue.setTextContent(value);

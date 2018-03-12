@@ -19,7 +19,7 @@ import static org.junit.Assert.assertEquals;
 @SpringBootTest(classes = SamlResponseCorrectnessIntegrationTest.class)
 @Category(IntegrationTest.class)
 public class SamlResponseCorrectnessIntegrationTest extends TestsBase {
-    
+
     @Test
     public void saml1_unsignedAssertionMustFailOnPostBinding() {
         String base64Response = getBase64SamlResponseDefaultMinimalAttributesWithoutAssertionSignature(getAuthenticationReqWithDefault());
@@ -60,7 +60,7 @@ public class SamlResponseCorrectnessIntegrationTest extends TestsBase {
         String base64Response = getBase64SamlResponseMinimalAttributesWithoutStatus(getAuthenticationReqWithDefault());
         JsonPath loginResponse = sendSamlResponse("",base64Response );
         assertEquals("500", loginResponse.getString("status"));
-        assertEquals("","Saml Response does not contain any encrypted assertions", loginResponse.getString("message"));
+        assertEquals("","", loginResponse.getString("message"));
     }
 
     @Ignore //TODO: Currently NPE is returned
@@ -69,7 +69,7 @@ public class SamlResponseCorrectnessIntegrationTest extends TestsBase {
         String base64Response = getBase64SamlResponseMinimalAttributesWithStatusCodes(getAuthenticationReqWithDefault(), 0);
         JsonPath loginResponse = sendSamlResponse("",base64Response );
         assertEquals("500", loginResponse.getString("status"));
-        assertEquals("","Saml Response does not contain any encrypted assertions", loginResponse.getString("message"));
+        assertEquals("","", loginResponse.getString("message"));
     }
 
     @Ignore //TODO: Currently this passes, it is unclear what it should do...
@@ -78,7 +78,43 @@ public class SamlResponseCorrectnessIntegrationTest extends TestsBase {
         String base64Response = getBase64SamlResponseMinimalAttributesWithStatusCodes(getAuthenticationReqWithDefault(), 2);
         JsonPath loginResponse = sendSamlResponse("",base64Response );
         assertEquals("500", loginResponse.getString("status"));
-        assertEquals("","Saml Response does not contain any encrypted assertions", loginResponse.getString("message"));
+        assertEquals("","", loginResponse.getString("message"));
+    }
+
+ //   @Ignore //TODO: Currently nameID presence is not checked
+    @Test
+    public void saml1_missingNameIdInResponseMustFail() {
+        String base64Response = getBase64SamlResponseMinimalAttributesWithoutNameId(getAuthenticationReqWithDefault());
+        JsonPath loginResponse = sendSamlResponse("",base64Response );
+        assertEquals("500", loginResponse.getString("status"));
+        assertEquals("","", loginResponse.getString("message"));
+    }
+
+    @Ignore //TODO: Currently the loa format is not checked
+    @Test
+    public void saml1_notSupportedLoaInResponseMustFail() {
+        String base64Response = getBase64SamlResponseMinimalAttributesWithNotExistingLoa(getAuthenticationReqWithDefault(), "http://eidas.europa.eu/LoA/extreme");
+        JsonPath loginResponse = sendSamlResponse("",base64Response );
+        assertEquals("500", loginResponse.getString("status"));
+        assertEquals("","", loginResponse.getString("message"));
+    }
+
+    @Ignore //TODO: Currently the loa format is not checked
+    @Test
+    public void saml1_emptyLoaInResponseMustFail() {
+        String base64Response = getBase64SamlResponseMinimalAttributesWithNotExistingLoa(getAuthenticationReqWithDefault(), "");
+        JsonPath loginResponse = sendSamlResponse("",base64Response );
+        assertEquals("500", loginResponse.getString("status"));
+        assertEquals("","", loginResponse.getString("message"));
+    }
+
+    @Ignore //TODO: Currently the format name is not checked
+    @Test
+    public void saml1_wrongNameFormatInResponseMustFail() {
+        String base64Response = getBase64SamlResponseMinimalAttributesWithWrongNameFormat(getAuthenticationReqWithDefault());
+        JsonPath loginResponse = sendSamlResponse("",base64Response );
+        assertEquals("500", loginResponse.getString("status"));
+        assertEquals("","", loginResponse.getString("message"));
     }
 
 }
