@@ -81,7 +81,7 @@ public class SamlResponseCorrectnessIntegrationTest extends TestsBase {
         assertEquals("","", loginResponse.getString("message"));
     }
 
- //   @Ignore //TODO: Currently nameID presence is not checked
+    @Ignore //TODO: Currently nameID presence is not checked
     @Test
     public void saml1_missingNameIdInResponseMustFail() {
         String base64Response = getBase64SamlResponseMinimalAttributesWithoutNameId(getAuthenticationReqWithDefault());

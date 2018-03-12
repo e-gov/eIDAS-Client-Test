@@ -33,6 +33,7 @@ public class ResponseBuilderUtils extends ResponseAssertionBuilderUtils {
             DateTime timeNow = new DateTime();
             Response authnResponse = buildResponseForSigningWithoutAssertion(inResponseId, recipient, timeNow);
             authnResponse.getEncryptedAssertions().add(buildEncrAssertionWithoutAssertionSignature(encCredential, inResponseId, recipient, timeNow, loa, givenName, familyName, personIdentifier, dateOfBirth));
+            authnResponse.setSignature(signature);
             XMLObjectProviderRegistrySupport.getMarshallerFactory().getMarshaller(authnResponse).marshall(authnResponse);
             Signer.signObject(signature);
             return authnResponse;
@@ -47,6 +48,7 @@ public class ResponseBuilderUtils extends ResponseAssertionBuilderUtils {
             DateTime timeNow = new DateTime();
             Response authnResponse = buildResponseForSigningWithoutAssertion(inResponseId, recipient, timeNow);
             authnResponse.getAssertions().add(buildAssertionWithoutEncryption(signCredential, inResponseId, recipient, timeNow, loa, givenName, familyName, personIdentifier, dateOfBirth));
+            authnResponse.setSignature(signature);
             XMLObjectProviderRegistrySupport.getMarshallerFactory().getMarshaller(authnResponse).marshall(authnResponse);
             Signer.signObject(signature);
             return authnResponse;
@@ -62,6 +64,7 @@ public class ResponseBuilderUtils extends ResponseAssertionBuilderUtils {
             Response authnResponse = buildResponseForSigningWithoutAssertion(inResponseId, recipient, timeNow);
             authnResponse.getAssertions().add(buildAssertionWithoutEncryption(signCredential, inResponseId, recipient, timeNow, loa, givenName, familyName, personIdentifier, dateOfBirth));
             authnResponse.getEncryptedAssertions().add(buildEncrAssertion(signCredential, encCredential,inResponseId, recipient, timeNow, loa, givenName, familyName, personIdentifier, dateOfBirth));
+            authnResponse.setSignature(signature);
             XMLObjectProviderRegistrySupport.getMarshallerFactory().getMarshaller(authnResponse).marshall(authnResponse);
             Signer.signObject(signature);
             return authnResponse;
@@ -77,6 +80,7 @@ public class ResponseBuilderUtils extends ResponseAssertionBuilderUtils {
             Response authnResponse = buildResponseForSigningWithoutAssertion(inResponseId, recipient, timeNow);
             authnResponse.getEncryptedAssertions().add(buildEncrAssertion(signCredential, encCredential, inResponseId, recipient, timeNow, loa, givenName, familyName, personIdentifier, dateOfBirth));
             authnResponse.getEncryptedAssertions().add(buildEncrAssertion(signCredential, encCredential, inResponseId, recipient, timeNow, loa, givenName + "1", familyName, personIdentifier, dateOfBirth));
+            authnResponse.setSignature(signature);
             XMLObjectProviderRegistrySupport.getMarshallerFactory().getMarshaller(authnResponse).marshall(authnResponse);
             Signer.signObject(signature);
             return authnResponse;
@@ -92,6 +96,7 @@ public class ResponseBuilderUtils extends ResponseAssertionBuilderUtils {
             Response authnResponse = buildResponseForSigningWithoutAssertion(inResponseId, recipient, timeNow);
             authnResponse.setStatus(null);
             authnResponse.getEncryptedAssertions().add(buildEncrAssertion(signCredential, encCredential, inResponseId, recipient, timeNow, loa, givenName, familyName, personIdentifier, dateOfBirth));
+            authnResponse.setSignature(signature);
             XMLObjectProviderRegistrySupport.getMarshallerFactory().getMarshaller(authnResponse).marshall(authnResponse);
             Signer.signObject(signature);
             return authnResponse;
@@ -108,6 +113,7 @@ public class ResponseBuilderUtils extends ResponseAssertionBuilderUtils {
             authnResponse.setStatus(null);
             authnResponse.setStatus(buildSuccessStatusWithStatusCode(statusCodeCnt));
             authnResponse.getEncryptedAssertions().add(buildEncrAssertion(signCredential, encCredential, inResponseId, recipient, timeNow, loa, givenName, familyName, personIdentifier, dateOfBirth));
+            authnResponse.setSignature(signature);
             XMLObjectProviderRegistrySupport.getMarshallerFactory().getMarshaller(authnResponse).marshall(authnResponse);
             Signer.signObject(signature);
             return authnResponse;
@@ -123,6 +129,7 @@ public class ResponseBuilderUtils extends ResponseAssertionBuilderUtils {
             Response authnResponse = buildResponseForSigningWithoutAssertion(inResponseId, recipient, timeNow);
             authnResponse.getEncryptedAssertions().add(buildEncrAssertionWithoutNameId(signCredential, encCredential, inResponseId, recipient, timeNow, loa, givenName, familyName, personIdentifier, dateOfBirth));
             XMLObjectProviderRegistrySupport.getMarshallerFactory().getMarshaller(authnResponse).marshall(authnResponse);
+            authnResponse.setSignature(signature);
             Signer.signObject(signature);
             return authnResponse;
         } catch (Exception e) {
@@ -137,6 +144,7 @@ public class ResponseBuilderUtils extends ResponseAssertionBuilderUtils {
             Response authnResponse = buildResponseForSigningWithoutAssertion(inResponseId, recipient, timeNow);
             authnResponse.getEncryptedAssertions().add(buildEncrAssertionWithWrongNameFormat(signCredential, encCredential, inResponseId, recipient, timeNow, loa, givenName, familyName, personIdentifier, dateOfBirth));
             XMLObjectProviderRegistrySupport.getMarshallerFactory().getMarshaller(authnResponse).marshall(authnResponse);
+            authnResponse.setSignature(signature);
             Signer.signObject(signature);
             return authnResponse;
         } catch (Exception e) {
