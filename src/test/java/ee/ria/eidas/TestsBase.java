@@ -181,32 +181,29 @@ public abstract class TestsBase {
 
     protected String getAuthenticationReq(String country, String loa, String relayState) {
         return given()
-                .formParam("relayState",relayState)
-                .formParam("loa",loa)
-                .formParam("country",country)
-                .contentType("application/x-www-form-urlencoded")
+                .queryParam("relayState",relayState)
+                .queryParam("loa",loa)
+                .queryParam("country",country)
                 .config(config().encoderConfig(encoderConfig().defaultContentCharset("UTF-8")))
                 .when()
-                .post(spStartUrl).then().log().ifError().extract().body().asString();
+                .get(spStartUrl).then().log().ifError().extract().body().asString();
     }
 
     protected String getAuthenticationReqForm(Map<String,String> values) {
         return given()
-                .formParams(values)
-                .contentType("application/x-www-form-urlencoded")
+                .queryParams(values)
                 .config(config().encoderConfig(encoderConfig().defaultContentCharset("UTF-8")))
                 .when()
-                .post(spStartUrl).then().log().ifError().extract().body().asString();
+                .get(spStartUrl).then().log().ifError().extract().body().asString();
     }
 
     protected JsonPath sendSamlResponse(String relayState, String response) {
         return given()
-                .formParam("relayState",relayState)
-                .formParam("SAMLResponse", response)
-                .contentType("application/x-www-form-urlencoded")
+                .queryParam("relayState",relayState)
+                .queryParam("SAMLResponse", response)
                 .config(config().encoderConfig(encoderConfig().defaultContentCharset("UTF-8")))
                 .when()
-                .post(spReturnUrl).then().log().ifError().extract().body().jsonPath();
+                .get(spReturnUrl).then().log().ifError().extract().body().jsonPath();
     }
 
     protected void validateMetadataSignature(String body) {

@@ -40,13 +40,12 @@ public class AuthenticationRequestIntegrationTest extends TestsBase {
     @Test
     public void auth6_invalidLoaLevelsAreNotAccepted() {
         given()
-                .formParam("relayState","")
-                .formParam("loa","SUPER")
-                .formParam("country","EE")
-                .contentType("application/x-www-form-urlencoded")
+                .queryParam("relayState","")
+                .queryParam("loa","SUPER")
+                .queryParam("country","EE")
                 .config(RestAssured.config().encoderConfig(encoderConfig().defaultContentCharset("UTF-8")))
                 .when()
-                .post(spStartUrl).then().log().ifError().statusCode(400).body("exception",equalTo("org.springframework.web.method.annotation.MethodArgumentTypeMismatchException"));
+                .get(spStartUrl).then().log().ifError().statusCode(400).body("exception",equalTo("org.springframework.web.method.annotation.MethodArgumentTypeMismatchException"));
 
         XmlPath samlRequest = getDecodedSamlRequestBodyXml(getAuthenticationReq("EE", "HIGH", "relayState"));
         assertEquals("Correct LOA is returned","http://eidas.europa.eu/LoA/high", samlRequest.getString("AuthnRequest.RequestedAuthnContext.AuthnContextClassRef"));
@@ -55,22 +54,20 @@ public class AuthenticationRequestIntegrationTest extends TestsBase {
     @Test //TODO: needs a method to fetch the supported country codes
     public void auth6_invalidCountryIsNotAccepted() {
         given()
-                .formParam("relayState","")
-                .formParam("loa","LOW")
-                .formParam("country","Est")
-                .contentType("application/x-www-form-urlencoded")
+                .queryParam("relayState","")
+                .queryParam("loa","LOW")
+                .queryParam("country","Est")
                 .config(RestAssured.config().encoderConfig(encoderConfig().defaultContentCharset("UTF-8")))
                 .when()
-                .post(spStartUrl).then().log().ifValidationFails().statusCode(400).body("error", Matchers.startsWith("Invalid country! Valid countries:["));
+                .get(spStartUrl).then().log().ifValidationFails().statusCode(400).body("error", Matchers.startsWith("Invalid country! Valid countries:["));
 
         given()
-                .formParam("relayState","")
-                .formParam("loa","LOW")
-                .formParam("country","ee")
-                .contentType("application/x-www-form-urlencoded")
+                .queryParam("relayState","")
+                .queryParam("loa","LOW")
+                .queryParam("country","ee")
                 .config(RestAssured.config().encoderConfig(encoderConfig().defaultContentCharset("UTF-8")))
                 .when()
-                .post(spStartUrl).then().log().ifValidationFails().statusCode(400).body("error", Matchers.startsWith("Invalid country! Valid countries:["));
+                .get(spStartUrl).then().log().ifValidationFails().statusCode(400).body("error", Matchers.startsWith("Invalid country! Valid countries:["));
 
         XmlPath samlRequest = getDecodedSamlRequestBodyXml(getAuthenticationReq("EE", "HIGH", "relayState"));
         assertEquals("Correct LOA is returned","http://eidas.europa.eu/LoA/high", samlRequest.getString("AuthnRequest.RequestedAuthnContext.AuthnContextClassRef"));
@@ -79,13 +76,12 @@ public class AuthenticationRequestIntegrationTest extends TestsBase {
     @Test
     public void auth6_notSupportedCountryIsNotAccepted() {
         given()
-                .formParam("relayState","")
-                .formParam("loa","LOW")
-                .formParam("country","SZ")
-                .contentType("application/x-www-form-urlencoded")
+                .queryParam("relayState","")
+                .queryParam("loa","LOW")
+                .queryParam("country","SZ")
                 .config(RestAssured.config().encoderConfig(encoderConfig().defaultContentCharset("UTF-8")))
                 .when()
-                .post(spStartUrl).then().log().ifValidationFails().statusCode(400).body("error", Matchers.startsWith("Invalid country! Valid countries:["));
+                .get(spStartUrl).then().log().ifValidationFails().statusCode(400).body("error", Matchers.startsWith("Invalid country! Valid countries:["));
 
         XmlPath samlRequest = getDecodedSamlRequestBodyXml(getAuthenticationReq("EE", "HIGH", "relayState"));
         assertEquals("Correct LOA is returned","http://eidas.europa.eu/LoA/high", samlRequest.getString("AuthnRequest.RequestedAuthnContext.AuthnContextClassRef"));
@@ -94,13 +90,12 @@ public class AuthenticationRequestIntegrationTest extends TestsBase {
     @Test
     public void auth6_loaMissingValueShouldReturnDefault() {
         String body = given()
-                .formParam("relayState","")
-                .formParam("loa","")
-                .formParam("country","CA")
-                .contentType("application/x-www-form-urlencoded")
+                .queryParam("relayState","")
+                .queryParam("loa","")
+                .queryParam("country","CA")
                 .config(RestAssured.config().encoderConfig(encoderConfig().defaultContentCharset("UTF-8")))
                 .when()
-                .post(spStartUrl).then().log().ifValidationFails().statusCode(200).extract().body().asString();
+                .get(spStartUrl).then().log().ifValidationFails().statusCode(200).extract().body().asString();
 
         XmlPath samlRequest = getDecodedSamlRequestBodyXml(body);
         assertEquals("Correct LOA is returned","http://eidas.europa.eu/LoA/substantial", samlRequest.getString("AuthnRequest.RequestedAuthnContext.AuthnContextClassRef"));
@@ -109,11 +104,10 @@ public class AuthenticationRequestIntegrationTest extends TestsBase {
     @Test
     public void auth6_optionalParametersMissingShouldReturnDefault() {
         String body = given()
-                .formParam("country","CA")
-                .contentType("application/x-www-form-urlencoded")
+                .queryParam("country","CA")
                 .config(RestAssured.config().encoderConfig(encoderConfig().defaultContentCharset("UTF-8")))
                 .when()
-                .post(spStartUrl).then().log().ifValidationFails().statusCode(200).extract().body().asString();
+                .get(spStartUrl).then().log().ifValidationFails().statusCode(200).extract().body().asString();
 
         XmlPath samlRequest = getDecodedSamlRequestBodyXml(body);
         assertEquals("Correct LOA is returned","http://eidas.europa.eu/LoA/substantial", samlRequest.getString("AuthnRequest.RequestedAuthnContext.AuthnContextClassRef"));
@@ -135,23 +129,21 @@ public class AuthenticationRequestIntegrationTest extends TestsBase {
     public void auth6_errorIsReturnedOnWrongRelayStatePattern() {
         String relayState = RandomStringUtils.randomAlphanumeric(81);
         given()
-                .formParam("relayState",relayState)
-                .formParam("loa","LOW")
-                .formParam("country","CA")
-                .contentType("application/x-www-form-urlencoded")
+                .queryParam("relayState",relayState)
+                .queryParam("loa","LOW")
+                .queryParam("country","CA")
                 .config(RestAssured.config().encoderConfig(encoderConfig().defaultContentCharset("UTF-8")))
                 .when()
-                .post(spStartUrl).then().log().ifValidationFails().statusCode(400).body("error", Matchers.equalTo("Invalid RelayState! Must match the following regexp: ^[a-zA-Z0-9-_]{0,80}$"));
+                .get(spStartUrl).then().log().ifValidationFails().statusCode(400).body("error", Matchers.equalTo("Invalid RelayState! Must match the following regexp: ^[a-zA-Z0-9-_]{0,80}$"));
 
         relayState = "<>$";
         given()
-                .formParam("relayState",relayState)
-                .formParam("loa","LOW")
-                .formParam("country","CA")
-                .contentType("application/x-www-form-urlencoded")
+                .queryParam("relayState",relayState)
+                .queryParam("loa","LOW")
+                .queryParam("country","CA")
                 .config(RestAssured.config().encoderConfig(encoderConfig().defaultContentCharset("UTF-8")))
                 .when()
-                .post(spStartUrl).then().log().ifValidationFails().statusCode(400).body("error", Matchers.equalTo("Invalid RelayState! Must match the following regexp: ^[a-zA-Z0-9-_]{0,80}$"));
+                .get(spStartUrl).then().log().ifValidationFails().statusCode(400).body("error", Matchers.equalTo("Invalid RelayState! Must match the following regexp: ^[a-zA-Z0-9-_]{0,80}$"));
 
     }
 
@@ -159,13 +151,12 @@ public class AuthenticationRequestIntegrationTest extends TestsBase {
     @Test
     public void auth6_loaLevelCaseSensitivity() {
         String response = given()
-                .formParam("relayState","")
-                .formParam("lOa","high")
-                .formParam("country","EE")
-                .contentType("application/x-www-form-urlencoded")
+                .queryParam("relayState","")
+                .queryParam("lOa","high")
+                .queryParam("country","EE")
                 .config(RestAssured.config().encoderConfig(encoderConfig().defaultContentCharset("UTF-8")))
                 .when()
-                .post(spStartUrl).then().log().ifError().statusCode(200).extract().body().asString();
+                .get(spStartUrl).then().log().ifError().statusCode(200).extract().body().asString();
 
         XmlPath samlRequest = getDecodedSamlRequestBodyXml(response);
         assertEquals("Correct LOA is returned","http://eidas.europa.eu/LoA/high", samlRequest.getString("AuthnRequest.RequestedAuthnContext.AuthnContextClassRef"));
@@ -175,13 +166,12 @@ public class AuthenticationRequestIntegrationTest extends TestsBase {
     @Test
     public void auth6_relayStateCaseSensitivity() {
         String response = given()
-                .formParam("ReLaYStAtE","RelayState123")
-                .formParam("loa","HIGH")
-                .formParam("country","EE")
-                .contentType("application/x-www-form-urlencoded")
+                .queryParam("ReLaYStAtE","RelayState123")
+                .queryParam("loa","HIGH")
+                .queryParam("country","EE")
                 .config(RestAssured.config().encoderConfig(encoderConfig().defaultContentCharset("UTF-8")))
                 .when()
-                .post(spStartUrl).then().log().ifError().statusCode(200).extract().body().asString();
+                .get(spStartUrl).then().log().ifError().statusCode(200).extract().body().asString();
 
         XmlPath html = new XmlPath(XmlPath.CompatibilityMode.HTML, response);
         assertEquals("Status is returned with correct relayState","RelayState123", html.getString("**.findAll { it.@name == 'RelayState' }.@value"));
@@ -191,11 +181,10 @@ public class AuthenticationRequestIntegrationTest extends TestsBase {
     @Test
     public void auth6_countryCaseSensitivity() {
         String response = given()
-                .formParam("cOuNtRy","EE")
-                .contentType("application/x-www-form-urlencoded")
+                .queryParam("cOuNtRy","EE")
                 .config(RestAssured.config().encoderConfig(encoderConfig().defaultContentCharset("UTF-8")))
                 .when()
-                .post(spStartUrl).then().log().ifError().statusCode(200).extract().body().asString();
+                .get(spStartUrl).then().log().ifError().statusCode(200).extract().body().asString();
 
         XmlPath html = new XmlPath(XmlPath.CompatibilityMode.HTML, response);
         assertEquals("Status is returned with correct relayState","EE", html.getString("**.findAll { it.@name == 'country' }.@value"));
@@ -206,7 +195,7 @@ public class AuthenticationRequestIntegrationTest extends TestsBase {
         given()
                 .config(RestAssured.config().encoderConfig(encoderConfig().defaultContentCharset("UTF-8")))
                 .when()
-                .post("/LoGiN").then().log().ifValidationFails().statusCode(404).body("error",equalTo("Not Found"));
+                .get("/LoGiN").then().log().ifValidationFails().statusCode(404).body("error",equalTo("Not Found"));
     }
 
     @Test
@@ -220,22 +209,20 @@ public class AuthenticationRequestIntegrationTest extends TestsBase {
     @Test
     public void auth6_headHttpMethodShouldNotReturnBody() {
         given()
-                .formParam("relayState","")
-                .formParam("loa","LOW")
-                .formParam("country","CA")
-                .contentType("application/x-www-form-urlencoded")
+                .queryParam("relayState","")
+                .queryParam("loa","LOW")
+                .queryParam("country","CA")
                 .config(RestAssured.config().encoderConfig(encoderConfig().defaultContentCharset("UTF-8")))
                 .when()
-                .head(spStartUrl).then().log().ifValidationFails().statusCode(405).body(isEmptyOrNullString());
+                .head(spStartUrl).then().log().ifValidationFails().statusCode(200).body(isEmptyOrNullString());
     }
 
     @Test
     public void auth6_notSupportedHttpPutMethodShouldReturnError() {
         given()
-                .formParam("relayState","")
-                .formParam("loa","LOW")
-                .formParam("country","CA")
-                .contentType("application/x-www-form-urlencoded")
+                .queryParam("relayState","")
+                .queryParam("loa","LOW")
+                .queryParam("country","CA")
                 .config(RestAssured.config().encoderConfig(encoderConfig().defaultContentCharset("UTF-8")))
                 .when()
                 .put(spStartUrl).then().log().ifValidationFails().statusCode(405).body("error",Matchers.equalTo("Method Not Allowed"));
@@ -244,10 +231,9 @@ public class AuthenticationRequestIntegrationTest extends TestsBase {
     @Test
     public void auth6_notSupportedHttpDeleteMethodShouldReturnError() {
         given()
-                .formParam("relayState","")
-                .formParam("loa","LOW")
-                .formParam("country","CA")
-                .contentType("application/x-www-form-urlencoded")
+                .queryParam("relayState","")
+                .queryParam("loa","LOW")
+                .queryParam("country","CA")
                 .config(RestAssured.config().encoderConfig(encoderConfig().defaultContentCharset("UTF-8")))
                 .when()
                 .delete(spStartUrl).then().log().ifValidationFails().statusCode(405).body("error",Matchers.equalTo("Method Not Allowed"));
@@ -257,10 +243,9 @@ public class AuthenticationRequestIntegrationTest extends TestsBase {
     @Test
     public void auth6_optionsMethodShouldReturnAllowedMethods() {
         given()
-                .formParam("relayState","")
-                .formParam("loa","LOW")
-                .formParam("country","CA")
-                .contentType("application/x-www-form-urlencoded")
+                .queryParam("relayState","")
+                .queryParam("loa","LOW")
+                .queryParam("country","CA")
                 .config(RestAssured.config().encoderConfig(encoderConfig().defaultContentCharset("UTF-8")))
                 .when()
                 .options(spStartUrl).then().log().ifValidationFails().statusCode(200).header("Allow",Matchers.equalTo("POST,GET,HEAD"));
