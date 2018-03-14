@@ -14,7 +14,7 @@ public class EidasTestStrings {
     public static final String STATUS_PNO = "attributes.PersonIdendifier";
     public static final String STATUS_FAMILY = "attributes.FamilyName";
     public static final String STATUS_FIRST = "attributes.FirstName";
-    public static final String STATUS_ADDR = "levelOfAssurance.CurrentAddress";
+    public static final String STATUS_ADDR = "attributes.CurrentAddress";
     public static final String STATUS_GENDER = "attributes.Gender";
     public static final String STATUS_BIRTH_FIRST = "attributes.BirthName";
     public static final String STATUS_BIRTH_FAMILY = "attributes.???";
@@ -28,6 +28,6 @@ public class EidasTestStrings {
     public static final String DEFATTR_BIRTH_FIRST = "Test-Birth-FirstName";
     public static final String DEFATTR_BIRTH_FAMILY = "Test-Birth-FamilyName";
     public static final String DEFATTR_BIRTH_PLACE = "Country";
-    public static final String DEFATTR_ADDR = "Street 1, Flat 5b, Village, Country";
+    public static final String DEFATTR_ADDR = "Street 1, Flat 3, Village 2, Country7";
     public static final String DEFATTR_GENDER = "Male";
 }

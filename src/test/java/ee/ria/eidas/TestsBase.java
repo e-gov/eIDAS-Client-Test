@@ -67,6 +67,9 @@ public abstract class TestsBase {
     @Value("${test.client.url}")
     protected String testTargetUrl;
 
+    @Value("${test.client.demoUrl}")
+    protected String testTargetDemoUrl;
+
     @Value("${test.client.spMetadataUrl}")
     protected String spMetadataUrl;
 
@@ -196,14 +199,6 @@ public abstract class TestsBase {
                 .post(spStartUrl).then().log().ifError().extract().body().asString();
     }
 
-    protected String getLoginPage() {
-        return given()
-                .contentType("application/x-www-form-urlencoded")
-                .config(config().encoderConfig(encoderConfig().defaultContentCharset("UTF-8")))
-                .when()
-                .get(spStartUrl).then().log().ifError().extract().body().asString();
-    }
-
     protected JsonPath sendSamlResponse(String relayState, String response) {
         return given()
                 .formParam("relayState",relayState)
@@ -303,7 +298,7 @@ public abstract class TestsBase {
             loa =  xmlPath.getString("AuthnRequest.RequestedAuthnContext.AuthnContextClassRef");
         }
         Response response = new ResponseBuilderUtils().buildAuthnResponse(signatureCredential, encryptionCredential, xmlPath.getString("AuthnRequest.@ID"),
-                testTargetUrl+spReturnUrl, loa, givenName, familyName, personIdentifier, dateOfBirth);
+                testTargetDemoUrl+spReturnUrl, loa, givenName, familyName, personIdentifier, dateOfBirth);
         String stringResponse = OpenSAMLUtils.getXmlString(response);
         validateSamlResponseSignature(stringResponse);
         return new String(Base64.getEncoder().encode(stringResponse.getBytes()));
@@ -313,7 +308,7 @@ public abstract class TestsBase {
         XmlPath xmlPath = getDecodedSamlRequestBodyXml(requestBody);
         String loa =  xmlPath.getString("AuthnRequest.RequestedAuthnContext.AuthnContextClassRef");
         Response response = new ResponseBuilderUtils().buildAuthnResponseWithMaxAttributes(signatureCredential, encryptionCredential, xmlPath.getString("AuthnRequest.@ID"),
-                testTargetUrl+spReturnUrl, loa, DEFATTR_FIRST, DEFATTR_FAMILY, DEFATTR_PNO, DEFATTR_DATE, DEFATTR_BIRTH_FIRST, DEFATTR_BIRTH_FAMILY, DEFATTR_BIRTH_PLACE, DEFATTR_ADDR, DEFATTR_GENDER);
+                testTargetDemoUrl+spReturnUrl, loa, DEFATTR_FIRST, DEFATTR_FAMILY, DEFATTR_PNO, DEFATTR_DATE, DEFATTR_BIRTH_FIRST, DEFATTR_BIRTH_FAMILY, DEFATTR_BIRTH_PLACE, DEFATTR_ADDR, DEFATTR_GENDER);
         String stringResponse = OpenSAMLUtils.getXmlString(response);
         validateSamlResponseSignature(stringResponse);
         return new String(Base64.getEncoder().encode(stringResponse.getBytes()));
@@ -328,7 +323,7 @@ public abstract class TestsBase {
         String loa =  xmlPath.getString("AuthnRequest.RequestedAuthnContext.AuthnContextClassRef");
 
         Response response = new ResponseBuilderUtils().buildAuthnResponseWithUnsignedAssertions(signatureCredential, encryptionCredential, xmlPath.getString("AuthnRequest.@ID"),
-                testTargetUrl+spReturnUrl, loa, DEFATTR_FIRST, DEFATTR_FAMILY, DEFATTR_PNO, DEFATTR_DATE);
+                testTargetDemoUrl+spReturnUrl, loa, DEFATTR_FIRST, DEFATTR_FAMILY, DEFATTR_PNO, DEFATTR_DATE);
         String stringResponse = OpenSAMLUtils.getXmlString(response);
         validateSamlResponseSignature(stringResponse);
         return new String(Base64.getEncoder().encode(stringResponse.getBytes()));
@@ -339,7 +334,7 @@ public abstract class TestsBase {
         String loa =  xmlPath.getString("AuthnRequest.RequestedAuthnContext.AuthnContextClassRef");
 
         Response response = new ResponseBuilderUtils().buildAuthnResponseWithoutEncryption(signatureCredential, xmlPath.getString("AuthnRequest.@ID"),
-                testTargetUrl+spReturnUrl, loa, DEFATTR_FIRST, DEFATTR_FAMILY, DEFATTR_PNO, DEFATTR_DATE);
+                testTargetDemoUrl+spReturnUrl, loa, DEFATTR_FIRST, DEFATTR_FAMILY, DEFATTR_PNO, DEFATTR_DATE);
         String stringResponse = OpenSAMLUtils.getXmlString(response);
         validateSamlResponseSignature(stringResponse);
         return new String(Base64.getEncoder().encode(stringResponse.getBytes()));
@@ -350,7 +345,7 @@ public abstract class TestsBase {
         String loa =  xmlPath.getString("AuthnRequest.RequestedAuthnContext.AuthnContextClassRef");
 
         Response response = new ResponseBuilderUtils().buildAuthnResponseWithMixedEncryption(signatureCredential, encryptionCredential, xmlPath.getString("AuthnRequest.@ID"),
-                testTargetUrl+spReturnUrl, loa, DEFATTR_FIRST, DEFATTR_FAMILY, DEFATTR_PNO, DEFATTR_DATE);
+                testTargetDemoUrl+spReturnUrl, loa, DEFATTR_FIRST, DEFATTR_FAMILY, DEFATTR_PNO, DEFATTR_DATE);
         String stringResponse = OpenSAMLUtils.getXmlString(response);
         validateSamlResponseSignature(stringResponse);
         return new String(Base64.getEncoder().encode(stringResponse.getBytes()));
@@ -361,7 +356,7 @@ public abstract class TestsBase {
         String loa =  xmlPath.getString("AuthnRequest.RequestedAuthnContext.AuthnContextClassRef");
 
         Response response = new ResponseBuilderUtils().buildAuthnResponseWithMultipleAssertions(signatureCredential, encryptionCredential, xmlPath.getString("AuthnRequest.@ID"),
-                testTargetUrl+spReturnUrl, loa, DEFATTR_FIRST, DEFATTR_FAMILY, DEFATTR_PNO, DEFATTR_DATE);
+                testTargetDemoUrl+spReturnUrl, loa, DEFATTR_FIRST, DEFATTR_FAMILY, DEFATTR_PNO, DEFATTR_DATE);
         String stringResponse = OpenSAMLUtils.getXmlString(response);
         validateSamlResponseSignature(stringResponse);
         return new String(Base64.getEncoder().encode(stringResponse.getBytes()));
@@ -372,7 +367,7 @@ public abstract class TestsBase {
         String loa =  xmlPath.getString("AuthnRequest.RequestedAuthnContext.AuthnContextClassRef");
 
         Response response = new ResponseBuilderUtils().buildAuthnResponseWithoutStatus(signatureCredential, encryptionCredential, xmlPath.getString("AuthnRequest.@ID"),
-                testTargetUrl+spReturnUrl, loa, DEFATTR_FIRST, DEFATTR_FAMILY, DEFATTR_PNO, DEFATTR_DATE);
+                testTargetDemoUrl+spReturnUrl, loa, DEFATTR_FIRST, DEFATTR_FAMILY, DEFATTR_PNO, DEFATTR_DATE);
         String stringResponse = OpenSAMLUtils.getXmlString(response);
         validateSamlResponseSignature(stringResponse);
         return new String(Base64.getEncoder().encode(stringResponse.getBytes()));
@@ -383,7 +378,7 @@ public abstract class TestsBase {
         String loa =  xmlPath.getString("AuthnRequest.RequestedAuthnContext.AuthnContextClassRef");
 
         Response response = new ResponseBuilderUtils().buildAuthnResponseWithMultipleStatusCode(signatureCredential, encryptionCredential, xmlPath.getString("AuthnRequest.@ID"),
-                testTargetUrl+spReturnUrl, loa, DEFATTR_FIRST, DEFATTR_FAMILY, DEFATTR_PNO, DEFATTR_DATE, statusCodeCnt);
+                testTargetDemoUrl+spReturnUrl, loa, DEFATTR_FIRST, DEFATTR_FAMILY, DEFATTR_PNO, DEFATTR_DATE, statusCodeCnt);
         String stringResponse = OpenSAMLUtils.getXmlString(response);
         validateSamlResponseSignature(stringResponse);
         return new String(Base64.getEncoder().encode(stringResponse.getBytes()));
@@ -393,7 +388,7 @@ public abstract class TestsBase {
         XmlPath xmlPath = getDecodedSamlRequestBodyXml(requestBody);
 
         Response response = new ResponseBuilderUtils().buildAuthnResponse(signatureCredential, encryptionCredential, xmlPath.getString("AuthnRequest.@ID"),
-                testTargetUrl+spReturnUrl, loa, DEFATTR_FIRST, DEFATTR_FAMILY, DEFATTR_PNO, DEFATTR_DATE);
+                testTargetDemoUrl+spReturnUrl, loa, DEFATTR_FIRST, DEFATTR_FAMILY, DEFATTR_PNO, DEFATTR_DATE);
         String stringResponse = OpenSAMLUtils.getXmlString(response);
         validateSamlResponseSignature(stringResponse);
         return new String(Base64.getEncoder().encode(stringResponse.getBytes()));
@@ -403,7 +398,7 @@ public abstract class TestsBase {
         XmlPath xmlPath = getDecodedSamlRequestBodyXml(requestBody);
         String loa =  xmlPath.getString("AuthnRequest.RequestedAuthnContext.AuthnContextClassRef");
         Response response = new ResponseBuilderUtils().buildAuthnResponseWithoutNameID(signatureCredential, encryptionCredential, xmlPath.getString("AuthnRequest.@ID"),
-                testTargetUrl+spReturnUrl, loa, DEFATTR_FIRST, DEFATTR_FAMILY, DEFATTR_PNO, DEFATTR_DATE);
+                testTargetDemoUrl+spReturnUrl, loa, DEFATTR_FIRST, DEFATTR_FAMILY, DEFATTR_PNO, DEFATTR_DATE);
         String stringResponse = OpenSAMLUtils.getXmlString(response);
         validateSamlResponseSignature(stringResponse);
         return new String(Base64.getEncoder().encode(stringResponse.getBytes()));
@@ -413,7 +408,7 @@ public abstract class TestsBase {
         XmlPath xmlPath = getDecodedSamlRequestBodyXml(requestBody);
         String loa =  xmlPath.getString("AuthnRequest.RequestedAuthnContext.AuthnContextClassRef");
         Response response = new ResponseBuilderUtils().buildAuthnResponseWithWrongNameFormat(signatureCredential, encryptionCredential, xmlPath.getString("AuthnRequest.@ID"),
-                testTargetUrl+spReturnUrl, loa, DEFATTR_FIRST, DEFATTR_FAMILY, DEFATTR_PNO, DEFATTR_DATE);
+                testTargetDemoUrl+spReturnUrl, loa, DEFATTR_FIRST, DEFATTR_FAMILY, DEFATTR_PNO, DEFATTR_DATE);
         String stringResponse = OpenSAMLUtils.getXmlString(response);
         validateSamlResponseSignature(stringResponse);
         return new String(Base64.getEncoder().encode(stringResponse.getBytes()));
@@ -422,7 +417,7 @@ public abstract class TestsBase {
     protected String getBase64SamlResponseWithErrors(String requestBody, String error) {
         XmlPath xmlPath = getDecodedSamlRequestBodyXml(requestBody);
         Response response = new ResponseBuilderUtils().buildAuthnResponseWithError(signatureCredential, xmlPath.getString("AuthnRequest.@ID"),
-                testTargetUrl+spReturnUrl, error);
+                testTargetDemoUrl+spReturnUrl, error);
         String stringResponse = OpenSAMLUtils.getXmlString(response);
         validateSamlResponseSignature(stringResponse);
         return new String(Base64.getEncoder().encode(stringResponse.getBytes()));
