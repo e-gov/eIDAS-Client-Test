@@ -309,6 +309,16 @@ public abstract class TestsBase {
         return new String(Base64.getEncoder().encode(stringResponse.getBytes()));
     }
 
+    protected String getBase64SamlResponseDefaultMaximalAttributes(String requestBody) {
+        XmlPath xmlPath = getDecodedSamlRequestBodyXml(requestBody);
+        String loa =  xmlPath.getString("AuthnRequest.RequestedAuthnContext.AuthnContextClassRef");
+        Response response = new ResponseBuilderUtils().buildAuthnResponseWithMaxAttributes(signatureCredential, encryptionCredential, xmlPath.getString("AuthnRequest.@ID"),
+                testTargetUrl+spReturnUrl, loa, DEFATTR_FIRST, DEFATTR_FAMILY, DEFATTR_PNO, DEFATTR_DATE, DEFATTR_BIRTH_FIRST, DEFATTR_BIRTH_FAMILY, DEFATTR_BIRTH_PLACE, DEFATTR_ADDR, DEFATTR_GENDER);
+        String stringResponse = OpenSAMLUtils.getXmlString(response);
+        validateSamlResponseSignature(stringResponse);
+        return new String(Base64.getEncoder().encode(stringResponse.getBytes()));
+    }
+
     protected String getBase64SamlResponseDefaultMinimalAttributes(String requestBody) {
         return getBase64SamlResponseMinimalAttributes(requestBody, DEFATTR_FIRST, DEFATTR_FAMILY, DEFATTR_PNO, DEFATTR_DATE, null );
     }

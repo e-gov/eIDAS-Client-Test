@@ -116,5 +116,4 @@ public class SamlResponseCorrectnessIntegrationTest extends TestsBase {
         assertEquals("500", loginResponse.getString("status"));
         assertEquals("","", loginResponse.getString("message"));
     }
-
 }

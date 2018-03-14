@@ -27,6 +27,21 @@ public class ResponseBuilderUtils extends ResponseAssertionBuilderUtils {
         }
     }
 
+    public Response buildAuthnResponseWithMaxAttributes(Credential signCredential, Credential encCredential, String inResponseId, String recipient, String loa, String givenName, String familyName, String personIdentifier, String dateOfBirth, String birthName, String birthNameFamily, String birthPlace, String address, String gender) {
+        try {
+            Signature signature = prepareSignature(signCredential);
+            DateTime timeNow = new DateTime();
+            Response authnResponse = buildResponseForSigningWithoutAssertion(inResponseId, recipient, timeNow);
+            authnResponse.getEncryptedAssertions().add(buildEncrAssertionWithMaxAttributes(signCredential, encCredential, inResponseId, recipient, timeNow, loa, givenName, familyName, personIdentifier, dateOfBirth, birthName, birthNameFamily, birthPlace, address, gender));
+            authnResponse.setSignature(signature);
+            XMLObjectProviderRegistrySupport.getMarshallerFactory().getMarshaller(authnResponse).marshall(authnResponse);
+            Signer.signObject(signature);
+            return authnResponse;
+        } catch (Exception e) {
+            throw new RuntimeException("SAML error:" + e.getMessage(), e);
+        }
+    }
+
     public Response buildAuthnResponseWithUnsignedAssertions(Credential signCredential, Credential encCredential, String inResponseId, String recipient, String loa, String givenName, String familyName, String personIdentifier, String dateOfBirth) {
         try {
             Signature signature = prepareSignature(signCredential);

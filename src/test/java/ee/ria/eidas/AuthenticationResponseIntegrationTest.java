@@ -32,6 +32,23 @@ public class AuthenticationResponseIntegrationTest extends TestsBase {
         assertEquals("Correct first name is returned", DEFATTR_FIRST, loginResponseJson.getString(STATUS_FIRST));
     }
 
+    @Test //TODO: There is confusion in spec about birth family and first name.
+    public void resp1_validMaximalInputAuthentication() {
+        String base64Response = getBase64SamlResponseDefaultMaximalAttributes(getAuthenticationReqWithDefault());
+        JsonPath loginResponseJson = sendSamlResponse("",base64Response );
+        assertEquals("Expected statusCode: Success", STATUS_SUCCESS, loginResponseJson.getString(STATUS_CODE));
+        assertEquals("Correct loa is returned", LOA_SUBSTANTIAL, loginResponseJson.getString(STATUS_LOA));
+        assertEquals("Correct person idendifier is returned", DEFATTR_PNO, loginResponseJson.getString(STATUS_PNO));
+        assertEquals("Correct date is returned", DEFATTR_DATE, loginResponseJson.getString(STATUS_DATE));
+        assertEquals("Correct family name is returned", DEFATTR_FAMILY, loginResponseJson.getString(STATUS_FAMILY));
+        assertEquals("Correct first name is returned", DEFATTR_FIRST, loginResponseJson.getString(STATUS_FIRST));
+//        assertEquals("Correct birth first name is returned", DEFATTR_BIRTH_FIRST, loginResponseJson.getString(STATUS_BIRTH_FIRST));
+//        assertEquals("Correct birth family name is returned", DEFATTR_BIRTH_FAMILY, loginResponseJson.getString(STATUS_BIRTH_FAMILY));
+        assertEquals("Correct birth place is returned", DEFATTR_BIRTH_PLACE, loginResponseJson.getString(STATUS_BIRTH_PLACE));
+        assertEquals("Correct gender is returned", DEFATTR_GENDER, loginResponseJson.getString(STATUS_GENDER));
+        assertEquals("Correct address is returned", DEFATTR_ADDR, loginResponseJson.getString(STATUS_ADDR));
+    }
+
     //TODO: We do not receive a proper JSON error response yet
     @Ignore
     @Test

@@ -34,6 +34,16 @@ public class ResponseAssertionBuilderUtils extends ResponseBuilderBase {
         return encryptAssertion(assertion, encCredential);
     }
 
+    protected EncryptedAssertion buildEncrAssertionWithMaxAttributes(Credential signCredential, Credential encCredential, String inResponseId, String recipient, DateTime issueInstant, String loa, String givenName, String familyName, String personIdendifier, String dateOfBirth, String birthName, String birthNameFamily, String birthPlace, String address, String gender) throws SecurityException, SignatureException, MarshallingException, EncryptionException {
+        Signature signature = prepareSignature(signCredential);
+        Assertion assertion = buildMaximumAssertionForSigning(inResponseId, recipient ,issueInstant, loa, givenName, familyName, personIdendifier, dateOfBirth, birthName, birthNameFamily, birthPlace, address, gender);
+        assertion.setSignature(signature);
+        XMLObjectProviderRegistrySupport.getMarshallerFactory().getMarshaller(assertion).marshall(assertion);
+        Signer.signObject(signature);
+
+        return encryptAssertion(assertion, encCredential);
+    }
+
     protected Assertion buildAssertionForSigning(String inResponseId, String recipient, DateTime issueInstant, String loa, String givenName, String familyName, String personIdendifier, String dateOfBirth) {
         Assertion assertion = new AssertionBuilder().buildObject();
         assertion.setIssueInstant(issueInstant);
@@ -44,6 +54,19 @@ public class ResponseAssertionBuilderUtils extends ResponseBuilderBase {
         assertion.setConditions(buildConditions(issueInstant));
         assertion.getAuthnStatements().add(buildAuthnStatement(issueInstant,loa));
         assertion.getAttributeStatements().add(buildMinimalAttributeStatement(givenName, familyName, personIdendifier, dateOfBirth));
+        return assertion;
+    }
+
+    protected Assertion buildMaximumAssertionForSigning(String inResponseId, String recipient, DateTime issueInstant, String loa, String givenName, String familyName, String personIdentifier, String dateOfBirth, String birthName, String birthNameFamily, String birthPlace, String address, String gender) {
+        Assertion assertion = new AssertionBuilder().buildObject();
+        assertion.setIssueInstant(issueInstant);
+        assertion.setID(OpenSAMLUtils.generateSecureRandomId());
+        assertion.setVersion(SAMLVersion.VERSION_20);
+        assertion.setIssuer(buildIssuer());
+        assertion.setSubject(buildSubject(inResponseId, recipient, issueInstant, personIdentifier));
+        assertion.setConditions(buildConditions(issueInstant));
+        assertion.getAuthnStatements().add(buildAuthnStatement(issueInstant,loa));
+        assertion.getAttributeStatements().add(buildMaximalAttributeStatement(givenName, familyName, personIdentifier, dateOfBirth, birthName, birthNameFamily, birthPlace, address, gender));
         return assertion;
     }
 
