@@ -199,11 +199,12 @@ public abstract class TestsBase {
 
     protected JsonPath sendSamlResponse(String relayState, String response) {
         return given()
-                .queryParam("relayState",relayState)
-                .queryParam("SAMLResponse", response)
+                .formParam("relayState",relayState)
+                .formParam("SAMLResponse", response)
+                .contentType("application/x-www-form-urlencoded")
                 .config(config().encoderConfig(encoderConfig().defaultContentCharset("UTF-8")))
                 .when()
-                .get(spReturnUrl).then().log().ifError().extract().body().jsonPath();
+                .post(spReturnUrl).then().log().ifError().extract().body().jsonPath();
     }
 
     protected void validateMetadataSignature(String body) {
