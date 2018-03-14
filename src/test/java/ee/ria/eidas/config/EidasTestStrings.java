@@ -20,6 +20,10 @@ public class EidasTestStrings {
     public static final String STATUS_BIRTH_FAMILY = "attributes.???";
     public static final String STATUS_BIRTH_PLACE = "attributes.PlaceOfBirth";
 
+    //JSON error strings
+    public static final String STATUS_ERROR = "error";
+    public static final String STATUS_ERROR_MESSAGE = "message";
+
     //Test data strings
     public static final String DEFATTR_FIRST = "Test-FirstName";
     public static final String DEFATTR_FAMILY = "Test-FamilyName";

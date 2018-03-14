@@ -61,7 +61,7 @@ public class AuthenticationRequestIntegrationTest extends TestsBase {
                 .contentType("application/x-www-form-urlencoded")
                 .config(RestAssured.config().encoderConfig(encoderConfig().defaultContentCharset("UTF-8")))
                 .when()
-                .post(spStartUrl).then().log().ifValidationFails().statusCode(400).body("error", Matchers.equalTo("Invalid country! Valid countries:[EE, CA, CD]"));
+                .post(spStartUrl).then().log().ifValidationFails().statusCode(400).body("error", Matchers.startsWith("Invalid country! Valid countries:["));
 
         given()
                 .formParam("relayState","")
@@ -70,7 +70,7 @@ public class AuthenticationRequestIntegrationTest extends TestsBase {
                 .contentType("application/x-www-form-urlencoded")
                 .config(RestAssured.config().encoderConfig(encoderConfig().defaultContentCharset("UTF-8")))
                 .when()
-                .post(spStartUrl).then().log().ifValidationFails().statusCode(400).body("error", Matchers.equalTo("Invalid country! Valid countries:[EE, CA, CD]"));
+                .post(spStartUrl).then().log().ifValidationFails().statusCode(400).body("error", Matchers.startsWith("Invalid country! Valid countries:["));
 
         XmlPath samlRequest = getDecodedSamlRequestBodyXml(getAuthenticationReq("EE", "HIGH", "relayState"));
         assertEquals("Correct LOA is returned","http://eidas.europa.eu/LoA/high", samlRequest.getString("AuthnRequest.RequestedAuthnContext.AuthnContextClassRef"));
@@ -85,7 +85,7 @@ public class AuthenticationRequestIntegrationTest extends TestsBase {
                 .contentType("application/x-www-form-urlencoded")
                 .config(RestAssured.config().encoderConfig(encoderConfig().defaultContentCharset("UTF-8")))
                 .when()
-                .post(spStartUrl).then().log().ifValidationFails().statusCode(400).body("error", Matchers.equalTo("Invalid country! Valid countries:[EE, CA, CD]"));
+                .post(spStartUrl).then().log().ifValidationFails().statusCode(400).body("error", Matchers.startsWith("Invalid country! Valid countries:["));
 
         XmlPath samlRequest = getDecodedSamlRequestBodyXml(getAuthenticationReq("EE", "HIGH", "relayState"));
         assertEquals("Correct LOA is returned","http://eidas.europa.eu/LoA/high", samlRequest.getString("AuthnRequest.RequestedAuthnContext.AuthnContextClassRef"));

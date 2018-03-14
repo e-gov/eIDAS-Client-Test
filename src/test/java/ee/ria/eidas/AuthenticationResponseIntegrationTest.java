@@ -55,15 +55,15 @@ public class AuthenticationResponseIntegrationTest extends TestsBase {
     public void resp1_authenticationFails() {
         String base64Response = getBase64SamlResponseWithErrors(getAuthenticationReqWithDefault(), "ConsentNotGiven");
         JsonPath loginResponse = sendSamlResponse("",base64Response );
-        assertEquals("saas", loginResponse);
+        assertEquals("User did not give consent, error should be returned","Error of some sort", loginResponse.getString(STATUS_ERROR_MESSAGE));
     }
 
-    @Ignore
+    @Ignore //TODO: There is no minimal attributes check!
     @Test
-    public void resp1_faultyAuthentication() {
+    public void resp1_faultyAuthenticationResponse() {
         String base64Response = getBase64SamlResponseMinimalAttributes(getAuthenticationReqWithDefault(), null,"TestFamily", "TestPNO", "TestDate", null);
         JsonPath loginResponse = sendSamlResponse("",base64Response );
-        assertEquals("saas", loginResponse);
+        assertEquals("Missing required attribute, error should be returned","Error of some sort", loginResponse.getString(STATUS_ERROR_MESSAGE));
     }
 
     @Ignore //TODO: Need a specification for error statuses
@@ -71,7 +71,7 @@ public class AuthenticationResponseIntegrationTest extends TestsBase {
     public void resp3_responseWithLowLoaShouldNotBeAcceptedWhenSubstantialWasRequired() {
         String base64Response = getBase64SamlResponseMinimalAttributes(getAuthenticationReq("CA","SUBSTANTIAL",""), "TestGiven","TestFamily","TestPNO", "TestDate", LOA_LOW);
         JsonPath loginResponseJson = sendSamlResponse("",base64Response );
-        assertEquals("Error message is expected", "", loginResponseJson.getString(STATUS_CODE));
+        assertEquals("Error message is expected", "", loginResponseJson.getString(STATUS_ERROR_MESSAGE));
     }
 
     @Ignore //TODO: Need a specification for error statuses
@@ -79,7 +79,7 @@ public class AuthenticationResponseIntegrationTest extends TestsBase {
     public void resp3_responseWithLowLoaShouldNotBeAcceptedWhenHighWasRequired() {
         String base64Response = getBase64SamlResponseMinimalAttributes(getAuthenticationReq("CA","HIGH",""), "TestGiven","TestFamily","TestPNO", "TestDate", LOA_LOW);
         JsonPath loginResponseJson = sendSamlResponse("",base64Response );
-        assertEquals("Error message is expected", "", loginResponseJson.getString(STATUS_CODE));
+        assertEquals("Error message is expected", "", loginResponseJson.getString(STATUS_ERROR_MESSAGE));
     }
 
     @Ignore //TODO: Need a specification for error statuses
@@ -87,7 +87,7 @@ public class AuthenticationResponseIntegrationTest extends TestsBase {
     public void resp3_responseWithSubstantialLoaShouldNotBeAcceptedWhenHighWasRequired() {
         String base64Response = getBase64SamlResponseMinimalAttributes(getAuthenticationReq("CA","HIGH",""), "TestGiven","TestFamily","TestPNO", "TestDate", LOA_SUBSTANTIAL);
         JsonPath loginResponseJson = sendSamlResponse("",base64Response );
-        assertEquals("Error message is expected", "", loginResponseJson.getString(STATUS_CODE));
+        assertEquals("Error message is expected", "", loginResponseJson.getString(STATUS_ERROR_MESSAGE));
     }
 
     @Test
@@ -136,14 +136,6 @@ public class AuthenticationResponseIntegrationTest extends TestsBase {
         JsonPath loginResponseJson = sendSamlResponse("",base64Response );
         assertEquals("Expected statusCode: Success", STATUS_SUCCESS, loginResponseJson.getString(STATUS_CODE));
         assertEquals("Correct loa is returned", LOA_HIGH, loginResponseJson.getString(STATUS_LOA));
-    }
-
-    @Ignore //TODO: No relay state handling currently implemented
-    @Test
-    public void respX_relayStateChangeShouldReturnError() {
-        String base64Response = getBase64SamlResponseMinimalAttributes(getAuthenticationReq("CA","SUBSTANTIAL","relayState"), "TestGiven","TestFamily","TestPNO", "TestDate", LOA_HIGH);
-        JsonPath loginResponseJson = sendSamlResponse("changedRelayState",base64Response );
-        assertEquals("Expected statusCode: Success", STATUS_SUCCESS, loginResponseJson.getString(STATUS_CODE));
     }
 
     @Ignore //TODO: Inconsistency, this returns method not allowed in this endpoint (without body), others 200

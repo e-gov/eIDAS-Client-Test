@@ -23,16 +23,17 @@ Parameetrite kirjeldus:
 
 | Parameeter | Vaikeväärtus | Vajalik korduvkasutatavatele testidele | Kirjeldus |
 |------------|--------------|----------------------------------------|-----------|
-| test.client.url | http://localhost:8889 | Jah | Testitava klientrakenduse Url ja port |
-| test.client.spMetadataUrl | /metadata | Jah | eIDAS kliendi metaandmete otspunkt |
-| test.client.spStartUrl | /login | Ei | eIDAS kliendi autentimise alustamise otspunkt |
-| test.client.spReturnUrl | /returnUrl | Ei | eIDAS kliendi autentimise vastuse otspunkt |
-| test.client.spProviderName | EIDAS KLIENT DEMO | Jah | eIDAS kliendi nimi mida reklaamitakse metaandmetes |
-| test.node.idpStartUrl | /EidasNode/ServiceProvider |  Ei |eIDAS nodei otspunkt kuhu klient päringu saadab |
-| test.keystore | classpath:samlKeystore.jks | Ei | Võtmehoidla asukoht testides kasutatavate võtmete hoidmiseks |
-| test.keystorePass | changeit | Ei | Võtmehoidla parool |
-| test.node.responseSigningKeyId | test_sign | Ei | Võtmehoidlas oleva võtme alias mida kasutatakse SAML vastuse allkirjastamiseks. eIDAS sõlme vastuse simuleerimiseks |
-| test.node.responseSigningKeyPass | changeit | Ei | Võtme parool |
+| test.client.url | http://localhost:8889 | Jah | Testitava klientrakenduse Url ja port. |
+| test.client.demoUrl | http://localhost:8889 | Ei | Demorakenduse Url ja port. Sama url mis kajastub metateabe otspunktis. |
+| test.client.spMetadataUrl | /metadata | Jah | eIDAS kliendi metaandmete otspunkt. |
+| test.client.spStartUrl | /login | Ei | eIDAS kliendi autentimise alustamise otspunkt. |
+| test.client.spReturnUrl | /returnUrl | Ei | eIDAS kliendi autentimise vastuse otspunkt. |
+| test.client.spProviderName | EIDAS KLIENT DEMO | Jah | eIDAS kliendi nimi mida reklaamitakse metaandmetes. |
+| test.node.idpStartUrl | /EidasNode/ServiceProvider |  Ei |eIDAS nodei otspunkt kuhu klient päringu saadab. |
+| test.keystore | classpath:samlKeystore.jks | Ei | Võtmehoidla asukoht testides kasutatavate võtmete hoidmiseks. |
+| test.keystorePass | changeit | Ei | Võtmehoidla parool. |
+| test.node.responseSigningKeyId | test_sign | Ei | Võtmehoidlas oleva võtme alias mida kasutatakse SAML vastuse allkirjastamiseks. eIDAS sõlme vastuse simuleerimiseks. |
+| test.node.responseSigningKeyPass | changeit | Ei | Võtme parool. |
 
 4. Käivita testid:
 
