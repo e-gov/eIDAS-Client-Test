@@ -21,7 +21,7 @@ import static org.junit.Assert.assertEquals;
 public class SamlResponseCorrectnessIntegrationTest extends TestsBase {
 
     @Test
-    public void saml1_unsignedAssertionMustFailOnPostBinding() {
+    public void resp7_unsignedAssertionMustFailOnPostBinding() {
         String base64Response = getBase64SamlResponseDefaultMinimalAttributesWithoutAssertionSignature(getAuthenticationReqWithDefault());
         JsonPath loginResponse = sendSamlResponse("",base64Response );
         assertEquals("500", loginResponse.getString("status"));
@@ -29,7 +29,7 @@ public class SamlResponseCorrectnessIntegrationTest extends TestsBase {
     }
 
     @Test
-    public void saml1_notEncryptedAssertionMustFail() {
+    public void resp4_notEncryptedAssertionMustFail() {
         String base64Response = getBase64SamlResponseDefaultMinimalAttributesWithoutEncryption(getAuthenticationReqWithDefault());
         JsonPath loginResponse = sendSamlResponse("",base64Response );
         assertEquals("500", loginResponse.getString("status"));
@@ -56,7 +56,7 @@ public class SamlResponseCorrectnessIntegrationTest extends TestsBase {
 
     @Ignore //TODO: Currently NPE is returned
     @Test
-    public void saml1_missingStatusInResponseMustFail() {
+    public void saml2_missingStatusInResponseMustFail() {
         String base64Response = getBase64SamlResponseMinimalAttributesWithoutStatus(getAuthenticationReqWithDefault());
         JsonPath loginResponse = sendSamlResponse("",base64Response );
         assertEquals("500", loginResponse.getString("status"));
@@ -65,7 +65,7 @@ public class SamlResponseCorrectnessIntegrationTest extends TestsBase {
 
     @Ignore //TODO: Currently NPE is returned
     @Test
-    public void saml1_missingStatusCodeInResponseMustFail() {
+    public void saml2_missingStatusCodeInResponseMustFail() {
         String base64Response = getBase64SamlResponseMinimalAttributesWithStatusCodes(getAuthenticationReqWithDefault(), 0);
         JsonPath loginResponse = sendSamlResponse("",base64Response );
         assertEquals("500", loginResponse.getString("status"));
@@ -74,7 +74,7 @@ public class SamlResponseCorrectnessIntegrationTest extends TestsBase {
 
     @Ignore //TODO: Currently this passes, it is unclear what it should do...
     @Test
-    public void saml1_multipleStatusCodesInResponseMustFail() {
+    public void saml2_multipleStatusCodesInResponseMustFail() {
         String base64Response = getBase64SamlResponseMinimalAttributesWithStatusCodes(getAuthenticationReqWithDefault(), 2);
         JsonPath loginResponse = sendSamlResponse("",base64Response );
         assertEquals("500", loginResponse.getString("status"));
@@ -83,7 +83,7 @@ public class SamlResponseCorrectnessIntegrationTest extends TestsBase {
 
     @Ignore //TODO: Currently nameID presence is not checked
     @Test
-    public void saml1_missingNameIdInResponseMustFail() {
+    public void saml2_missingNameIdInResponseMustFail() {
         String base64Response = getBase64SamlResponseMinimalAttributesWithoutNameId(getAuthenticationReqWithDefault());
         JsonPath loginResponse = sendSamlResponse("",base64Response );
         assertEquals("500", loginResponse.getString("status"));
@@ -92,7 +92,7 @@ public class SamlResponseCorrectnessIntegrationTest extends TestsBase {
 
     @Ignore //TODO: Currently the loa format is not checked
     @Test
-    public void saml1_notSupportedLoaInResponseMustFail() {
+    public void saml2_notSupportedLoaInResponseMustFail() {
         String base64Response = getBase64SamlResponseMinimalAttributesWithNotExistingLoa(getAuthenticationReqWithDefault(), "http://eidas.europa.eu/LoA/extreme");
         JsonPath loginResponse = sendSamlResponse("",base64Response );
         assertEquals("500", loginResponse.getString("status"));
@@ -101,7 +101,7 @@ public class SamlResponseCorrectnessIntegrationTest extends TestsBase {
 
     @Ignore //TODO: Currently the loa format is not checked
     @Test
-    public void saml1_emptyLoaInResponseMustFail() {
+    public void saml2_emptyLoaInResponseMustFail() {
         String base64Response = getBase64SamlResponseMinimalAttributesWithNotExistingLoa(getAuthenticationReqWithDefault(), "");
         JsonPath loginResponse = sendSamlResponse("",base64Response );
         assertEquals("500", loginResponse.getString("status"));
@@ -110,10 +110,18 @@ public class SamlResponseCorrectnessIntegrationTest extends TestsBase {
 
     @Ignore //TODO: Currently the format name is not checked
     @Test
-    public void saml1_wrongNameFormatInResponseMustFail() {
+    public void saml2_wrongNameFormatInResponseMustFail() {
         String base64Response = getBase64SamlResponseMinimalAttributesWithWrongNameFormat(getAuthenticationReqWithDefault());
         JsonPath loginResponse = sendSamlResponse("",base64Response );
         assertEquals("500", loginResponse.getString("status"));
         assertEquals("","", loginResponse.getString("message"));
+    }
+
+    @Ignore //TODO: There is no minimal attributes check!
+    @Test
+    public void saml3_faultyAuthenticationResponse() {
+        String base64Response = getBase64SamlResponseMinimalAttributes(getAuthenticationReqWithDefault(), null,"TestFamily", "TestPNO", "TestDate", null);
+        JsonPath loginResponse = sendSamlResponse("",base64Response );
+        assertEquals("Missing required attribute, error should be returned","Error of some sort", loginResponse.getString(STATUS_ERROR_MESSAGE));
     }
 }

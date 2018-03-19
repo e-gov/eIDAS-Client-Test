@@ -49,23 +49,6 @@ public class AuthenticationResponseIntegrationTest extends TestsBase {
         assertEquals("Correct address is returned", DEFATTR_ADDR, loginResponseJson.getString(STATUS_ADDR));
     }
 
-    //TODO: We do not receive a proper JSON error response yet
-    @Ignore
-    @Test
-    public void resp1_authenticationFails() {
-        String base64Response = getBase64SamlResponseWithErrors(getAuthenticationReqWithDefault(), "ConsentNotGiven");
-        JsonPath loginResponse = sendSamlResponse("",base64Response );
-        assertEquals("User did not give consent, error should be returned","Error of some sort", loginResponse.getString(STATUS_ERROR_MESSAGE));
-    }
-
-    @Ignore //TODO: There is no minimal attributes check!
-    @Test
-    public void resp1_faultyAuthenticationResponse() {
-        String base64Response = getBase64SamlResponseMinimalAttributes(getAuthenticationReqWithDefault(), null,"TestFamily", "TestPNO", "TestDate", null);
-        JsonPath loginResponse = sendSamlResponse("",base64Response );
-        assertEquals("Missing required attribute, error should be returned","Error of some sort", loginResponse.getString(STATUS_ERROR_MESSAGE));
-    }
-
     @Ignore //TODO: Need a specification for error statuses
     @Test
     public void resp3_responseWithLowLoaShouldNotBeAcceptedWhenSubstantialWasRequired() {
@@ -138,63 +121,13 @@ public class AuthenticationResponseIntegrationTest extends TestsBase {
         assertEquals("Correct loa is returned", LOA_HIGH, loginResponseJson.getString(STATUS_LOA));
     }
 
-    @Ignore //TODO: Inconsistency, this returns method not allowed in this endpoint (without body), others 200
-    @Test
-    public void resp1_headHttpMethodShouldNotReturnBody() {
-        given()
-                .formParam("relayState","")
-                .formParam("SAMLResponse",getBase64SamlResponseMinimalAttributes(getAuthenticationReqWithDefault(), "TestFamily", "TestGiven", "TestPNO", "TestDate", null))
-                .contentType("application/x-www-form-urlencoded")
-                .config(RestAssured.config().encoderConfig(encoderConfig().defaultContentCharset("UTF-8")))
-                .when()
-                .head(spReturnUrl).then().log().ifValidationFails().statusCode(200).body(isEmptyOrNullString());
-    }
-
+    //TODO: We do not receive a proper JSON error response yet
     @Ignore
     @Test
-    public void resp1_notSupportedHttpPutMethodShouldReturnError() {
-        given()
-                .formParam("relayState","")
-                .formParam("SAMLResponse",getBase64SamlResponseMinimalAttributes(getAuthenticationReqWithDefault(), "TestFamily", "TestGiven", "TestPNO", "TestDate", null))
-                .contentType("application/x-www-form-urlencoded")
-                .config(RestAssured.config().encoderConfig(encoderConfig().defaultContentCharset("UTF-8")))
-                .when()
-                .put(spReturnUrl).then().log().ifValidationFails().statusCode(405).body("error",Matchers.equalTo("Method Not Allowed"));
+    public void resp9_authenticationFails() {
+        String base64Response = getBase64SamlResponseWithErrors(getAuthenticationReqWithDefault(), "ConsentNotGiven");
+        JsonPath loginResponse = sendSamlResponse("",base64Response );
+        assertEquals("User did not give consent, error should be returned","Error of some sort", loginResponse.getString(STATUS_ERROR_MESSAGE));
     }
 
-    @Ignore //TODO: This return HTTP 400 in this endpoint
-    @Test
-    public void resp1_notSupportedHttpGetMethodShouldReturnError() {
-        given()
-                .formParam("relayState","")
-                .formParam("SAMLResponse",getBase64SamlResponseMinimalAttributes(getAuthenticationReqWithDefault(), "TestFamily", "TestGiven", "TestPNO", "TestDate", null))
-                .contentType("application/x-www-form-urlencoded")
-                .config(RestAssured.config().encoderConfig(encoderConfig().defaultContentCharset("UTF-8")))
-                .when()
-                .get(spReturnUrl).then().log().ifValidationFails().statusCode(405).body("error",Matchers.equalTo("Method Not Allowed"));
-    }
-
-    @Ignore
-    @Test
-    public void resp1_notSupportedHttpDeleteMethodShouldReturnError() {
-        given()
-                .formParam("relayState","")
-                .formParam("SAMLResponse",getBase64SamlResponseMinimalAttributes(getAuthenticationReqWithDefault(), "TestFamily", "TestGiven", "TestPNO", "TestDate", null))
-                .contentType("application/x-www-form-urlencoded")
-                .config(RestAssured.config().encoderConfig(encoderConfig().defaultContentCharset("UTF-8")))
-                .when()
-                .delete(spReturnUrl).then().log().ifValidationFails().statusCode(405).body("error",Matchers.equalTo("Method Not Allowed"));
-    }
-
-    @Ignore
-    @Test //TODO: Need clarification what should be returned, currently there is inconsistency between endpoints
-    public void resp1_optionsMethodShouldReturnAllowedMethods() {
-        given()
-                .formParam("relayState","")
-                .formParam("SAMLResponse",getBase64SamlResponseMinimalAttributes(getAuthenticationReqWithDefault(), "TestFamily", "TestGiven", "TestPNO", "TestDate", null))
-                .contentType("application/x-www-form-urlencoded")
-                .config(RestAssured.config().encoderConfig(encoderConfig().defaultContentCharset("UTF-8")))
-                .when()
-                .options(spReturnUrl).then().log().ifValidationFails().statusCode(200).header("Allow",Matchers.equalTo("POST, OPTIONS"));
-    }
 }
