@@ -4,6 +4,7 @@ package ee.ria.eidas;
 import ee.ria.eidas.config.IntegrationTest;
 import io.restassured.RestAssured;
 import io.restassured.path.json.JsonPath;
+import io.restassured.path.xml.XmlPath;
 import org.hamcrest.Matchers;
 import org.junit.Ignore;
 import org.junit.Test;
@@ -112,7 +113,7 @@ public class SamlResponseCorrectnessIntegrationTest extends TestsBase {
     @Test
     public void saml2_wrongNameFormatInResponseMustFail() {
         String base64Response = getBase64SamlResponseMinimalAttributesWithWrongNameFormat(getAuthenticationReqWithDefault());
-        JsonPath loginResponse = sendSamlResponse("",base64Response );
+        JsonPath loginResponse = sendSamlResponse("", base64Response);
         assertEquals("500", loginResponse.getString("status"));
         assertEquals("","", loginResponse.getString("message"));
     }
@@ -121,7 +122,50 @@ public class SamlResponseCorrectnessIntegrationTest extends TestsBase {
     @Test
     public void saml3_faultyAuthenticationResponse() {
         String base64Response = getBase64SamlResponseMinimalAttributes(getAuthenticationReqWithDefault(), null,"TestFamily", "TestPNO", "TestDate", null);
-        JsonPath loginResponse = sendSamlResponse("",base64Response );
+        JsonPath loginResponse = sendSamlResponse("",base64Response);
         assertEquals("Missing required attribute, error should be returned","Error of some sort", loginResponse.getString(STATUS_ERROR_MESSAGE));
+    }
+
+    @Ignore //TODO: Currently there is no replay check!
+    @Test
+    public void saml10_replayAttackShouldReturnError() {
+        String base64Response = getBase64SamlResponseDefaultMinimalAttributes(getAuthenticationReqWithDefault());
+        sendSamlResponse("", base64Response );
+        JsonPath loginResponse = sendSamlResponse("",base64Response);
+        assertEquals("Repeated SAML response should not be accepted","Error of some sort", loginResponse.getString(STATUS_ERROR_MESSAGE));
+    }
+
+    @Ignore //TODO: Currently there is no ID check!
+    @Test
+    public void saml10_wrongInResponseToInResponse() {
+        XmlPath xmlPath = getDecodedSamlRequestBodyXml(getAuthenticationReqWithDefault());
+        String base64Response = getBase64SamlResponseInResponseTo("SomeWrongID", xmlPath.getString("AuthnRequest.@ID"));
+        JsonPath loginResponse = sendSamlResponse("",base64Response);
+        assertEquals("SAML response with unregistered ID should not be accepted","Error of some sort", loginResponse.getString(STATUS_ERROR_MESSAGE));
+    }
+
+    @Ignore //TODO: Currently there is no ID check!
+    @Test
+    public void saml10_wrongInResponseToInSubject() {
+        XmlPath xmlPath = getDecodedSamlRequestBodyXml(getAuthenticationReqWithDefault());
+        String base64Response = getBase64SamlResponseInResponseTo(xmlPath.getString("AuthnRequest.@ID"), "SomeWrongIDForSubject");
+        JsonPath loginResponse = sendSamlResponse("",base64Response);
+        assertEquals("SAML response with unregistered ID should not be accepted","Error of some sort", loginResponse.getString(STATUS_ERROR_MESSAGE));
+    }
+
+    @Ignore //TODO: Currently there is no issuer check!
+    @Test
+    public void saml15_wrongIssuerFormat() {
+        String base64Response = getBase64SamlResponseIssuer(getAuthenticationReqWithDefault(), idpUrl+idpMetadataUrl, "urn:oasis:names:tc:SAML:2.0:format:entity");
+        JsonPath loginResponse = sendSamlResponse("",base64Response);
+        assertEquals("SAML response with wrong issuer name format should not be accepted","Error of some sort", loginResponse.getString(STATUS_ERROR_MESSAGE));
+    }
+
+    @Ignore //TODO: Currently there is no issuer check!
+    @Test
+    public void saml15_wrongIssuerUrl() {
+        String base64Response = getBase64SamlResponseIssuer(getAuthenticationReqWithDefault(), "http://192.32.221.22/metadata", ISSUER_FORMAT);
+        JsonPath loginResponse = sendSamlResponse("",base64Response);
+        assertEquals("SAML response with wrong metadata url should not be accepted","Error of some sort", loginResponse.getString(STATUS_ERROR_MESSAGE));
     }
 }

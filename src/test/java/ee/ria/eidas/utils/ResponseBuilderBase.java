@@ -96,19 +96,19 @@ public class ResponseBuilderBase {
         return status;
     }
 
-    protected Issuer buildIssuer() {
+    protected Issuer buildIssuer(String issuerValue, String issuerFormat) {
         Issuer issuer = new IssuerBuilder().buildObject();
-        issuer.setValue("http://localhost:8080/EidasNode/ConnectorResponderMetadata");
-        issuer.setFormat("urn:oasis:names:tc:SAML:2.0:nameid-format:entity");
+        issuer.setValue(issuerValue);
+        issuer.setFormat(issuerFormat);
         return issuer;
     }
 
-    protected Assertion buildAssertion(String inResponseId, String recipient, DateTime issuInstant, String loa, String personIdentifier) {
+    protected Assertion buildAssertion(String inResponseId, String recipient, DateTime issuInstant, String loa, String personIdentifier, String issuerValue, String issuerFormat) {
         Assertion assertion = new AssertionBuilder().buildObject();
         assertion.setID(OpenSAMLUtils.generateSecureRandomId());
         assertion.setIssueInstant(new DateTime());
         assertion.setVersion(VERSION_20);
-        assertion.setIssuer(buildIssuer());
+        assertion.setIssuer(buildIssuer(issuerValue, issuerFormat));
         assertion.setSubject(buildSubject(inResponseId,recipient, issuInstant, personIdentifier));
         assertion.setConditions(buildConditions(issuInstant));
         assertion.getAuthnStatements().add(buildAuthnStatement(issuInstant, loa));

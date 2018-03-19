@@ -29,6 +29,8 @@ Parameetrite kirjeldus:
 | test.client.spStartUrl | /login | Ei | eIDAS kliendi autentimise alustamise otspunkt. |
 | test.client.spReturnUrl | /returnUrl | Ei | eIDAS kliendi autentimise vastuse otspunkt. |
 | test.client.spProviderName | EIDAS KLIENT DEMO | Jah | eIDAS kliendi nimi mida reklaamitakse metaandmetes. |
+| test.node.idpUrl | http://localhost:8080 |  Ei |eIDAS nodei url ja port. |
+| test.node.idpMetadataUrl | /EidasNode/ConnectorResponderMetadata |  Ei |eIDAS nodei metateabe otspunkt. |
 | test.node.idpStartUrl | /EidasNode/ServiceProvider |  Ei |eIDAS nodei otspunkt kuhu klient päringu saadab. |
 | test.keystore | classpath:samlKeystore.jks | Ei | Võtmehoidla asukoht testides kasutatavate võtmete hoidmiseks. |
 | test.keystorePass | changeit | Ei | Võtmehoidla parool. |

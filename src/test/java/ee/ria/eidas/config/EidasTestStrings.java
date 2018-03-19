@@ -6,6 +6,7 @@ public class EidasTestStrings {
     public static final String LOA_SUBSTANTIAL = "http://eidas.europa.eu/LoA/substantial";
     public static final String LOA_HIGH = "http://eidas.europa.eu/LoA/high";
     public static final String STATUS_SUCCESS = "urn:oasis:names:tc:SAML:2.0:status:Success";
+    public static final String ISSUER_FORMAT = "urn:oasis:names:tc:SAML:2.0:nameid-format:entity";
 
     //JSON response strings
     public static final String STATUS_CODE = "statusCode";

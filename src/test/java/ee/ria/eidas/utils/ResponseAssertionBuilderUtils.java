@@ -24,9 +24,9 @@ import org.opensaml.xmlsec.signature.support.Signer;
 
 public class ResponseAssertionBuilderUtils extends ResponseBuilderBase {
 
-    protected EncryptedAssertion buildEncrAssertion(Credential signCredential, Credential encCredential, String inResponseId, String recipient, DateTime issueInstant, String loa, String givenName, String familyName, String personIdendifier, String dateOfBirth) throws SecurityException, SignatureException, MarshallingException, EncryptionException {
+    protected EncryptedAssertion buildEncrAssertion(Credential signCredential, Credential encCredential, String inResponseId, String recipient, DateTime issueInstant, String loa, String givenName, String familyName, String personIdendifier, String dateOfBirth, String issuerValue, String issuerFormat) throws SecurityException, SignatureException, MarshallingException, EncryptionException {
         Signature signature = prepareSignature(signCredential);
-        Assertion assertion = buildAssertionForSigning(inResponseId, recipient ,issueInstant, loa, givenName, familyName, personIdendifier, dateOfBirth);
+        Assertion assertion = buildAssertionForSigning(inResponseId, recipient ,issueInstant, loa, givenName, familyName, personIdendifier, dateOfBirth, issuerValue, issuerFormat);
         assertion.setSignature(signature);
         XMLObjectProviderRegistrySupport.getMarshallerFactory().getMarshaller(assertion).marshall(assertion);
         Signer.signObject(signature);
@@ -34,9 +34,9 @@ public class ResponseAssertionBuilderUtils extends ResponseBuilderBase {
         return encryptAssertion(assertion, encCredential);
     }
 
-    protected EncryptedAssertion buildEncrAssertionWithMaxAttributes(Credential signCredential, Credential encCredential, String inResponseId, String recipient, DateTime issueInstant, String loa, String givenName, String familyName, String personIdendifier, String dateOfBirth, String birthName, String birthNameFamily, String birthPlace, String address, String gender) throws SecurityException, SignatureException, MarshallingException, EncryptionException {
+    protected EncryptedAssertion buildEncrAssertionWithMaxAttributes(Credential signCredential, Credential encCredential, String inResponseId, String recipient, DateTime issueInstant, String loa, String givenName, String familyName, String personIdendifier, String dateOfBirth, String birthName, String birthNameFamily, String birthPlace, String address, String gender, String issuerValue, String issuerFormat) throws SecurityException, SignatureException, MarshallingException, EncryptionException {
         Signature signature = prepareSignature(signCredential);
-        Assertion assertion = buildMaximumAssertionForSigning(inResponseId, recipient ,issueInstant, loa, givenName, familyName, personIdendifier, dateOfBirth, birthName, birthNameFamily, birthPlace, address, gender);
+        Assertion assertion = buildMaximumAssertionForSigning(inResponseId, recipient ,issueInstant, loa, givenName, familyName, personIdendifier, dateOfBirth, birthName, birthNameFamily, birthPlace, address, gender, issuerValue, issuerFormat);
         assertion.setSignature(signature);
         XMLObjectProviderRegistrySupport.getMarshallerFactory().getMarshaller(assertion).marshall(assertion);
         Signer.signObject(signature);
@@ -44,12 +44,12 @@ public class ResponseAssertionBuilderUtils extends ResponseBuilderBase {
         return encryptAssertion(assertion, encCredential);
     }
 
-    protected Assertion buildAssertionForSigning(String inResponseId, String recipient, DateTime issueInstant, String loa, String givenName, String familyName, String personIdendifier, String dateOfBirth) {
+    protected Assertion buildAssertionForSigning(String inResponseId, String recipient, DateTime issueInstant, String loa, String givenName, String familyName, String personIdendifier, String dateOfBirth, String issuerValue, String issuerFormat) {
         Assertion assertion = new AssertionBuilder().buildObject();
         assertion.setIssueInstant(issueInstant);
         assertion.setID(OpenSAMLUtils.generateSecureRandomId());
         assertion.setVersion(SAMLVersion.VERSION_20);
-        assertion.setIssuer(buildIssuer());
+        assertion.setIssuer(buildIssuer(issuerValue, issuerFormat));
         assertion.setSubject(buildSubject(inResponseId, recipient, issueInstant, personIdendifier));
         assertion.setConditions(buildConditions(issueInstant));
         assertion.getAuthnStatements().add(buildAuthnStatement(issueInstant,loa));
@@ -57,12 +57,12 @@ public class ResponseAssertionBuilderUtils extends ResponseBuilderBase {
         return assertion;
     }
 
-    protected Assertion buildMaximumAssertionForSigning(String inResponseId, String recipient, DateTime issueInstant, String loa, String givenName, String familyName, String personIdentifier, String dateOfBirth, String birthName, String birthNameFamily, String birthPlace, String address, String gender) {
+    protected Assertion buildMaximumAssertionForSigning(String inResponseId, String recipient, DateTime issueInstant, String loa, String givenName, String familyName, String personIdentifier, String dateOfBirth, String birthName, String birthNameFamily, String birthPlace, String address, String gender, String issuerValue, String issuerFormat) {
         Assertion assertion = new AssertionBuilder().buildObject();
         assertion.setIssueInstant(issueInstant);
         assertion.setID(OpenSAMLUtils.generateSecureRandomId());
         assertion.setVersion(SAMLVersion.VERSION_20);
-        assertion.setIssuer(buildIssuer());
+        assertion.setIssuer(buildIssuer(issuerValue, issuerFormat));
         assertion.setSubject(buildSubject(inResponseId, recipient, issueInstant, personIdentifier));
         assertion.setConditions(buildConditions(issueInstant));
         assertion.getAuthnStatements().add(buildAuthnStatement(issueInstant,loa));
@@ -102,14 +102,14 @@ public class ResponseAssertionBuilderUtils extends ResponseBuilderBase {
         return  encryptedAssertion;
     }
 
-    protected EncryptedAssertion buildEncrAssertionWithoutAssertionSignature(Credential encCredential, String inResponseId, String recipient, DateTime issueInstant, String loa, String givenName, String familyName, String personIdendifier, String dateOfBirth) throws SecurityException, SignatureException, MarshallingException, EncryptionException {
-        Assertion assertion = buildAssertionForSigning(inResponseId, recipient ,issueInstant, loa, givenName, familyName, personIdendifier, dateOfBirth);
+    protected EncryptedAssertion buildEncrAssertionWithoutAssertionSignature(Credential encCredential, String inResponseId, String recipient, DateTime issueInstant, String loa, String givenName, String familyName, String personIdendifier, String dateOfBirth, String issuerValue, String issuerFormat) throws EncryptionException {
+        Assertion assertion = buildAssertionForSigning(inResponseId, recipient ,issueInstant, loa, givenName, familyName, personIdendifier, dateOfBirth, issuerValue, issuerFormat);
         return encryptAssertion(assertion, encCredential);
     }
 
-    protected Assertion buildAssertionWithoutEncryption(Credential signCredential, String inResponseId, String recipient, DateTime issueInstant, String loa, String givenName, String familyName, String personIdendifier, String dateOfBirth) throws SecurityException, SignatureException, MarshallingException, EncryptionException {
+    protected Assertion buildAssertionWithoutEncryption(Credential signCredential, String inResponseId, String recipient, DateTime issueInstant, String loa, String givenName, String familyName, String personIdendifier, String dateOfBirth, String issuerValue, String issuerFormat) throws SecurityException, SignatureException, MarshallingException {
         Signature signature = prepareSignature(signCredential);
-        Assertion assertion = buildAssertionForSigning(inResponseId, recipient ,issueInstant, loa, givenName, familyName, personIdendifier, dateOfBirth);
+        Assertion assertion = buildAssertionForSigning(inResponseId, recipient ,issueInstant, loa, givenName, familyName, personIdendifier, dateOfBirth, issuerValue, issuerFormat);
         assertion.setSignature(signature);
         XMLObjectProviderRegistrySupport.getMarshallerFactory().getMarshaller(assertion).marshall(assertion);
         Signer.signObject(signature);
@@ -117,9 +117,9 @@ public class ResponseAssertionBuilderUtils extends ResponseBuilderBase {
         return assertion;
     }
 
-    protected EncryptedAssertion buildEncrAssertionWithoutNameId(Credential signCredential, Credential encCredential, String inResponseId, String recipient, DateTime issueInstant, String loa, String givenName, String familyName, String personIdendifier, String dateOfBirth) throws SecurityException, SignatureException, MarshallingException, EncryptionException {
+    protected EncryptedAssertion buildEncrAssertionWithoutNameId(Credential signCredential, Credential encCredential, String inResponseId, String recipient, DateTime issueInstant, String loa, String givenName, String familyName, String personIdendifier, String dateOfBirth, String issuerValue, String issuerFormat) throws SecurityException, SignatureException, MarshallingException, EncryptionException {
         Signature signature = prepareSignature(signCredential);
-        Assertion assertion = buildAssertionForSigning(inResponseId, recipient ,issueInstant, loa, givenName, familyName, personIdendifier, dateOfBirth);
+        Assertion assertion = buildAssertionForSigning(inResponseId, recipient ,issueInstant, loa, givenName, familyName, personIdendifier, dateOfBirth, issuerValue, issuerFormat);
         assertion.getSubject().setNameID(null);
         assertion.setSignature(signature);
         XMLObjectProviderRegistrySupport.getMarshallerFactory().getMarshaller(assertion).marshall(assertion);
@@ -128,13 +128,13 @@ public class ResponseAssertionBuilderUtils extends ResponseBuilderBase {
         return encryptAssertion(assertion, encCredential);
     }
 
-    protected EncryptedAssertion buildEncrAssertionWithWrongNameFormat(Credential signCredential, Credential encCredential, String inResponseId, String recipient, DateTime issueInstant, String loa, String givenName, String familyName, String personIdendifier, String dateOfBirth) throws SecurityException, SignatureException, MarshallingException, EncryptionException {
+    protected EncryptedAssertion buildEncrAssertionWithWrongNameFormat(Credential signCredential, Credential encCredential, String inResponseId, String recipient, DateTime issueInstant, String loa, String givenName, String familyName, String personIdendifier, String dateOfBirth, String issuerValue, String issuerFormat) throws SecurityException, SignatureException, MarshallingException, EncryptionException {
         Signature signature = prepareSignature(signCredential);
         Assertion assertion = new AssertionBuilder().buildObject();
         assertion.setIssueInstant(issueInstant);
         assertion.setID(OpenSAMLUtils.generateSecureRandomId());
         assertion.setVersion(SAMLVersion.VERSION_20);
-        assertion.setIssuer(buildIssuer());
+        assertion.setIssuer(buildIssuer(issuerValue, issuerFormat));
         assertion.setSubject(buildSubject(inResponseId, recipient, issueInstant, personIdendifier));
         assertion.setConditions(buildConditions(issueInstant));
         assertion.getAuthnStatements().add(buildAuthnStatement(issueInstant,loa));
