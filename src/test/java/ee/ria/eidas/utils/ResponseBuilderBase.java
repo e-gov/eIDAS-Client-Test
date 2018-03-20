@@ -96,19 +96,19 @@ public class ResponseBuilderBase {
         return status;
     }
 
-    protected Issuer buildIssuer(String issuerValue, String issuerFormat) {
+    protected Issuer buildIssuer(String issuerValue) {
         Issuer issuer = new IssuerBuilder().buildObject();
         issuer.setValue(issuerValue);
-        issuer.setFormat(issuerFormat);
+        issuer.setFormat("urn:oasis:names:tc:SAML:2.0:nameid-format:entity");
         return issuer;
     }
 
-    protected Assertion buildAssertion(String inResponseId, String recipient, DateTime issuInstant, Integer acceptableTimeMin, String loa, String personIdentifier, String issuerValue, String issuerFormat, String audienceUri) {
+    protected Assertion buildAssertion(String inResponseId, String recipient, DateTime issuInstant, Integer acceptableTimeMin, String loa, String personIdentifier, String issuerValue, String audienceUri) {
         Assertion assertion = new AssertionBuilder().buildObject();
         assertion.setID(OpenSAMLUtils.generateSecureRandomId());
         assertion.setIssueInstant(issuInstant);
         assertion.setVersion(VERSION_20);
-        assertion.setIssuer(buildIssuer(issuerValue, issuerFormat));
+        assertion.setIssuer(buildIssuer(issuerValue));
         assertion.setSubject(buildSubject(inResponseId,recipient, issuInstant, acceptableTimeMin, personIdentifier));
         assertion.setConditions(buildConditions(audienceUri, issuInstant, acceptableTimeMin));
         assertion.getAuthnStatements().add(buildAuthnStatement(issuInstant, loa));
