@@ -123,6 +123,7 @@ public class SamlResponseCorrectnessIntegrationTest extends TestsBase {
     public void saml3_faultyAuthenticationResponse() {
         String base64Response = getBase64SamlResponseMinimalAttributes(getAuthenticationReqWithDefault(), null,"TestFamily", "TestPNO", "TestDate", null);
         JsonPath loginResponse = sendSamlResponse("",base64Response);
+        assertEquals("400", loginResponse.getString("status"));
         assertEquals("Missing required attribute, error should be returned","Error of some sort", loginResponse.getString(STATUS_ERROR_MESSAGE));
     }
 
@@ -177,6 +178,7 @@ public class SamlResponseCorrectnessIntegrationTest extends TestsBase {
         String base64Response = getBase64SamlResponseDefaultMinimalAttributes(getAuthenticationReqWithDefault());
         sendSamlResponse("", base64Response );
         JsonPath loginResponse = sendSamlResponse("",base64Response);
+        assertEquals("400", loginResponse.getString("status"));
         assertEquals("Repeated SAML response should not be accepted","Error of some sort", loginResponse.getString(STATUS_ERROR_MESSAGE));
     }
 
@@ -186,6 +188,7 @@ public class SamlResponseCorrectnessIntegrationTest extends TestsBase {
         XmlPath xmlPath = getDecodedSamlRequestBodyXml(getAuthenticationReqWithDefault());
         String base64Response = getBase64SamlResponseInResponseTo("SomeWrongID", xmlPath.getString("AuthnRequest.@ID"));
         JsonPath loginResponse = sendSamlResponse("",base64Response);
+        assertEquals("400", loginResponse.getString("status"));
         assertEquals("SAML response with unregistered ID should not be accepted","Error of some sort", loginResponse.getString(STATUS_ERROR_MESSAGE));
     }
 
@@ -195,7 +198,53 @@ public class SamlResponseCorrectnessIntegrationTest extends TestsBase {
         XmlPath xmlPath = getDecodedSamlRequestBodyXml(getAuthenticationReqWithDefault());
         String base64Response = getBase64SamlResponseInResponseTo(xmlPath.getString("AuthnRequest.@ID"), "SomeWrongIDForSubject");
         JsonPath loginResponse = sendSamlResponse("",base64Response);
+        assertEquals("400", loginResponse.getString("status"));
         assertEquals("SAML response with unregistered ID should not be accepted","Error of some sort", loginResponse.getString(STATUS_ERROR_MESSAGE));
+    }
+
+    @Ignore //TODO: Currently there is no check!
+    @Test
+    public void saml11_noAttributeStatementInResponseShouldReturnError() {
+        String base64Response = getBase64SamlResponseWithAttributeCnt(0, getAuthenticationReqWithDefault());
+        JsonPath loginResponse = sendSamlResponse("",base64Response);
+        assertEquals("400", loginResponse.getString("status"));
+        assertEquals("Generic error should be returned", BAD_SAML, loginResponse.getString(STATUS_ERROR_MESSAGE));
+    }
+
+    @Ignore //TODO: Currently there is no check!
+    @Test
+    public void saml11_twoAttributeStatementInResponseShouldReturnError() {
+        String base64Response = getBase64SamlResponseWithAttributeCnt(2, getAuthenticationReqWithDefault());
+        JsonPath loginResponse = sendSamlResponse("",base64Response);
+        assertEquals("400", loginResponse.getString("status"));
+        assertEquals("Generic error should be returned", BAD_SAML, loginResponse.getString(STATUS_ERROR_MESSAGE));
+    }
+
+    @Ignore //TODO: Currently there is no check!
+    @Test
+    public void saml11_noSubjectInResponseShouldReturnError() {
+        String base64Response = getBase64SamlResponseWithoutSubject(getAuthenticationReqWithDefault());
+        JsonPath loginResponse = sendSamlResponse("",base64Response);
+        assertEquals("400", loginResponse.getString("status"));
+        assertEquals("Generic error should be returned", BAD_SAML, loginResponse.getString(STATUS_ERROR_MESSAGE));
+    }
+
+    @Ignore //TODO: Currently there is no check!
+    @Test
+    public void saml11_noAuthnContextInResponseShouldReturnError() {
+        String base64Response = getBase64SamlResponseAuthnContextCnt(getAuthenticationReqWithDefault(), 0);
+        JsonPath loginResponse = sendSamlResponse("",base64Response);
+        assertEquals("400", loginResponse.getString("status"));
+        assertEquals("Generic error should be returned", BAD_SAML, loginResponse.getString(STATUS_ERROR_MESSAGE));
+    }
+
+    @Ignore //TODO: Currently there is no check!
+    @Test
+    public void saml11_twoAuthnContextInResponseShouldReturnError() {
+        String base64Response = getBase64SamlResponseAuthnContextCnt(getAuthenticationReqWithDefault(), 2);
+        JsonPath loginResponse = sendSamlResponse("",base64Response);
+        assertEquals("400", loginResponse.getString("status"));
+        assertEquals("Generic error should be returned", BAD_SAML, loginResponse.getString(STATUS_ERROR_MESSAGE));
     }
 
     @Ignore //TODO: We do not receive a proper JSON error response yet
@@ -221,6 +270,7 @@ public class SamlResponseCorrectnessIntegrationTest extends TestsBase {
     public void saml15_wrongIssuerFormat() {
         String base64Response = getBase64SamlResponseIssuer(getAuthenticationReqWithDefault(), idpUrl+idpMetadataUrl, "urn:oasis:names:tc:SAML:2.0:format:entity");
         JsonPath loginResponse = sendSamlResponse("",base64Response);
+        assertEquals("400", loginResponse.getString("status"));
         assertEquals("SAML response with wrong issuer name format should not be accepted","Error of some sort", loginResponse.getString(STATUS_ERROR_MESSAGE));
     }
 
@@ -229,6 +279,7 @@ public class SamlResponseCorrectnessIntegrationTest extends TestsBase {
     public void saml15_wrongIssuerUrl() {
         String base64Response = getBase64SamlResponseIssuer(getAuthenticationReqWithDefault(), "http://192.32.221.22/metadata", ISSUER_FORMAT);
         JsonPath loginResponse = sendSamlResponse("",base64Response);
+        assertEquals("400", loginResponse.getString("status"));
         assertEquals("SAML response with wrong metadata url should not be accepted","Error of some sort", loginResponse.getString(STATUS_ERROR_MESSAGE));
     }
 
@@ -264,6 +315,7 @@ public class SamlResponseCorrectnessIntegrationTest extends TestsBase {
     public void saml23_noAuthnStatementOnSuccessShouldReturnError() {
         String base64Response = getBase64SamlResponseAuthnStatement(getAuthenticationReqWithDefault(), 0);
         JsonPath loginResponse = sendSamlResponse("",base64Response);
+        assertEquals("400", loginResponse.getString("status"));
         assertEquals("SAML response without AuthnStatement should not be accepted","Error of some sort", loginResponse.getString(STATUS_ERROR_MESSAGE));
     }
 
@@ -272,6 +324,7 @@ public class SamlResponseCorrectnessIntegrationTest extends TestsBase {
     public void saml23_multipleAuthnStatementOnSuccessShouldReturnError() {
         String base64Response = getBase64SamlResponseAuthnStatement(getAuthenticationReqWithDefault(), 2);
         JsonPath loginResponse = sendSamlResponse("",base64Response);
+        assertEquals("400", loginResponse.getString("status"));
         assertEquals("SAML response with multiple AuthnStatement should not be accepted","Error of some sort", loginResponse.getString(STATUS_ERROR_MESSAGE));
     }
 

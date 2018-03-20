@@ -4,8 +4,7 @@ import org.joda.time.DateTime;
 import org.opensaml.core.xml.config.XMLObjectProviderRegistrySupport;
 import org.opensaml.core.xml.io.MarshallingException;
 import org.opensaml.saml.common.SAMLVersion;
-import org.opensaml.saml.saml2.core.Assertion;
-import org.opensaml.saml.saml2.core.EncryptedAssertion;
+import org.opensaml.saml.saml2.core.*;
 import org.opensaml.saml.saml2.core.impl.AssertionBuilder;
 import org.opensaml.saml.saml2.encryption.Encrypter;
 import org.opensaml.security.SecurityException;
@@ -192,4 +191,62 @@ public class ResponseAssertionBuilderUtils extends ResponseBuilderBase {
         return encryptAssertion(assertion, encCredential);
     }
 
+    protected EncryptedAssertion buildEncrAssertionWithAttributeCnt(Integer attributeCnt, Credential signCredential, Credential encCredential, String inResponseId, String recipient, DateTime issueInstant, Integer acceptableTimeMin, String loa, String givenName, String familyName, String personIdendifier, String dateOfBirth, String issuerValue, String issuerFormat, String audienceUri) throws SecurityException, SignatureException, MarshallingException, EncryptionException {
+        Signature signature = prepareSignature(signCredential);
+        Assertion assertion = new AssertionBuilder().buildObject();
+        assertion.setIssueInstant(issueInstant);
+        assertion.setID(OpenSAMLUtils.generateSecureRandomId());
+        assertion.setVersion(SAMLVersion.VERSION_20);
+        assertion.setIssuer(buildIssuer(issuerValue, issuerFormat));
+        assertion.setSubject(buildSubject(inResponseId, recipient, issueInstant, acceptableTimeMin, personIdendifier));
+        assertion.setConditions(buildConditions(audienceUri, issueInstant, acceptableTimeMin));
+        assertion.getAuthnStatements().add(buildAuthnStatement(issueInstant,loa));
+        if (attributeCnt == 1) {
+            assertion.getAttributeStatements().add(buildMinimalAttributeStatement(givenName, familyName, personIdendifier, dateOfBirth));
+        } else if (attributeCnt == 2) {
+            assertion.getAttributeStatements().add(buildMinimalAttributeStatement(givenName, familyName, personIdendifier, dateOfBirth));
+            assertion.getAttributeStatements().add(buildMinimalAttributeStatement(givenName, familyName, personIdendifier, dateOfBirth));
+        }
+
+        assertion.setSignature(signature);
+        XMLObjectProviderRegistrySupport.getMarshallerFactory().getMarshaller(assertion).marshall(assertion);
+        Signer.signObject(signature);
+
+        return encryptAssertion(assertion, encCredential);
+    }
+
+    protected EncryptedAssertion buildEncrAssertionWithoutSubject(Credential signCredential, Credential encCredential, String inResponseId, String recipient, DateTime issueInstant, Integer acceptableTimeMin, String loa, String givenName, String familyName, String personIdendifier, String dateOfBirth, String issuerValue, String issuerFormat, String audienceUri) throws SecurityException, SignatureException, MarshallingException, EncryptionException {
+        Signature signature = prepareSignature(signCredential);
+        Assertion assertion = buildAssertionForSigning(inResponseId, recipient ,issueInstant, acceptableTimeMin, loa, givenName, familyName, personIdendifier, dateOfBirth, issuerValue, issuerFormat, audienceUri);
+        assertion.setSubject(null);
+        assertion.setSignature(signature);
+        XMLObjectProviderRegistrySupport.getMarshallerFactory().getMarshaller(assertion).marshall(assertion);
+        Signer.signObject(signature);
+
+        return encryptAssertion(assertion, encCredential);
+    }
+
+    protected EncryptedAssertion buildEncrAssertionWithAuthnContextCnt(Integer cnt, Credential signCredential, Credential encCredential, String inResponseId, String recipient, DateTime issueInstant, Integer acceptableTimeMin, String loa, String givenName, String familyName, String personIdendifier, String dateOfBirth, String issuerValue, String issuerFormat, String audienceUri) throws SecurityException, SignatureException, MarshallingException, EncryptionException {
+        Signature signature = prepareSignature(signCredential);
+        Assertion assertion = new AssertionBuilder().buildObject();
+        assertion.setIssueInstant(issueInstant);
+        assertion.setID(OpenSAMLUtils.generateSecureRandomId());
+        assertion.setVersion(SAMLVersion.VERSION_20);
+        assertion.setIssuer(buildIssuer(issuerValue, issuerFormat));
+        assertion.setSubject(buildSubject(inResponseId, recipient, issueInstant, acceptableTimeMin, personIdendifier));
+        assertion.setConditions(buildConditions(audienceUri, issueInstant, acceptableTimeMin));
+        if (cnt == 1) {
+            assertion.getAuthnStatements().add(buildAuthnStatement(issueInstant, loa));
+        }
+        else if (cnt == 2) {
+            assertion.getAuthnStatements().add(buildAuthnStatement(issueInstant, loa));
+            assertion.getAuthnStatements().add(buildAuthnStatement(issueInstant, "http://eidas.europa.eu/LoA/low"));
+        }
+        assertion.getAttributeStatements().add(buildMinimalAttributeStatement(givenName, familyName, personIdendifier, dateOfBirth));
+        assertion.setSignature(signature);
+        XMLObjectProviderRegistrySupport.getMarshallerFactory().getMarshaller(assertion).marshall(assertion);
+        Signer.signObject(signature);
+
+        return encryptAssertion(assertion, encCredential);
+    }
 }
