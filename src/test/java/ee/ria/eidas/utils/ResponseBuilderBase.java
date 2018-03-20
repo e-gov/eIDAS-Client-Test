@@ -103,19 +103,19 @@ public class ResponseBuilderBase {
         return issuer;
     }
 
-    protected Assertion buildAssertion(String inResponseId, String recipient, DateTime issuInstant, String loa, String personIdentifier, String issuerValue, String issuerFormat) {
+    protected Assertion buildAssertion(String inResponseId, String recipient, DateTime issuInstant, Integer acceptableTimeMin, String loa, String personIdentifier, String issuerValue, String issuerFormat, String audienceUri) {
         Assertion assertion = new AssertionBuilder().buildObject();
         assertion.setID(OpenSAMLUtils.generateSecureRandomId());
-        assertion.setIssueInstant(new DateTime());
+        assertion.setIssueInstant(issuInstant);
         assertion.setVersion(VERSION_20);
         assertion.setIssuer(buildIssuer(issuerValue, issuerFormat));
-        assertion.setSubject(buildSubject(inResponseId,recipient, issuInstant, personIdentifier));
-        assertion.setConditions(buildConditions(issuInstant));
+        assertion.setSubject(buildSubject(inResponseId,recipient, issuInstant, acceptableTimeMin, personIdentifier));
+        assertion.setConditions(buildConditions(audienceUri, issuInstant, acceptableTimeMin));
         assertion.getAuthnStatements().add(buildAuthnStatement(issuInstant, loa));
         return assertion;
     }
 
-    protected Subject buildSubject(String inResponseId, String recipient, DateTime issueInstant, String personIdentifier) {
+    protected Subject buildSubject(String inResponseId, String recipient, DateTime issueInstant, Integer acceptableTimeMin, String personIdentifier) {
         Subject subject = new SubjectBuilder().buildObject();
         NameID nameID = new NameIDBuilder().buildObject();
         nameID.setValue(personIdentifier);
@@ -125,22 +125,22 @@ public class ResponseBuilderBase {
         SubjectConfirmation subjectConf = new SubjectConfirmationBuilder().buildObject();
         subjectConf.setMethod("urn:oasis:names:tc:SAML:2.0:cm:bearer");
         SubjectConfirmationData subConfData = new SubjectConfirmationDataBuilder().buildObject();
-        subConfData.setAddress("172.24.0.1");
+        subConfData.setAddress("172.24.0.1"); //TODO: this needs to be configurable probably
         subConfData.setInResponseTo(inResponseId);
-        subConfData.setNotOnOrAfter(issueInstant.plusMinutes(5));
+        subConfData.setNotOnOrAfter(issueInstant.plusMinutes(acceptableTimeMin));
         subConfData.setRecipient(recipient);
         subjectConf.setSubjectConfirmationData(subConfData);
         subject.getSubjectConfirmations().add(subjectConf);
         return subject;
     }
 
-    protected Conditions buildConditions(DateTime issueInstant) {
+    protected Conditions buildConditions(String audienceUri, DateTime issueInstant, Integer acceptableTimeMin) {
         Conditions conditions = new ConditionsBuilder().buildObject();
         conditions.setNotBefore(issueInstant);
-        conditions.setNotOnOrAfter(issueInstant.plusMinutes(5));
+        conditions.setNotOnOrAfter(issueInstant.plusMinutes(acceptableTimeMin));
         AudienceRestriction audienceRestriction = new AudienceRestrictionBuilder().buildObject();
         Audience audience = new AudienceBuilder().buildObject();
-        audience.setAudienceURI("http://localhost:8080/SP/metadata");
+        audience.setAudienceURI(audienceUri);
         audienceRestriction.getAudiences().add(audience);
         conditions.getAudienceRestrictions().add(audienceRestriction);
         return conditions;

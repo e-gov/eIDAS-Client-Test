@@ -17,13 +17,15 @@ public class EidasTestStrings {
     public static final String STATUS_FIRST = "attributes.FirstName";
     public static final String STATUS_ADDR = "attributes.CurrentAddress";
     public static final String STATUS_GENDER = "attributes.Gender";
-    public static final String STATUS_BIRTH_FIRST = "attributes.BirthName";
-    public static final String STATUS_BIRTH_FAMILY = "attributes.???";
+    public static final String STATUS_BIRTH_NAME = "attributes.BirthName";
     public static final String STATUS_BIRTH_PLACE = "attributes.PlaceOfBirth";
 
-    //JSON error strings
+    //JSON response error strings
     public static final String STATUS_ERROR = "error";
     public static final String STATUS_ERROR_MESSAGE = "message";
+
+    //JSON response error messages
+    public static final String BAD_SAML = "Bad SAML message";
 
     //Test data strings
     public static final String DEFATTR_FIRST = "Test-FirstName";

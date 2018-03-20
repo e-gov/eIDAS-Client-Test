@@ -120,14 +120,4 @@ public class AuthenticationResponseIntegrationTest extends TestsBase {
         assertEquals("Expected statusCode: Success", STATUS_SUCCESS, loginResponseJson.getString(STATUS_CODE));
         assertEquals("Correct loa is returned", LOA_HIGH, loginResponseJson.getString(STATUS_LOA));
     }
-
-    //TODO: We do not receive a proper JSON error response yet
-    @Ignore
-    @Test
-    public void resp9_authenticationFails() {
-        String base64Response = getBase64SamlResponseWithErrors(getAuthenticationReqWithDefault(), "ConsentNotGiven");
-        JsonPath loginResponse = sendSamlResponse("",base64Response );
-        assertEquals("User did not give consent, error should be returned","Error of some sort", loginResponse.getString(STATUS_ERROR_MESSAGE));
-    }
-
 }

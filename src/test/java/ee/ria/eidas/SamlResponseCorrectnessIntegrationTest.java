@@ -126,6 +126,51 @@ public class SamlResponseCorrectnessIntegrationTest extends TestsBase {
         assertEquals("Missing required attribute, error should be returned","Error of some sort", loginResponse.getString(STATUS_ERROR_MESSAGE));
     }
 
+    @Ignore //TODO: We do not receive a proper JSON error response yet
+    @Test
+    public void saml8_userAuthFailsErrorShouldBeReturned() {
+        String base64Response = getBase64SamlResponseWithErrors(getAuthenticationReqWithDefault(), "AuthFailed");
+        JsonPath loginResponse = sendSamlResponse("",base64Response );
+        assertEquals("401", loginResponse.getString("status"));
+        assertEquals("User did not authenticate, error should be returned","Error of some sort", loginResponse.getString(STATUS_ERROR_MESSAGE));
+    }
+
+    @Ignore //TODO: We do not receive a proper JSON error response yet
+    @Test
+    public void saml8_userConsentNotGiverErrorShouldBeReturned() {
+        String base64Response = getBase64SamlResponseWithErrors(getAuthenticationReqWithDefault(), "ConsentNotGiven");
+        JsonPath loginResponse = sendSamlResponse("",base64Response );
+        assertEquals("401", loginResponse.getString("status"));
+        assertEquals("User did not give consent, error should be returned","Error of some sort", loginResponse.getString(STATUS_ERROR_MESSAGE));
+    }
+
+    @Ignore //TODO: We do not receive a proper JSON error response yet
+    @Test
+    public void saml8_someOtherErrorStatusErrorShouldBeReturned() {
+        String base64Response = getBase64SamlResponseWithErrors(getAuthenticationReqWithDefault(), "SomethingFailed");
+        JsonPath loginResponse = sendSamlResponse("",base64Response );
+        assertEquals("500", loginResponse.getString("status"));
+        assertEquals("Generic error should be returned","Error of some sort", loginResponse.getString(STATUS_ERROR_MESSAGE));
+    }
+
+    @Ignore //TODO: We do not receive a proper JSON error response yet
+    @Test
+    public void saml9_samlResponseIssueInstantFarInPastErrorShouldBeReturned() {
+        String base64Response = getBase64SamlResponseTimeManipulation(getAuthenticationReqWithDefault(), -20, 0,0, 0, 0);
+        JsonPath loginResponse = sendSamlResponse("",base64Response );
+        assertEquals("400", loginResponse.getString("status"));
+        assertEquals("Generic error should be returned", BAD_SAML, loginResponse.getString(STATUS_ERROR_MESSAGE));
+    }
+
+    @Ignore //TODO: We do not receive a proper JSON error response yet
+    @Test
+    public void saml9_samlResponseIssueInstantInFutureErrorShouldBeReturned() {
+        String base64Response = getBase64SamlResponseTimeManipulation(getAuthenticationReqWithDefault(), 20, 0,0, 0, 0);
+        JsonPath loginResponse = sendSamlResponse("",base64Response );
+        assertEquals("400", loginResponse.getString("status"));
+        assertEquals("Generic error should be returned", BAD_SAML, loginResponse.getString(STATUS_ERROR_MESSAGE));
+    }
+
     @Ignore //TODO: Currently there is no replay check!
     @Test
     public void saml10_replayAttackShouldReturnError() {
@@ -153,6 +198,24 @@ public class SamlResponseCorrectnessIntegrationTest extends TestsBase {
         assertEquals("SAML response with unregistered ID should not be accepted","Error of some sort", loginResponse.getString(STATUS_ERROR_MESSAGE));
     }
 
+    @Ignore //TODO: We do not receive a proper JSON error response yet
+    @Test
+    public void saml13_samlAssertionIssueInstantInFarPastErrorShouldBeReturned() {
+        String base64Response = getBase64SamlResponseTimeManipulation(getAuthenticationReqWithDefault(), 0, -20,0, 0, 0);
+        JsonPath loginResponse = sendSamlResponse("",base64Response );
+        assertEquals("400", loginResponse.getString("status"));
+        assertEquals("Generic error should be returned", BAD_SAML, loginResponse.getString(STATUS_ERROR_MESSAGE));
+    }
+
+    @Ignore //TODO: We do not receive a proper JSON error response yet
+    @Test
+    public void saml13_samlAssertionIssueInstantInFutureErrorShouldBeReturned() {
+        String base64Response = getBase64SamlResponseTimeManipulation(getAuthenticationReqWithDefault(), 0, 20,0, 0, 0);
+        JsonPath loginResponse = sendSamlResponse("",base64Response );
+        assertEquals("400", loginResponse.getString("status"));
+        assertEquals("Generic error should be returned", BAD_SAML, loginResponse.getString(STATUS_ERROR_MESSAGE));
+    }
+
     @Ignore //TODO: Currently there is no issuer check!
     @Test
     public void saml15_wrongIssuerFormat() {
@@ -168,4 +231,66 @@ public class SamlResponseCorrectnessIntegrationTest extends TestsBase {
         JsonPath loginResponse = sendSamlResponse("",base64Response);
         assertEquals("SAML response with wrong metadata url should not be accepted","Error of some sort", loginResponse.getString(STATUS_ERROR_MESSAGE));
     }
+
+    @Ignore //TODO: We do not receive a proper JSON error response yet
+    @Test
+    public void saml18_samlSubjectNotOnOrAfterInPastErrorShouldBeReturned() {
+        String base64Response = getBase64SamlResponseTimeManipulation(getAuthenticationReqWithDefault(), 0, 0,-20, 0, 0);
+        JsonPath loginResponse = sendSamlResponse("",base64Response );
+        assertEquals("400", loginResponse.getString("status"));
+        assertEquals("Generic error should be returned", BAD_SAML, loginResponse.getString(STATUS_ERROR_MESSAGE));
+    }
+
+    @Ignore //TODO: We do not receive a proper JSON error response yet
+    @Test
+    public void saml21_samlConditionsNotOnOrAfterInPastErrorShouldBeReturned() {
+        String base64Response = getBase64SamlResponseTimeManipulation(getAuthenticationReqWithDefault(), 0, 0,0, -20, 0);
+        JsonPath loginResponse = sendSamlResponse("",base64Response );
+        assertEquals("400", loginResponse.getString("status"));
+        assertEquals("Generic error should be returned", BAD_SAML, loginResponse.getString(STATUS_ERROR_MESSAGE));
+    }
+
+    @Ignore //TODO: We do not receive a proper JSON error response yet
+    @Test
+    public void saml21_samlConditionsNotBeforeInFutureErrorShouldBeReturned() {
+        String base64Response = getBase64SamlResponseTimeManipulation(getAuthenticationReqWithDefault(), 0, 0,0, 20, 0);
+        JsonPath loginResponse = sendSamlResponse("",base64Response );
+        assertEquals("400", loginResponse.getString("status"));
+        assertEquals("Generic error should be returned", BAD_SAML, loginResponse.getString(STATUS_ERROR_MESSAGE));
+    }
+
+    @Ignore //TODO: Currently there is no check!
+    @Test
+    public void saml23_noAuthnStatementOnSuccessShouldReturnError() {
+        String base64Response = getBase64SamlResponseAuthnStatement(getAuthenticationReqWithDefault(), 0);
+        JsonPath loginResponse = sendSamlResponse("",base64Response);
+        assertEquals("SAML response without AuthnStatement should not be accepted","Error of some sort", loginResponse.getString(STATUS_ERROR_MESSAGE));
+    }
+
+    @Ignore //TODO: Currently there is no check!
+    @Test
+    public void saml23_multipleAuthnStatementOnSuccessShouldReturnError() {
+        String base64Response = getBase64SamlResponseAuthnStatement(getAuthenticationReqWithDefault(), 2);
+        JsonPath loginResponse = sendSamlResponse("",base64Response);
+        assertEquals("SAML response with multiple AuthnStatement should not be accepted","Error of some sort", loginResponse.getString(STATUS_ERROR_MESSAGE));
+    }
+
+    @Ignore //TODO: We do not receive a proper JSON error response yet
+    @Test
+    public void saml24_samlAuthnInstantInFarPastErrorShouldBeReturned() {
+        String base64Response = getBase64SamlResponseTimeManipulation(getAuthenticationReqWithDefault(), 0, 0,0, 0, -20);
+        JsonPath loginResponse = sendSamlResponse("",base64Response );
+        assertEquals("400", loginResponse.getString("status"));
+        assertEquals("Generic error should be returned", BAD_SAML, loginResponse.getString(STATUS_ERROR_MESSAGE));
+    }
+
+    @Ignore //TODO: We do not receive a proper JSON error response yet
+    @Test
+    public void saml24_samlAuthnInstantInFutureErrorShouldBeReturned() {
+        String base64Response = getBase64SamlResponseTimeManipulation(getAuthenticationReqWithDefault(), 0, 0,0, 0, 20);
+        JsonPath loginResponse = sendSamlResponse("",base64Response );
+        assertEquals("400", loginResponse.getString("status"));
+        assertEquals("Generic error should be returned", BAD_SAML, loginResponse.getString(STATUS_ERROR_MESSAGE));
+    }
+
 }
