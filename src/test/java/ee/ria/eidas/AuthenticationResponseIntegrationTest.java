@@ -2,18 +2,13 @@ package ee.ria.eidas;
 
 
 import ee.ria.eidas.config.IntegrationTest;
-import io.restassured.RestAssured;
 import io.restassured.path.json.JsonPath;
-import org.hamcrest.Matchers;
 import org.junit.Ignore;
 import org.junit.Test;
 import org.junit.experimental.categories.Category;
 import org.springframework.boot.test.context.SpringBootTest;
 
 import static ee.ria.eidas.config.EidasTestStrings.*;
-import static io.restassured.RestAssured.given;
-import static io.restassured.config.EncoderConfig.encoderConfig;
-import static org.hamcrest.Matchers.isEmptyOrNullString;
 import static org.junit.Assert.assertEquals;
 
 @SpringBootTest(classes = AuthenticationResponseIntegrationTest.class)
@@ -32,7 +27,7 @@ public class AuthenticationResponseIntegrationTest extends TestsBase {
         assertEquals("Correct first name is returned", DEFATTR_FIRST, loginResponseJson.getString(STATUS_FIRST));
     }
 
-    @Test //TODO: There is confusion in spec about birth family and first name.
+    @Test
     public void resp1_validMaximalInputAuthentication() {
         String base64Response = getBase64SamlResponseDefaultMaximalAttributes(getAuthenticationReqWithDefault());
         JsonPath loginResponseJson = sendSamlResponse("",base64Response );
@@ -42,8 +37,7 @@ public class AuthenticationResponseIntegrationTest extends TestsBase {
         assertEquals("Correct date is returned", DEFATTR_DATE, loginResponseJson.getString(STATUS_DATE));
         assertEquals("Correct family name is returned", DEFATTR_FAMILY, loginResponseJson.getString(STATUS_FAMILY));
         assertEquals("Correct first name is returned", DEFATTR_FIRST, loginResponseJson.getString(STATUS_FIRST));
-//        assertEquals("Correct birth first name is returned", DEFATTR_BIRTH_FIRST, loginResponseJson.getString(STATUS_BIRTH_FIRST));
-//        assertEquals("Correct birth family name is returned", DEFATTR_BIRTH_FAMILY, loginResponseJson.getString(STATUS_BIRTH_FAMILY));
+        assertEquals("Correct birth name is returned", DEFATTR_BIRTH_NAME, loginResponseJson.getString(STATUS_BIRTH_NAME));
         assertEquals("Correct birth place is returned", DEFATTR_BIRTH_PLACE, loginResponseJson.getString(STATUS_BIRTH_PLACE));
         assertEquals("Correct gender is returned", DEFATTR_GENDER, loginResponseJson.getString(STATUS_GENDER));
         assertEquals("Correct address is returned", DEFATTR_ADDR, loginResponseJson.getString(STATUS_ADDR));
@@ -51,7 +45,7 @@ public class AuthenticationResponseIntegrationTest extends TestsBase {
 
     @Ignore //TODO: Need a specification for error statuses
     @Test
-    public void resp3_responseWithLowLoaShouldNotBeAcceptedWhenSubstantialWasRequired() {
+    public void resp4_responseWithLowLoaShouldNotBeAcceptedWhenSubstantialWasRequired() {
         String base64Response = getBase64SamlResponseMinimalAttributes(getAuthenticationReq("CA","SUBSTANTIAL",""), "TestGiven","TestFamily","TestPNO", "TestDate", LOA_LOW);
         JsonPath loginResponseJson = sendSamlResponse("",base64Response );
         assertEquals("Error message is expected", "", loginResponseJson.getString(STATUS_ERROR_MESSAGE));
@@ -59,7 +53,7 @@ public class AuthenticationResponseIntegrationTest extends TestsBase {
 
     @Ignore //TODO: Need a specification for error statuses
     @Test
-    public void resp3_responseWithLowLoaShouldNotBeAcceptedWhenHighWasRequired() {
+    public void resp4_responseWithLowLoaShouldNotBeAcceptedWhenHighWasRequired() {
         String base64Response = getBase64SamlResponseMinimalAttributes(getAuthenticationReq("CA","HIGH",""), "TestGiven","TestFamily","TestPNO", "TestDate", LOA_LOW);
         JsonPath loginResponseJson = sendSamlResponse("",base64Response );
         assertEquals("Error message is expected", "", loginResponseJson.getString(STATUS_ERROR_MESSAGE));
@@ -67,14 +61,14 @@ public class AuthenticationResponseIntegrationTest extends TestsBase {
 
     @Ignore //TODO: Need a specification for error statuses
     @Test
-    public void resp3_responseWithSubstantialLoaShouldNotBeAcceptedWhenHighWasRequired() {
+    public void resp4_responseWithSubstantialLoaShouldNotBeAcceptedWhenHighWasRequired() {
         String base64Response = getBase64SamlResponseMinimalAttributes(getAuthenticationReq("CA","HIGH",""), "TestGiven","TestFamily","TestPNO", "TestDate", LOA_SUBSTANTIAL);
         JsonPath loginResponseJson = sendSamlResponse("",base64Response );
         assertEquals("Error message is expected", "", loginResponseJson.getString(STATUS_ERROR_MESSAGE));
     }
 
     @Test
-    public void resp3_responseWithSameLoaShouldBeAcceptedLow() {
+    public void resp4_responseWithSameLoaShouldBeAcceptedLow() {
         String base64Response = getBase64SamlResponseMinimalAttributes(getAuthenticationReq("CA","LOW",""), "TestGiven","TestFamily","TestPNO", "TestDate", LOA_LOW);
         JsonPath loginResponseJson = sendSamlResponse("",base64Response );
         assertEquals("Expected statusCode: Success", STATUS_SUCCESS, loginResponseJson.getString(STATUS_CODE));
@@ -82,7 +76,7 @@ public class AuthenticationResponseIntegrationTest extends TestsBase {
     }
 
     @Test
-    public void resp3_responseWithSameLoaShouldBeAcceptedSubstantial() {
+    public void resp4_responseWithSameLoaShouldBeAcceptedSubstantial() {
         String base64Response = getBase64SamlResponseMinimalAttributes(getAuthenticationReq("CA","SUBSTANTIAL",""), "TestGiven","TestFamily","TestPNO", "TestDate", LOA_SUBSTANTIAL);
         JsonPath loginResponseJson = sendSamlResponse("",base64Response );
         assertEquals("Expected statusCode: Success", STATUS_SUCCESS, loginResponseJson.getString(STATUS_CODE));
@@ -90,7 +84,7 @@ public class AuthenticationResponseIntegrationTest extends TestsBase {
     }
 
     @Test
-    public void resp3_responseWithSameLoaShouldBeAcceptedHigh() {
+    public void resp4_responseWithSameLoaShouldBeAcceptedHigh() {
         String base64Response = getBase64SamlResponseMinimalAttributes(getAuthenticationReq("CA","HIGH",""), "TestGiven","TestFamily","TestPNO", "TestDate", LOA_HIGH);
         JsonPath loginResponseJson = sendSamlResponse("",base64Response );
         assertEquals("Expected statusCode: Success", STATUS_SUCCESS, loginResponseJson.getString(STATUS_CODE));
@@ -98,7 +92,7 @@ public class AuthenticationResponseIntegrationTest extends TestsBase {
     }
 
     @Test
-    public void resp3_responseWithHigherLoaLowShouldBeAcceptedSubstantial() {
+    public void resp4_responseWithHigherLoaLowShouldBeAcceptedSubstantial() {
         String base64Response = getBase64SamlResponseMinimalAttributes(getAuthenticationReq("CA","LOW",""), "TestGiven","TestFamily","TestPNO", "TestDate", LOA_SUBSTANTIAL);
         JsonPath loginResponseJson = sendSamlResponse("",base64Response );
         assertEquals("Expected statusCode: Success", STATUS_SUCCESS, loginResponseJson.getString(STATUS_CODE));
@@ -106,7 +100,7 @@ public class AuthenticationResponseIntegrationTest extends TestsBase {
     }
 
     @Test
-    public void resp3_responseWithHigherLoaLowShouldBeAcceptedHigh() {
+    public void resp4_responseWithHigherLoaLowShouldBeAcceptedHigh() {
         String base64Response = getBase64SamlResponseMinimalAttributes(getAuthenticationReq("CA","LOW",""), "TestGiven","TestFamily","TestPNO", "TestDate", LOA_HIGH);
         JsonPath loginResponseJson = sendSamlResponse("",base64Response );
         assertEquals("Expected statusCode: Success", STATUS_SUCCESS, loginResponseJson.getString(STATUS_CODE));
@@ -114,7 +108,7 @@ public class AuthenticationResponseIntegrationTest extends TestsBase {
     }
 
     @Test
-    public void resp3_responseWithHigherLoaSubstantialShouldBeAcceptedHigh() {
+    public void resp4_responseWithHigherLoaSubstantialShouldBeAcceptedHigh() {
         String base64Response = getBase64SamlResponseMinimalAttributes(getAuthenticationReq("CA","SUBSTANTIAL",""), "TestGiven","TestFamily","TestPNO", "TestDate", LOA_HIGH);
         JsonPath loginResponseJson = sendSamlResponse("",base64Response );
         assertEquals("Expected statusCode: Success", STATUS_SUCCESS, loginResponseJson.getString(STATUS_CODE));

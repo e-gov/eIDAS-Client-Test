@@ -21,9 +21,8 @@ b) Andes vastavad parameetrid ette testide käivitamisel (kirjeldus testide käi
 
 Parameetrite kirjeldus:
 
-Terminite seletus
-
 **sp** - Service Provider, teenus kes kasutab eIDAS autentimise võrgustikku. Praegusel juhul [eIDAS kliendi demo rakendus](https://github.com/e-gov/eIDAS-Client-demo).
+
 **idp** - Identity Provider, teenus kes pakub autentimist. Praegusel juhul eIDAS sõlm (eIDAS Node).
 
 | Parameeter | Vaikeväärtus | Vajalik korduvkasutatavatele testidele | Kirjeldus |

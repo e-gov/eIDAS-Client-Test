@@ -32,8 +32,7 @@ public class EidasTestStrings {
     public static final String DEFATTR_FAMILY = "Test-FamilyName";
     public static final String DEFATTR_PNO = "EE/CA/30011092212";
     public static final String DEFATTR_DATE = "1900-11-09";
-    public static final String DEFATTR_BIRTH_FIRST = "Test-Birth-FirstName";
-    public static final String DEFATTR_BIRTH_FAMILY = "Test-Birth-FamilyName";
+    public static final String DEFATTR_BIRTH_NAME = "Test-Birth-First-Last-Name";
     public static final String DEFATTR_BIRTH_PLACE = "Country";
     public static final String DEFATTR_ADDR = "Street 1, Flat 3, Village 2, Country7";
     public static final String DEFATTR_GENDER = "Male";
