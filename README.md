@@ -21,22 +21,27 @@ b) Andes vastavad parameetrid ette testide käivitamisel (kirjeldus testide käi
 
 Parameetrite kirjeldus:
 
+Terminite seletus
+
+**sp** - Service Provider, teenus kes kasutab eIDAS autentimise võrgustikku. Praegusel juhul [eIDAS kliendi demo rakendus](https://github.com/e-gov/eIDAS-Client-demo).
+**idp** - Identity Provider, teenus kes pakub autentimist. Praegusel juhul eIDAS sõlm (eIDAS Node).
+
 | Parameeter | Vaikeväärtus | Vajalik korduvkasutatavatele testidele | Kirjeldus |
 |------------|--------------|----------------------------------------|-----------|
-| test.client.url | http://localhost:8889 | Jah | Testitava klientrakenduse Url ja port. |
-| test.client.demoUrl | http://localhost:8889 | Ei | Demorakenduse Url ja port. Sama url mis kajastub metateabe otspunktis. |
-| test.client.spMetadataUrl | /metadata | Jah | eIDAS kliendi metaandmete otspunkt. |
-| test.client.spStartUrl | /login | Ei | eIDAS kliendi autentimise alustamise otspunkt. |
-| test.client.spReturnUrl | /returnUrl | Ei | eIDAS kliendi autentimise vastuse otspunkt. |
-| test.client.spProviderName | EIDAS KLIENT DEMO | Jah | eIDAS kliendi nimi mida reklaamitakse metaandmetes. |
+| test.client.targetUrl | http://localhost:8889 | Jah | Testitava klientrakenduse Url ja port. |
+| test.client.targetSpUrl | http://localhost:8889 | Ei | Teenuse Url ja port. Sama url mis kajastub metateabe otspunktis. |
+| test.client.spMetadataUrl | /metadata | Jah | Teenuse metaandmete otspunkt. |
+| test.client.spStartUrl | /login | Ei | Teenuse autentimise alustamise otspunkt. |
+| test.client.spReturnUrl | /returnUrl | Ei | Teenuse autentimise vastuse otspunkt. |
+| test.client.spProviderName | EIDAS KLIENT DEMO | Jah | Teenuse nimi mida reklaamitakse metaandmetes. |
 | test.client.acceptableTimeDiffMin | 5 | Ei | Vastuses tagastatava kehtivuse ajaperioodi pikkus. Peab olema sünkroonis kliendi seadistustega. |
-| test.node.idpUrl | http://localhost:8080 |  Ei |eIDAS nodei url ja port. |
-| test.node.idpMetadataUrl | /EidasNode/ConnectorResponderMetadata |  Ei |eIDAS nodei metateabe otspunkt. |
-| test.node.idpStartUrl | /EidasNode/ServiceProvider |  Ei |eIDAS nodei otspunkt kuhu klient päringu saadab. |
-| test.keystore | classpath:samlKeystore.jks | Ei | Võtmehoidla asukoht testides kasutatavate võtmete hoidmiseks. |
-| test.keystorePass | changeit | Ei | Võtmehoidla parool. |
-| test.node.responseSigningKeyId | test_sign | Ei | Võtmehoidlas oleva võtme alias mida kasutatakse SAML vastuse allkirjastamiseks. eIDAS sõlme vastuse simuleerimiseks. |
-| test.node.responseSigningKeyPass | changeit | Ei | Võtme parool. |
+| test.client.idpUrl | http://localhost:8080 |  Ei | eIDAS sõlme url ja port. |
+| test.client.idpMetadataUrl | /EidasNode/ConnectorResponderMetadata |  Ei |eIDAS sõlme metateabe otspunkt. |
+| test.client.idpStartUrl  | /EidasNode/ServiceProvider |  Ei | eIDAS sõlme autentimise alustamise otspunkt. |
+| test.client.keystore | classpath:samlKeystore.jks | Ei | Võtmehoidla asukoht testides kasutatavate võtmete hoidmiseks. |
+| test.client.keystorePass | changeit | Ei | Võtmehoidla parool. |
+| test.client.responseSigningKeyId | test_sign | Ei | Võtmehoidlas oleva võtme alias mida kasutatakse SAML vastuse allkirjastamiseks. eIDAS sõlme vastuse simuleerimiseks. |
+| test.client.responseSigningKeyPass | changeit | Ei | Võtme parool. |
 
 4. Käivita testid:
 
@@ -50,7 +55,7 @@ b) Enda eIDAS klient rakenduse testimiseks käivita ainult korduvkasutatavad tes
 
 Testidele parameetrite ette andmine käivitamisel:
 
-`./mvnw clean test -Dtarget.url=http://localhost:1881`
+`./mvnw clean test -Dtest.client.targetUrl=http://localhost:1881`
 
 5. Kontrolli testide tulemusi
 
