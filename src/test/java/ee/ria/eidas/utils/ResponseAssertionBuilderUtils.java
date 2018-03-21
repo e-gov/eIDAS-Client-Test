@@ -6,6 +6,9 @@ import org.opensaml.core.xml.io.MarshallingException;
 import org.opensaml.saml.common.SAMLVersion;
 import org.opensaml.saml.saml2.core.*;
 import org.opensaml.saml.saml2.core.impl.AssertionBuilder;
+import org.opensaml.saml.saml2.core.impl.AudienceBuilder;
+import org.opensaml.saml.saml2.core.impl.AudienceRestrictionBuilder;
+import org.opensaml.saml.saml2.core.impl.ConditionsBuilder;
 import org.opensaml.saml.saml2.encryption.Encrypter;
 import org.opensaml.security.SecurityException;
 import org.opensaml.security.credential.Credential;
@@ -33,9 +36,9 @@ public class ResponseAssertionBuilderUtils extends ResponseBuilderBase {
         return encryptAssertion(assertion, encCredential);
     }
 
-    protected EncryptedAssertion buildEncrAssertionWithMaxAttributes(Credential signCredential, Credential encCredential, String inResponseId, String recipient, DateTime issueInstant, Integer acceptableTimeMin, String loa, String givenName, String familyName, String personIdendifier, String dateOfBirth, String birthName, String birthNameFamily, String birthPlace, String address, String gender, String issuerValue, String audienceUri) throws SecurityException, SignatureException, MarshallingException, EncryptionException {
+    protected EncryptedAssertion buildEncrAssertionWithMaxAttributes(Credential signCredential, Credential encCredential, String inResponseId, String recipient, DateTime issueInstant, Integer acceptableTimeMin, String loa, String givenName, String familyName, String personIdendifier, String dateOfBirth, String birthName, String birthPlace, String address, String gender, String issuerValue, String audienceUri) throws SecurityException, SignatureException, MarshallingException, EncryptionException {
         Signature signature = prepareSignature(signCredential);
-        Assertion assertion = buildMaximumAssertionForSigning(inResponseId, recipient ,issueInstant, acceptableTimeMin, loa, givenName, familyName, personIdendifier, dateOfBirth, birthName, birthNameFamily, birthPlace, address, gender, issuerValue, audienceUri);
+        Assertion assertion = buildMaximumAssertionForSigning(inResponseId, recipient ,issueInstant, acceptableTimeMin, loa, givenName, familyName, personIdendifier, dateOfBirth, birthName, birthPlace, address, gender, issuerValue, audienceUri);
         assertion.setSignature(signature);
         XMLObjectProviderRegistrySupport.getMarshallerFactory().getMarshaller(assertion).marshall(assertion);
         Signer.signObject(signature);
@@ -56,7 +59,7 @@ public class ResponseAssertionBuilderUtils extends ResponseBuilderBase {
         return assertion;
     }
 
-    protected Assertion buildMaximumAssertionForSigning(String inResponseId, String recipient, DateTime issueInstant, Integer acceptableTimeMin, String loa, String givenName, String familyName, String personIdentifier, String dateOfBirth, String birthName, String birthNameFamily, String birthPlace, String address, String gender, String issuerValue, String audienceUri) {
+    protected Assertion buildMaximumAssertionForSigning(String inResponseId, String recipient, DateTime issueInstant, Integer acceptableTimeMin, String loa, String givenName, String familyName, String personIdentifier, String dateOfBirth, String birthName, String birthPlace, String address, String gender, String issuerValue, String audienceUri) {
         Assertion assertion = new AssertionBuilder().buildObject();
         assertion.setIssueInstant(issueInstant);
         assertion.setID(OpenSAMLUtils.generateSecureRandomId());
@@ -65,7 +68,7 @@ public class ResponseAssertionBuilderUtils extends ResponseBuilderBase {
         assertion.setSubject(buildSubject(inResponseId, recipient, issueInstant, acceptableTimeMin, personIdentifier));
         assertion.setConditions(buildConditions(audienceUri, issueInstant, acceptableTimeMin));
         assertion.getAuthnStatements().add(buildAuthnStatement(issueInstant,loa));
-        assertion.getAttributeStatements().add(buildMaximalAttributeStatement(givenName, familyName, personIdentifier, dateOfBirth, birthName, birthNameFamily, birthPlace, address, gender));
+        assertion.getAttributeStatements().add(buildMaximalAttributeStatement(givenName, familyName, personIdentifier, dateOfBirth, birthName, birthPlace, address, gender));
         return assertion;
     }
 
@@ -249,4 +252,47 @@ public class ResponseAssertionBuilderUtils extends ResponseBuilderBase {
 
         return encryptAssertion(assertion, encCredential);
     }
+
+    protected EncryptedAssertion buildEncrAssertionWithAudienceCnt(Integer audienceCnt, Credential signCredential, Credential encCredential, String inResponseId, String recipient, DateTime issueInstant, Integer acceptableTimeMin, String loa, String givenName, String familyName, String personIdendifier, String dateOfBirth, String issuerValue, String audienceUri) throws SecurityException, SignatureException, MarshallingException, EncryptionException {
+        Signature signature = prepareSignature(signCredential);
+        Assertion assertion = new AssertionBuilder().buildObject();
+        assertion.setIssueInstant(issueInstant);
+        assertion.setID(OpenSAMLUtils.generateSecureRandomId());
+        assertion.setVersion(SAMLVersion.VERSION_20);
+        assertion.setIssuer(buildIssuer(issuerValue));
+        assertion.setSubject(buildSubject(inResponseId, recipient, issueInstant, acceptableTimeMin, personIdendifier));
+        assertion.getAuthnStatements().add(buildAuthnStatement(issueInstant, loa));
+        if (audienceCnt == 0) {
+            Conditions conditions = new ConditionsBuilder().buildObject();
+            conditions.setNotBefore(issueInstant);
+            conditions.setNotOnOrAfter(issueInstant.plusMinutes(acceptableTimeMin));
+            AudienceRestriction audienceRestriction = new AudienceRestrictionBuilder().buildObject();
+            conditions.getAudienceRestrictions().add(audienceRestriction);
+            assertion.setConditions(conditions);
+        }
+        else if (audienceCnt == 1) {
+            assertion.setConditions(buildConditions(audienceUri, issueInstant, acceptableTimeMin));
+        }
+        else if (audienceCnt == 2) {
+            Conditions conditions = new ConditionsBuilder().buildObject();
+            conditions.setNotBefore(issueInstant);
+            conditions.setNotOnOrAfter(issueInstant.plusMinutes(acceptableTimeMin));
+            AudienceRestriction audienceRestriction = new AudienceRestrictionBuilder().buildObject();
+            Audience audience = new AudienceBuilder().buildObject();
+            audience.setAudienceURI("someRandomUri");
+            Audience audience2 = new AudienceBuilder().buildObject();
+            audience2.setAudienceURI(audienceUri);
+            audienceRestriction.getAudiences().add(audience2);
+            conditions.getAudienceRestrictions().add(audienceRestriction);
+            assertion.setConditions(conditions);
+        }
+
+        assertion.getAttributeStatements().add(buildMinimalAttributeStatement(givenName, familyName, personIdendifier, dateOfBirth));
+        assertion.setSignature(signature);
+        XMLObjectProviderRegistrySupport.getMarshallerFactory().getMarshaller(assertion).marshall(assertion);
+        Signer.signObject(signature);
+
+        return encryptAssertion(assertion, encCredential);
+    }
+
 }

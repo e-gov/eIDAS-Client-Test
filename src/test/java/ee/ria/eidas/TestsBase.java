@@ -279,7 +279,7 @@ public abstract class TestsBase {
         XmlPath xmlPath = getDecodedSamlRequestBodyXml(requestBody);
         String loa =  xmlPath.getString("AuthnRequest.RequestedAuthnContext.AuthnContextClassRef");
         Response response = new ResponseBuilderUtils().buildAuthnResponseWithMaxAttributes(signatureCredential, encryptionCredential, xmlPath.getString("AuthnRequest.@ID"),
-                testEidasClientProperties.getFullSpReturnUrl(), loa, DEFATTR_FIRST, DEFATTR_FAMILY, DEFATTR_PNO, DEFATTR_DATE, DEFATTR_BIRTH_FIRST, DEFATTR_BIRTH_FAMILY, DEFATTR_BIRTH_PLACE, DEFATTR_ADDR, DEFATTR_GENDER, testEidasClientProperties.getFullIdpMetadataUrl(), testEidasClientProperties.getAcceptableTimeDiffMin(), testEidasClientProperties.getFullSpReturnUrl());
+                testEidasClientProperties.getFullSpReturnUrl(), loa, DEFATTR_FIRST, DEFATTR_FAMILY, DEFATTR_PNO, DEFATTR_DATE, DEFATTR_BIRTH_NAME, DEFATTR_BIRTH_PLACE, DEFATTR_ADDR, DEFATTR_GENDER, testEidasClientProperties.getFullIdpMetadataUrl(), testEidasClientProperties.getAcceptableTimeDiffMin(), testEidasClientProperties.getFullSpReturnUrl());
         String stringResponse = OpenSAMLUtils.getXmlString(response);
         validateSamlResponseSignature(stringResponse);
         return new String(Base64.getEncoder().encode(stringResponse.getBytes()));
@@ -471,6 +471,17 @@ public abstract class TestsBase {
 
         Response response = new ResponseBuilderUtils().buildAuthnResponseWithAuthnContextCnt(authnContextCnt, signatureCredential, encryptionCredential, xmlPath.getString("AuthnRequest.@ID"),
                 testEidasClientProperties.getFullSpReturnUrl(), loa, DEFATTR_FIRST, DEFATTR_FAMILY, DEFATTR_PNO, DEFATTR_DATE, testEidasClientProperties.getFullIdpMetadataUrl() , testEidasClientProperties.getAcceptableTimeDiffMin(), testEidasClientProperties.getFullSpReturnUrl());
+        String stringResponse = OpenSAMLUtils.getXmlString(response);
+        validateSamlResponseSignature(stringResponse);
+        return new String(Base64.getEncoder().encode(stringResponse.getBytes()));
+    }
+
+    protected String getBase64SamlResponseAudienceCnt(String requestBody,  Integer audienceCnt, String audienceUrl) {
+        XmlPath xmlPath = getDecodedSamlRequestBodyXml(requestBody);
+        String loa = xmlPath.getString("AuthnRequest.RequestedAuthnContext.AuthnContextClassRef");
+
+        Response response = new ResponseBuilderUtils().buildAuthnResponseWithAudienceCnt(audienceCnt, signatureCredential, encryptionCredential, xmlPath.getString("AuthnRequest.@ID"),
+                testEidasClientProperties.getFullSpReturnUrl(), loa, DEFATTR_FIRST, DEFATTR_FAMILY, DEFATTR_PNO, DEFATTR_DATE, testEidasClientProperties.getFullIdpMetadataUrl() , testEidasClientProperties.getAcceptableTimeDiffMin(), audienceUrl);
         String stringResponse = OpenSAMLUtils.getXmlString(response);
         validateSamlResponseSignature(stringResponse);
         return new String(Base64.getEncoder().encode(stringResponse.getBytes()));

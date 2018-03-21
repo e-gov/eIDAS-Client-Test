@@ -310,6 +310,37 @@ public class SamlResponseCorrectnessIntegrationTest extends TestsBase {
         assertEquals("Generic error should be returned", BAD_SAML, loginResponse.getString(STATUS_ERROR_MESSAGE));
     }
 
+    @Ignore //TODO: We do not receive a proper JSON error response yet
+    @Test
+    public void saml22_noAudienceInResponseShouldReturnError() {
+        String base64Response = getBase64SamlResponseAudienceCnt(getAuthenticationReqWithDefault(), 0, testEidasClientProperties.getSpReturnUrl());
+        JsonPath loginResponse = sendSamlResponse("",base64Response );
+        assertEquals("400", loginResponse.getString("status"));
+        assertEquals("Generic error should be returned", BAD_SAML, loginResponse.getString(STATUS_ERROR_MESSAGE));
+    }
+
+    @Ignore //TODO: We do not receive a proper JSON error response yet
+    @Test
+    public void saml22_multipleAudienceInResponseShouldPass() {
+        String base64Response = getBase64SamlResponseAudienceCnt(getAuthenticationReqWithDefault(), 2, testEidasClientProperties.getSpReturnUrl());
+        JsonPath loginResponse = sendSamlResponse("",base64Response );
+        assertEquals("Expected statusCode: Success", STATUS_SUCCESS, loginResponse.getString(STATUS_CODE));
+        assertEquals("Correct loa is returned", LOA_SUBSTANTIAL, loginResponse.getString(STATUS_LOA));
+        assertEquals("Correct person idendifier is returned", DEFATTR_PNO, loginResponse.getString(STATUS_PNO));
+        assertEquals("Correct date is returned", DEFATTR_DATE, loginResponse.getString(STATUS_DATE));
+        assertEquals("Correct family name is returned", DEFATTR_FAMILY, loginResponse.getString(STATUS_FAMILY));
+        assertEquals("Correct first name is returned", DEFATTR_FIRST, loginResponse.getString(STATUS_FIRST));
+    }
+
+    @Ignore //TODO: We do not receive a proper JSON error response yet
+    @Test
+    public void saml22_wrongAudienceUrlInResponseShouldReturnError() {
+        String base64Response = getBase64SamlResponseAudienceCnt(getAuthenticationReqWithDefault(), 0, "someRandomUrl");
+        JsonPath loginResponse = sendSamlResponse("",base64Response );
+        assertEquals("400", loginResponse.getString("status"));
+        assertEquals("Generic error should be returned", BAD_SAML, loginResponse.getString(STATUS_ERROR_MESSAGE));
+    }
+
     @Ignore //TODO: Currently there is no check!
     @Test
     public void saml23_noAuthnStatementOnSuccessShouldReturnError() {
