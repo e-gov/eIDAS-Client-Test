@@ -2,10 +2,12 @@ package ee.ria.eidas;
 
 import com.sun.org.apache.xerces.internal.dom.DOMInputImpl;
 import ee.ria.eidas.config.IntegrationTest;
+import ee.ria.eidas.config.TestConfiguration;
 import ee.ria.eidas.utils.OpenSAMLUtils;
 import ee.ria.eidas.utils.ResponseBuilderUtils;
 import ee.ria.eidas.utils.SystemPropertyActiveProfileResolver;
 import ee.ria.eidas.utils.XmlUtils;
+import ee.ria.eidas.config.TestEidasClientProperties;
 import io.restassured.config.XmlConfig;
 import io.restassured.path.json.JsonPath;
 import io.restassured.path.xml.XmlPath;
@@ -30,10 +32,10 @@ import org.opensaml.security.x509.X509Support;
 import org.opensaml.xmlsec.signature.support.SignatureException;
 import org.opensaml.xmlsec.signature.support.SignatureValidator;
 import org.springframework.beans.factory.annotation.Autowired;
-import org.springframework.beans.factory.annotation.Value;
 import org.springframework.core.io.Resource;
 import org.springframework.core.io.ResourceLoader;
 import org.springframework.test.context.ActiveProfiles;
+import org.springframework.test.context.ContextConfiguration;
 import org.springframework.test.context.junit4.SpringRunner;
 import org.w3c.dom.ls.LSInput;
 import org.w3c.dom.ls.LSResourceResolver;
@@ -58,60 +60,22 @@ import static io.restassured.internal.matcher.xml.XmlXsdMatcher.matchesXsdInClas
 
 @RunWith(SpringRunner.class)
 @Category(IntegrationTest.class)
+@ContextConfiguration(classes = TestConfiguration.class)
 @ActiveProfiles( profiles = {"dev"}, resolver = SystemPropertyActiveProfileResolver.class)
 public abstract class TestsBase {
 
     @Autowired
     private ResourceLoader resourceLoader;
 
-    @Value("${test.client.url}")
-    protected String testTargetUrl;
-
-    @Value("${test.client.demoUrl}")
-    protected String testTargetDemoUrl;
-
-    @Value("${test.client.spMetadataUrl}")
-    protected String spMetadataUrl;
-
-    @Value("${test.client.spStartUrl}")
-    protected String spStartUrl;
-
-    @Value("${test.client.spReturnUrl}")
-    protected String spReturnUrl;
-
-    @Value("${test.client.spProviderName}")
-    protected String spProviderName;
-
-    @Value("${test.client.acceptableTimeDiffMin}")
-    protected Integer acceptableTimeDiffMin;
-
-    @Value("${test.keystore}")
-    protected String clientKeystore;
-
-    @Value("${test.keystorePass}")
-    protected String clienKeystorePass;
-
-    @Value("${test.node.responseSigningKeyId}")
-    protected String responseSigningKey;
-
-    @Value("${test.node.responseSigningKeyPass}")
-    protected String responseSigningPass;
-
-    @Value("${test.node.idpUrl}")
-    protected String idpUrl;
-
-    @Value("${test.node.idpMetadataUrl}")
-    protected String idpMetadataUrl;
-
-    @Value("${test.node.idpStartUrl}")
-    protected String idpStartUrl;
+    @Autowired
+    protected TestEidasClientProperties testEidasClientProperties;
 
     protected  Credential signatureCredential;
     protected  Credential encryptionCredential;
 
     @Before
     public void setUp() throws MalformedURLException, InitializationException {
-        URL url = new URL(testTargetUrl);
+        URL url = new URL(testEidasClientProperties.getTargetUrl());
         port = url.getPort();
         baseURI = url.getProtocol() + "://" + url.getHost();
 
@@ -120,9 +84,9 @@ public abstract class TestsBase {
 
         try {
             KeyStore keystore = KeyStore.getInstance(KeyStore.getDefaultType());
-            Resource resource = resourceLoader.getResource(clientKeystore);
-            keystore.load(resource.getInputStream(), clienKeystorePass.toCharArray());
-            signatureCredential = getCredential(keystore, responseSigningKey, responseSigningPass );
+            Resource resource = resourceLoader.getResource(testEidasClientProperties.getKeystore());
+            keystore.load(resource.getInputStream(), testEidasClientProperties.getKeystorePass().toCharArray());
+            signatureCredential = getCredential(keystore, testEidasClientProperties.getResponseSigningKeyId(), testEidasClientProperties.getResponseSigningKeyPass() );
             encryptionCredential = getEncryptionCredentialFromMetaData(getMetadataBody());
         } catch (Exception e) {
             throw new RuntimeException("Something went wrong initializing credentials:", e);
@@ -149,7 +113,7 @@ public abstract class TestsBase {
         return given()
                 .config(config().encoderConfig(encoderConfig().defaultContentCharset("UTF-8")))
                 .when()
-                .get(spMetadataUrl).then().log().ifError().statusCode(200).extract().body().asString();
+                .get(testEidasClientProperties.getSpMetadataUrl()).then().log().ifError().statusCode(200).extract().body().asString();
     }
 
     protected XmlPath getMetadataBodyXML() {
@@ -162,7 +126,7 @@ public abstract class TestsBase {
         given()
         .config(config().xmlConfig(XmlConfig.xmlConfig().disableLoadingOfExternalDtd()))
                 .when()
-                .get(spMetadataUrl)
+                .get(testEidasClientProperties.getSpMetadataUrl())
                 .then().log().ifError()
                 .statusCode(200)
                 .body(matchesXsdInClasspath("SPschema.xsd").using(new ClasspathResourceResolver()));
@@ -195,7 +159,7 @@ public abstract class TestsBase {
                 .queryParam("country",country)
                 .config(config().encoderConfig(encoderConfig().defaultContentCharset("UTF-8")))
                 .when()
-                .get(spStartUrl).then().log().ifError().extract().body().asString();
+                .get(testEidasClientProperties.getSpStartUrl()).then().log().ifError().extract().body().asString();
     }
 
     protected String getAuthenticationReqForm(Map<String,String> values) {
@@ -203,7 +167,7 @@ public abstract class TestsBase {
                 .queryParams(values)
                 .config(config().encoderConfig(encoderConfig().defaultContentCharset("UTF-8")))
                 .when()
-                .get(spStartUrl).then().log().ifError().extract().body().asString();
+                .get(testEidasClientProperties.getSpStartUrl()).then().log().ifError().extract().body().asString();
     }
 
     protected JsonPath sendSamlResponse(String relayState, String response) {
@@ -213,7 +177,7 @@ public abstract class TestsBase {
                 .contentType("application/x-www-form-urlencoded")
                 .config(config().encoderConfig(encoderConfig().defaultContentCharset("UTF-8")))
                 .when()
-                .post(spReturnUrl).then().log().ifError().extract().body().jsonPath();
+                .post(testEidasClientProperties.getSpReturnUrl()).then().log().ifError().extract().body().jsonPath();
     }
 
     protected void validateMetadataSignature(String body) {
@@ -305,7 +269,7 @@ public abstract class TestsBase {
             loa =  xmlPath.getString("AuthnRequest.RequestedAuthnContext.AuthnContextClassRef");
         }
         Response response = new ResponseBuilderUtils().buildAuthnResponse(signatureCredential, encryptionCredential, xmlPath.getString("AuthnRequest.@ID"),
-                testTargetDemoUrl+spReturnUrl, loa, givenName, familyName, personIdentifier, dateOfBirth, idpUrl+idpMetadataUrl, acceptableTimeDiffMin, testTargetDemoUrl+spReturnUrl);
+                testEidasClientProperties.getFullSpReturnUrl(), loa, givenName, familyName, personIdentifier, dateOfBirth, testEidasClientProperties.getFullIdpMetadataUrl(), testEidasClientProperties.getAcceptableTimeDiffMin(), testEidasClientProperties.getFullSpReturnUrl());
         String stringResponse = OpenSAMLUtils.getXmlString(response);
         validateSamlResponseSignature(stringResponse);
         return new String(Base64.getEncoder().encode(stringResponse.getBytes()));
@@ -315,7 +279,7 @@ public abstract class TestsBase {
         XmlPath xmlPath = getDecodedSamlRequestBodyXml(requestBody);
         String loa =  xmlPath.getString("AuthnRequest.RequestedAuthnContext.AuthnContextClassRef");
         Response response = new ResponseBuilderUtils().buildAuthnResponseWithMaxAttributes(signatureCredential, encryptionCredential, xmlPath.getString("AuthnRequest.@ID"),
-                testTargetDemoUrl+spReturnUrl, loa, DEFATTR_FIRST, DEFATTR_FAMILY, DEFATTR_PNO, DEFATTR_DATE, DEFATTR_BIRTH_FIRST, DEFATTR_BIRTH_FAMILY, DEFATTR_BIRTH_PLACE, DEFATTR_ADDR, DEFATTR_GENDER, idpUrl+idpMetadataUrl, acceptableTimeDiffMin, testTargetDemoUrl+spReturnUrl);
+                testEidasClientProperties.getFullSpReturnUrl(), loa, DEFATTR_FIRST, DEFATTR_FAMILY, DEFATTR_PNO, DEFATTR_DATE, DEFATTR_BIRTH_FIRST, DEFATTR_BIRTH_FAMILY, DEFATTR_BIRTH_PLACE, DEFATTR_ADDR, DEFATTR_GENDER, testEidasClientProperties.getFullIdpMetadataUrl(), testEidasClientProperties.getAcceptableTimeDiffMin(), testEidasClientProperties.getFullSpReturnUrl());
         String stringResponse = OpenSAMLUtils.getXmlString(response);
         validateSamlResponseSignature(stringResponse);
         return new String(Base64.getEncoder().encode(stringResponse.getBytes()));
@@ -330,7 +294,7 @@ public abstract class TestsBase {
         String loa =  xmlPath.getString("AuthnRequest.RequestedAuthnContext.AuthnContextClassRef");
 
         Response response = new ResponseBuilderUtils().buildAuthnResponseWithUnsignedAssertions(signatureCredential, encryptionCredential, xmlPath.getString("AuthnRequest.@ID"),
-                testTargetDemoUrl+spReturnUrl, loa, DEFATTR_FIRST, DEFATTR_FAMILY, DEFATTR_PNO, DEFATTR_DATE, idpUrl+idpMetadataUrl, acceptableTimeDiffMin, testTargetDemoUrl+spReturnUrl);
+                testEidasClientProperties.getFullSpReturnUrl(), loa, DEFATTR_FIRST, DEFATTR_FAMILY, DEFATTR_PNO, DEFATTR_DATE, testEidasClientProperties.getFullIdpMetadataUrl(), testEidasClientProperties.getAcceptableTimeDiffMin(), testEidasClientProperties.getFullSpReturnUrl());
         String stringResponse = OpenSAMLUtils.getXmlString(response);
         validateSamlResponseSignature(stringResponse);
         return new String(Base64.getEncoder().encode(stringResponse.getBytes()));
@@ -341,7 +305,7 @@ public abstract class TestsBase {
         String loa =  xmlPath.getString("AuthnRequest.RequestedAuthnContext.AuthnContextClassRef");
 
         Response response = new ResponseBuilderUtils().buildAuthnResponseWithoutEncryption(signatureCredential, xmlPath.getString("AuthnRequest.@ID"),
-                testTargetDemoUrl+spReturnUrl, loa, DEFATTR_FIRST, DEFATTR_FAMILY, DEFATTR_PNO, DEFATTR_DATE, idpUrl+idpMetadataUrl, acceptableTimeDiffMin, testTargetDemoUrl+spReturnUrl);
+                testEidasClientProperties.getFullSpReturnUrl(), loa, DEFATTR_FIRST, DEFATTR_FAMILY, DEFATTR_PNO, DEFATTR_DATE, testEidasClientProperties.getFullIdpMetadataUrl(), testEidasClientProperties.getAcceptableTimeDiffMin(), testEidasClientProperties.getFullSpReturnUrl());
         String stringResponse = OpenSAMLUtils.getXmlString(response);
         validateSamlResponseSignature(stringResponse);
         return new String(Base64.getEncoder().encode(stringResponse.getBytes()));
@@ -352,7 +316,7 @@ public abstract class TestsBase {
         String loa =  xmlPath.getString("AuthnRequest.RequestedAuthnContext.AuthnContextClassRef");
 
         Response response = new ResponseBuilderUtils().buildAuthnResponseWithMixedEncryption(signatureCredential, encryptionCredential, xmlPath.getString("AuthnRequest.@ID"),
-                testTargetDemoUrl+spReturnUrl, loa, DEFATTR_FIRST, DEFATTR_FAMILY, DEFATTR_PNO, DEFATTR_DATE, idpUrl+idpMetadataUrl, acceptableTimeDiffMin, testTargetDemoUrl+spReturnUrl);
+                testEidasClientProperties.getFullSpReturnUrl(), loa, DEFATTR_FIRST, DEFATTR_FAMILY, DEFATTR_PNO, DEFATTR_DATE, testEidasClientProperties.getFullIdpMetadataUrl(), testEidasClientProperties.getAcceptableTimeDiffMin(), testEidasClientProperties.getFullSpReturnUrl());
         String stringResponse = OpenSAMLUtils.getXmlString(response);
         validateSamlResponseSignature(stringResponse);
         return new String(Base64.getEncoder().encode(stringResponse.getBytes()));
@@ -363,7 +327,7 @@ public abstract class TestsBase {
         String loa =  xmlPath.getString("AuthnRequest.RequestedAuthnContext.AuthnContextClassRef");
 
         Response response = new ResponseBuilderUtils().buildAuthnResponseWithMultipleAssertions(signatureCredential, encryptionCredential, xmlPath.getString("AuthnRequest.@ID"),
-                testTargetDemoUrl+spReturnUrl, loa, DEFATTR_FIRST, DEFATTR_FAMILY, DEFATTR_PNO, DEFATTR_DATE, idpUrl+idpMetadataUrl, acceptableTimeDiffMin, testTargetDemoUrl+spReturnUrl);
+                testEidasClientProperties.getFullSpReturnUrl(), loa, DEFATTR_FIRST, DEFATTR_FAMILY, DEFATTR_PNO, DEFATTR_DATE, testEidasClientProperties.getFullIdpMetadataUrl(), testEidasClientProperties.getAcceptableTimeDiffMin(), testEidasClientProperties.getFullSpReturnUrl());
         String stringResponse = OpenSAMLUtils.getXmlString(response);
         validateSamlResponseSignature(stringResponse);
         return new String(Base64.getEncoder().encode(stringResponse.getBytes()));
@@ -374,7 +338,7 @@ public abstract class TestsBase {
         String loa =  xmlPath.getString("AuthnRequest.RequestedAuthnContext.AuthnContextClassRef");
 
         Response response = new ResponseBuilderUtils().buildAuthnResponseWithoutStatus(signatureCredential, encryptionCredential, xmlPath.getString("AuthnRequest.@ID"),
-                testTargetDemoUrl+spReturnUrl, loa, DEFATTR_FIRST, DEFATTR_FAMILY, DEFATTR_PNO, DEFATTR_DATE, idpUrl+idpMetadataUrl, acceptableTimeDiffMin, testTargetDemoUrl+spReturnUrl);
+                testEidasClientProperties.getFullSpReturnUrl(), loa, DEFATTR_FIRST, DEFATTR_FAMILY, DEFATTR_PNO, DEFATTR_DATE, testEidasClientProperties.getFullIdpMetadataUrl(), testEidasClientProperties.getAcceptableTimeDiffMin(), testEidasClientProperties.getFullSpReturnUrl());
         String stringResponse = OpenSAMLUtils.getXmlString(response);
         validateSamlResponseSignature(stringResponse);
         return new String(Base64.getEncoder().encode(stringResponse.getBytes()));
@@ -385,7 +349,7 @@ public abstract class TestsBase {
         String loa =  xmlPath.getString("AuthnRequest.RequestedAuthnContext.AuthnContextClassRef");
 
         Response response = new ResponseBuilderUtils().buildAuthnResponseWithMultipleStatusCode(signatureCredential, encryptionCredential, xmlPath.getString("AuthnRequest.@ID"),
-                testTargetDemoUrl+spReturnUrl, loa, DEFATTR_FIRST, DEFATTR_FAMILY, DEFATTR_PNO, DEFATTR_DATE, statusCodeCnt, idpUrl+idpMetadataUrl, acceptableTimeDiffMin, testTargetDemoUrl+spReturnUrl);
+                testEidasClientProperties.getFullSpReturnUrl(), loa, DEFATTR_FIRST, DEFATTR_FAMILY, DEFATTR_PNO, DEFATTR_DATE, statusCodeCnt, testEidasClientProperties.getFullIdpMetadataUrl(), testEidasClientProperties.getAcceptableTimeDiffMin(), testEidasClientProperties.getFullSpReturnUrl());
         String stringResponse = OpenSAMLUtils.getXmlString(response);
         validateSamlResponseSignature(stringResponse);
         return new String(Base64.getEncoder().encode(stringResponse.getBytes()));
@@ -395,7 +359,7 @@ public abstract class TestsBase {
         XmlPath xmlPath = getDecodedSamlRequestBodyXml(requestBody);
 
         Response response = new ResponseBuilderUtils().buildAuthnResponse(signatureCredential, encryptionCredential, xmlPath.getString("AuthnRequest.@ID"),
-                testTargetDemoUrl+spReturnUrl, loa, DEFATTR_FIRST, DEFATTR_FAMILY, DEFATTR_PNO, DEFATTR_DATE, idpUrl+idpMetadataUrl, acceptableTimeDiffMin, testTargetDemoUrl+spReturnUrl);
+                testEidasClientProperties.getFullSpReturnUrl(), loa, DEFATTR_FIRST, DEFATTR_FAMILY, DEFATTR_PNO, DEFATTR_DATE, testEidasClientProperties.getFullIdpMetadataUrl(), testEidasClientProperties.getAcceptableTimeDiffMin(), testEidasClientProperties.getFullSpReturnUrl());
         String stringResponse = OpenSAMLUtils.getXmlString(response);
         validateSamlResponseSignature(stringResponse);
         return new String(Base64.getEncoder().encode(stringResponse.getBytes()));
@@ -405,7 +369,7 @@ public abstract class TestsBase {
         XmlPath xmlPath = getDecodedSamlRequestBodyXml(requestBody);
         String loa =  xmlPath.getString("AuthnRequest.RequestedAuthnContext.AuthnContextClassRef");
         Response response = new ResponseBuilderUtils().buildAuthnResponseWithoutNameID(signatureCredential, encryptionCredential, xmlPath.getString("AuthnRequest.@ID"),
-                testTargetDemoUrl+spReturnUrl, loa, DEFATTR_FIRST, DEFATTR_FAMILY, DEFATTR_PNO, DEFATTR_DATE,idpUrl+idpMetadataUrl, acceptableTimeDiffMin, testTargetDemoUrl+spReturnUrl);
+                testEidasClientProperties.getFullSpReturnUrl(), loa, DEFATTR_FIRST, DEFATTR_FAMILY, DEFATTR_PNO, DEFATTR_DATE,testEidasClientProperties.getFullIdpMetadataUrl(), testEidasClientProperties.getAcceptableTimeDiffMin(), testEidasClientProperties.getFullSpReturnUrl());
         String stringResponse = OpenSAMLUtils.getXmlString(response);
         validateSamlResponseSignature(stringResponse);
         return new String(Base64.getEncoder().encode(stringResponse.getBytes()));
@@ -415,7 +379,7 @@ public abstract class TestsBase {
         XmlPath xmlPath = getDecodedSamlRequestBodyXml(requestBody);
         String loa =  xmlPath.getString("AuthnRequest.RequestedAuthnContext.AuthnContextClassRef");
         Response response = new ResponseBuilderUtils().buildAuthnResponseWithWrongNameFormat(signatureCredential, encryptionCredential, xmlPath.getString("AuthnRequest.@ID"),
-                testTargetDemoUrl+spReturnUrl, loa, DEFATTR_FIRST, DEFATTR_FAMILY, DEFATTR_PNO, DEFATTR_DATE, idpUrl+idpMetadataUrl, acceptableTimeDiffMin, testTargetDemoUrl+spReturnUrl);
+                testEidasClientProperties.getFullSpReturnUrl(), loa, DEFATTR_FIRST, DEFATTR_FAMILY, DEFATTR_PNO, DEFATTR_DATE, testEidasClientProperties.getFullIdpMetadataUrl(), testEidasClientProperties.getAcceptableTimeDiffMin(), testEidasClientProperties.getFullSpReturnUrl());
         String stringResponse = OpenSAMLUtils.getXmlString(response);
         validateSamlResponseSignature(stringResponse);
         return new String(Base64.getEncoder().encode(stringResponse.getBytes()));
@@ -424,7 +388,7 @@ public abstract class TestsBase {
     protected String getBase64SamlResponseWithErrors(String requestBody, String error) {
         XmlPath xmlPath = getDecodedSamlRequestBodyXml(requestBody);
         Response response = new ResponseBuilderUtils().buildAuthnResponseWithError(signatureCredential, xmlPath.getString("AuthnRequest.@ID"),
-                testTargetDemoUrl+spReturnUrl, error, idpUrl+idpMetadataUrl, acceptableTimeDiffMin, testTargetDemoUrl+spReturnUrl);
+                testEidasClientProperties.getFullSpReturnUrl(), error, testEidasClientProperties.getFullIdpMetadataUrl(), testEidasClientProperties.getAcceptableTimeDiffMin(), testEidasClientProperties.getFullSpReturnUrl());
         String stringResponse = OpenSAMLUtils.getXmlString(response);
         validateSamlResponseSignature(stringResponse);
         return new String(Base64.getEncoder().encode(stringResponse.getBytes()));
@@ -440,7 +404,7 @@ public abstract class TestsBase {
 
     protected String getBase64SamlResponseInResponseTo(String inResponseToResponse, String inResponseToSubject) {
         Response response = new ResponseBuilderUtils().buildAuthnResponseWithInResponseTo(signatureCredential, encryptionCredential, inResponseToResponse, inResponseToSubject,
-                testTargetDemoUrl+spReturnUrl, LOA_SUBSTANTIAL, DEFATTR_FIRST, DEFATTR_FAMILY, DEFATTR_PNO, DEFATTR_DATE,idpUrl+idpMetadataUrl, acceptableTimeDiffMin, testTargetDemoUrl+spReturnUrl);
+                testEidasClientProperties.getFullSpReturnUrl(), LOA_SUBSTANTIAL, DEFATTR_FIRST, DEFATTR_FAMILY, DEFATTR_PNO, DEFATTR_DATE,testEidasClientProperties.getFullIdpMetadataUrl(), testEidasClientProperties.getAcceptableTimeDiffMin(), testEidasClientProperties.getFullSpReturnUrl());
         String stringResponse = OpenSAMLUtils.getXmlString(response);
         validateSamlResponseSignature(stringResponse);
         return new String(Base64.getEncoder().encode(stringResponse.getBytes()));
@@ -451,7 +415,7 @@ public abstract class TestsBase {
         String loa = xmlPath.getString("AuthnRequest.RequestedAuthnContext.AuthnContextClassRef");
 
         Response response = new ResponseBuilderUtils().buildAuthnResponseWithIssuer(signatureCredential, encryptionCredential, xmlPath.getString("AuthnRequest.@ID"),
-                testTargetDemoUrl + spReturnUrl, loa, DEFATTR_FIRST, DEFATTR_FAMILY, DEFATTR_PNO, DEFATTR_DATE, issuerValue, issuerFormat, acceptableTimeDiffMin, testTargetDemoUrl+spReturnUrl);
+                testEidasClientProperties.getFullSpReturnUrl(), loa, DEFATTR_FIRST, DEFATTR_FAMILY, DEFATTR_PNO, DEFATTR_DATE, issuerValue, issuerFormat, testEidasClientProperties.getAcceptableTimeDiffMin(), testEidasClientProperties.getFullSpReturnUrl());
         String stringResponse = OpenSAMLUtils.getXmlString(response);
         validateSamlResponseSignature(stringResponse);
         return new String(Base64.getEncoder().encode(stringResponse.getBytes()));
@@ -462,7 +426,7 @@ public abstract class TestsBase {
         String loa = xmlPath.getString("AuthnRequest.RequestedAuthnContext.AuthnContextClassRef");
 
         Response response = new ResponseBuilderUtils().buildAuthnResponseWithAuthnStatement(cnt, signatureCredential, encryptionCredential, xmlPath.getString("AuthnRequest.@ID"),
-                testTargetDemoUrl + spReturnUrl, loa, DEFATTR_FIRST, DEFATTR_FAMILY, DEFATTR_PNO, DEFATTR_DATE, idpUrl+idpMetadataUrl , acceptableTimeDiffMin, testTargetDemoUrl+spReturnUrl);
+                testEidasClientProperties.getFullSpReturnUrl(), loa, DEFATTR_FIRST, DEFATTR_FAMILY, DEFATTR_PNO, DEFATTR_DATE, testEidasClientProperties.getFullIdpMetadataUrl() , testEidasClientProperties.getAcceptableTimeDiffMin(), testEidasClientProperties.getFullSpReturnUrl());
         String stringResponse = OpenSAMLUtils.getXmlString(response);
         validateSamlResponseSignature(stringResponse);
         return new String(Base64.getEncoder().encode(stringResponse.getBytes()));
@@ -473,7 +437,7 @@ public abstract class TestsBase {
         String loa = xmlPath.getString("AuthnRequest.RequestedAuthnContext.AuthnContextClassRef");
 
         Response response = new ResponseBuilderUtils().buildAuthnResponseWithTimeManipulation(addResponseMin, addAssertionMin, addSubjectMin, addConditionsMin, addAuthnMin, signatureCredential, encryptionCredential, xmlPath.getString("AuthnRequest.@ID"),
-                testTargetDemoUrl + spReturnUrl, loa, DEFATTR_FIRST, DEFATTR_FAMILY, DEFATTR_PNO, DEFATTR_DATE, idpUrl+idpMetadataUrl , acceptableTimeDiffMin, testTargetDemoUrl+spReturnUrl);
+                testEidasClientProperties.getFullSpReturnUrl(), loa, DEFATTR_FIRST, DEFATTR_FAMILY, DEFATTR_PNO, DEFATTR_DATE, testEidasClientProperties.getFullIdpMetadataUrl() , testEidasClientProperties.getAcceptableTimeDiffMin(), testEidasClientProperties.getFullSpReturnUrl());
         String stringResponse = OpenSAMLUtils.getXmlString(response);
         validateSamlResponseSignature(stringResponse);
         return new String(Base64.getEncoder().encode(stringResponse.getBytes()));
@@ -484,7 +448,7 @@ public abstract class TestsBase {
         String loa = xmlPath.getString("AuthnRequest.RequestedAuthnContext.AuthnContextClassRef");
 
         Response response = new ResponseBuilderUtils().buildAuthnResponseWithAttributeStatementCnt(attributeCnt, signatureCredential, encryptionCredential, xmlPath.getString("AuthnRequest.@ID"),
-                testTargetDemoUrl + spReturnUrl, loa, DEFATTR_FIRST, DEFATTR_FAMILY, DEFATTR_PNO, DEFATTR_DATE, idpUrl+idpMetadataUrl , acceptableTimeDiffMin, testTargetDemoUrl+spReturnUrl);
+                testEidasClientProperties.getFullSpReturnUrl(), loa, DEFATTR_FIRST, DEFATTR_FAMILY, DEFATTR_PNO, DEFATTR_DATE, testEidasClientProperties.getFullIdpMetadataUrl() , testEidasClientProperties.getAcceptableTimeDiffMin(), testEidasClientProperties.getFullSpReturnUrl());
         String stringResponse = OpenSAMLUtils.getXmlString(response);
         validateSamlResponseSignature(stringResponse);
         return new String(Base64.getEncoder().encode(stringResponse.getBytes()));
@@ -495,7 +459,7 @@ public abstract class TestsBase {
         String loa = xmlPath.getString("AuthnRequest.RequestedAuthnContext.AuthnContextClassRef");
 
         Response response = new ResponseBuilderUtils().buildAuthnResponseWithoutSubject(signatureCredential, encryptionCredential, xmlPath.getString("AuthnRequest.@ID"),
-                testTargetDemoUrl + spReturnUrl, loa, DEFATTR_FIRST, DEFATTR_FAMILY, DEFATTR_PNO, DEFATTR_DATE, idpUrl+idpMetadataUrl , acceptableTimeDiffMin, testTargetDemoUrl+spReturnUrl);
+                testEidasClientProperties.getFullSpReturnUrl(), loa, DEFATTR_FIRST, DEFATTR_FAMILY, DEFATTR_PNO, DEFATTR_DATE, testEidasClientProperties.getFullIdpMetadataUrl() , testEidasClientProperties.getAcceptableTimeDiffMin(), testEidasClientProperties.getFullSpReturnUrl());
         String stringResponse = OpenSAMLUtils.getXmlString(response);
         validateSamlResponseSignature(stringResponse);
         return new String(Base64.getEncoder().encode(stringResponse.getBytes()));
@@ -506,7 +470,7 @@ public abstract class TestsBase {
         String loa = xmlPath.getString("AuthnRequest.RequestedAuthnContext.AuthnContextClassRef");
 
         Response response = new ResponseBuilderUtils().buildAuthnResponseWithAuthnContextCnt(authnContextCnt, signatureCredential, encryptionCredential, xmlPath.getString("AuthnRequest.@ID"),
-                testTargetDemoUrl + spReturnUrl, loa, DEFATTR_FIRST, DEFATTR_FAMILY, DEFATTR_PNO, DEFATTR_DATE, idpUrl+idpMetadataUrl , acceptableTimeDiffMin, testTargetDemoUrl+spReturnUrl);
+                testEidasClientProperties.getFullSpReturnUrl(), loa, DEFATTR_FIRST, DEFATTR_FAMILY, DEFATTR_PNO, DEFATTR_DATE, testEidasClientProperties.getFullIdpMetadataUrl() , testEidasClientProperties.getAcceptableTimeDiffMin(), testEidasClientProperties.getFullSpReturnUrl());
         String stringResponse = OpenSAMLUtils.getXmlString(response);
         validateSamlResponseSignature(stringResponse);
         return new String(Base64.getEncoder().encode(stringResponse.getBytes()));

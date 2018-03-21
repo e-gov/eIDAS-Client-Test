@@ -268,7 +268,7 @@ public class SamlResponseCorrectnessIntegrationTest extends TestsBase {
     @Ignore //TODO: Currently there is no issuer check!
     @Test
     public void saml15_wrongIssuerFormat() {
-        String base64Response = getBase64SamlResponseIssuer(getAuthenticationReqWithDefault(), idpUrl+idpMetadataUrl, "urn:oasis:names:tc:SAML:2.0:format:entity");
+        String base64Response = getBase64SamlResponseIssuer(getAuthenticationReqWithDefault(), "sasas", "urn:oasis:names:tc:SAML:2.0:format:entity");
         JsonPath loginResponse = sendSamlResponse("",base64Response);
         assertEquals("400", loginResponse.getString("status"));
         assertEquals("SAML response with wrong issuer name format should not be accepted","Error of some sort", loginResponse.getString(STATUS_ERROR_MESSAGE));

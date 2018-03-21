@@ -82,7 +82,7 @@ public class AuthenticationRequestTempIntegrationTest extends TestsBase {
         XmlPath xmlPath = getDecodedSamlRequestBodyXml(getAuthenticationReqWithDefault());
         assertEquals("SPType must be: public", "public", xmlPath.getString("AuthnRequest.Extensions.SPType"));
         assertEquals("The NameID policy must be: unspecified", "urn:oasis:names:tc:SAML:1.1:nameid-format:unspecified", xmlPath.getString("AuthnRequest.NameIDPolicy.@Format"));
-        assertThat("Issuer must point to Metadata url", xmlPath.getString("AuthnRequest.Issuer"), endsWith(spMetadataUrl));
+        assertThat("Issuer must point to Metadata url", xmlPath.getString("AuthnRequest.Issuer"), endsWith(testEidasClientProperties.getSpMetadataUrl()));
     }
 
     @Test
@@ -96,12 +96,12 @@ public class AuthenticationRequestTempIntegrationTest extends TestsBase {
     @Test
     public void auth3_mandatoryValuesArePresentInEntityDescriptor() {
         XmlPath xmlPath = getDecodedSamlRequestBodyXml(getAuthenticationReqWithDefault());
-        assertThat("The Destination must be the connected eIDAS node URL", xmlPath.getString("AuthnRequest.@Destination"), endsWith(idpStartUrl));
+        assertThat("The Destination must be the connected eIDAS node URL", xmlPath.getString("AuthnRequest.@Destination"), endsWith(testEidasClientProperties.getIdpStartUrl()));
         assertThat("ID must be in NCName format" ,  xmlPath.getString("AuthnRequest.@ID"), MatchesPattern.matchesPattern("^[a-zA-Z0-9_.]*$"));
         assertEquals("The ForceAuthn must be: true", "true", xmlPath.getString("AuthnRequest.@ForceAuthn"));
         assertEquals("The IsPassive must be: false", "false", xmlPath.getString("AuthnRequest.@IsPassive"));
         assertEquals("The Version must be: 2.0", "2.0", xmlPath.getString("AuthnRequest.@Version"));
-        assertEquals("ProviderName must be correct", spProviderName, xmlPath.getString("AuthnRequest.@ProviderName"));
+        assertEquals("ProviderName must be correct", testEidasClientProperties.getSpProviderName(), xmlPath.getString("AuthnRequest.@ProviderName"));
         Instant currentTime = Instant.now();
         Instant issuingTime = Instant.parse(xmlPath.getString("AuthnRequest.@IssueInstant"));
         // This assertion may cause flakyness if the client server clock is different

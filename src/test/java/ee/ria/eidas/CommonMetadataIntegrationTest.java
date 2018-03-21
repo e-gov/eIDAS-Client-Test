@@ -65,7 +65,7 @@ public class CommonMetadataIntegrationTest extends TestsBase {
     @Test
     public void metap2_mandatoryValuesArePresentInEntityDescriptor() {
         XmlPath xmlPath = getMetadataBodyXML();
-        assertThat("The entityID must be the same as entpointUrl", xmlPath.getString("EntityDescriptor.@entityID"), endsWith(spMetadataUrl));
+        assertThat("The entityID must be the same as entpointUrl", xmlPath.getString("EntityDescriptor.@entityID"), endsWith(testEidasClientProperties.getSpMetadataUrl()));
     }
 
     @Test
@@ -108,6 +108,6 @@ public class CommonMetadataIntegrationTest extends TestsBase {
         assertEquals("The binding must be: HTTP-POST", "urn:oasis:names:tc:SAML:2.0:bindings:HTTP-POST",
                 xmlPath.getString("EntityDescriptor.SPSSODescriptor.AssertionConsumerService.@Binding"));
         assertThat("The Location should indicate correct return url",
-                xmlPath.getString("EntityDescriptor.SPSSODescriptor.AssertionConsumerService.@Location"), endsWith( spReturnUrl));
+                xmlPath.getString("EntityDescriptor.SPSSODescriptor.AssertionConsumerService.@Location"), endsWith( testEidasClientProperties.getSpReturnUrl()));
     }
 }

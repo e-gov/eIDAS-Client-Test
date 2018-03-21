@@ -9,7 +9,6 @@ import org.hamcrest.Matchers;
 import org.junit.Ignore;
 import org.junit.Test;
 import org.junit.experimental.categories.Category;
-import org.springframework.beans.factory.annotation.Value;
 import org.springframework.boot.test.context.SpringBootTest;
 
 import java.util.HashMap;
@@ -18,7 +17,6 @@ import java.util.Map;
 import static io.restassured.RestAssured.given;
 import static io.restassured.config.EncoderConfig.encoderConfig;
 import static org.hamcrest.Matchers.equalTo;
-import static org.hamcrest.Matchers.isEmptyOrNullString;
 import static org.junit.Assert.assertEquals;
 
 @SpringBootTest(classes = AuthenticationRequestIntegrationTest.class)
@@ -45,7 +43,7 @@ public class AuthenticationRequestIntegrationTest extends TestsBase {
                 .queryParam("country","EE")
                 .config(RestAssured.config().encoderConfig(encoderConfig().defaultContentCharset("UTF-8")))
                 .when()
-                .get(spStartUrl).then().log().ifError().statusCode(400).body("exception",equalTo("org.springframework.web.method.annotation.MethodArgumentTypeMismatchException"));
+                .get(testEidasClientProperties.getSpStartUrl()).then().log().ifError().statusCode(400).body("exception",equalTo("org.springframework.web.method.annotation.MethodArgumentTypeMismatchException"));
 
         XmlPath samlRequest = getDecodedSamlRequestBodyXml(getAuthenticationReq("EE", "HIGH", "relayState"));
         assertEquals("Correct LOA is returned","http://eidas.europa.eu/LoA/high", samlRequest.getString("AuthnRequest.RequestedAuthnContext.AuthnContextClassRef"));
@@ -59,7 +57,7 @@ public class AuthenticationRequestIntegrationTest extends TestsBase {
                 .queryParam("country","Est")
                 .config(RestAssured.config().encoderConfig(encoderConfig().defaultContentCharset("UTF-8")))
                 .when()
-                .get(spStartUrl).then().log().ifValidationFails().statusCode(400).body("error", Matchers.startsWith("Invalid country! Valid countries:["));
+                .get(testEidasClientProperties.getSpStartUrl()).then().log().ifValidationFails().statusCode(400).body("error", Matchers.startsWith("Invalid country! Valid countries:["));
 
         given()
                 .queryParam("relayState","")
@@ -67,7 +65,7 @@ public class AuthenticationRequestIntegrationTest extends TestsBase {
                 .queryParam("country","ee")
                 .config(RestAssured.config().encoderConfig(encoderConfig().defaultContentCharset("UTF-8")))
                 .when()
-                .get(spStartUrl).then().log().ifValidationFails().statusCode(400).body("error", Matchers.startsWith("Invalid country! Valid countries:["));
+                .get(testEidasClientProperties.getSpStartUrl()).then().log().ifValidationFails().statusCode(400).body("error", Matchers.startsWith("Invalid country! Valid countries:["));
 
         XmlPath samlRequest = getDecodedSamlRequestBodyXml(getAuthenticationReq("EE", "HIGH", "relayState"));
         assertEquals("Correct LOA is returned","http://eidas.europa.eu/LoA/high", samlRequest.getString("AuthnRequest.RequestedAuthnContext.AuthnContextClassRef"));
@@ -81,7 +79,7 @@ public class AuthenticationRequestIntegrationTest extends TestsBase {
                 .queryParam("country","SZ")
                 .config(RestAssured.config().encoderConfig(encoderConfig().defaultContentCharset("UTF-8")))
                 .when()
-                .get(spStartUrl).then().log().ifValidationFails().statusCode(400).body("error", Matchers.startsWith("Invalid country! Valid countries:["));
+                .get(testEidasClientProperties.getSpStartUrl()).then().log().ifValidationFails().statusCode(400).body("error", Matchers.startsWith("Invalid country! Valid countries:["));
 
         XmlPath samlRequest = getDecodedSamlRequestBodyXml(getAuthenticationReq("EE", "HIGH", "relayState"));
         assertEquals("Correct LOA is returned","http://eidas.europa.eu/LoA/high", samlRequest.getString("AuthnRequest.RequestedAuthnContext.AuthnContextClassRef"));
@@ -95,7 +93,7 @@ public class AuthenticationRequestIntegrationTest extends TestsBase {
                 .queryParam("country","CA")
                 .config(RestAssured.config().encoderConfig(encoderConfig().defaultContentCharset("UTF-8")))
                 .when()
-                .get(spStartUrl).then().log().ifValidationFails().statusCode(200).extract().body().asString();
+                .get(testEidasClientProperties.getSpStartUrl()).then().log().ifValidationFails().statusCode(200).extract().body().asString();
 
         XmlPath samlRequest = getDecodedSamlRequestBodyXml(body);
         assertEquals("Correct LOA is returned","http://eidas.europa.eu/LoA/substantial", samlRequest.getString("AuthnRequest.RequestedAuthnContext.AuthnContextClassRef"));
@@ -107,7 +105,7 @@ public class AuthenticationRequestIntegrationTest extends TestsBase {
                 .queryParam("country","CA")
                 .config(RestAssured.config().encoderConfig(encoderConfig().defaultContentCharset("UTF-8")))
                 .when()
-                .get(spStartUrl).then().log().ifValidationFails().statusCode(200).extract().body().asString();
+                .get(testEidasClientProperties.getSpStartUrl()).then().log().ifValidationFails().statusCode(200).extract().body().asString();
 
         XmlPath samlRequest = getDecodedSamlRequestBodyXml(body);
         assertEquals("Correct LOA is returned","http://eidas.europa.eu/LoA/substantial", samlRequest.getString("AuthnRequest.RequestedAuthnContext.AuthnContextClassRef"));
@@ -134,7 +132,7 @@ public class AuthenticationRequestIntegrationTest extends TestsBase {
                 .queryParam("country","CA")
                 .config(RestAssured.config().encoderConfig(encoderConfig().defaultContentCharset("UTF-8")))
                 .when()
-                .get(spStartUrl).then().log().ifValidationFails().statusCode(400).body("error", Matchers.equalTo("Invalid RelayState! Must match the following regexp: ^[a-zA-Z0-9-_]{0,80}$"));
+                .get(testEidasClientProperties.getSpStartUrl()).then().log().ifValidationFails().statusCode(400).body("error", Matchers.equalTo("Invalid RelayState! Must match the following regexp: ^[a-zA-Z0-9-_]{0,80}$"));
 
         relayState = "<>$";
         given()
@@ -143,7 +141,7 @@ public class AuthenticationRequestIntegrationTest extends TestsBase {
                 .queryParam("country","CA")
                 .config(RestAssured.config().encoderConfig(encoderConfig().defaultContentCharset("UTF-8")))
                 .when()
-                .get(spStartUrl).then().log().ifValidationFails().statusCode(400).body("error", Matchers.equalTo("Invalid RelayState! Must match the following regexp: ^[a-zA-Z0-9-_]{0,80}$"));
+                .get(testEidasClientProperties.getSpStartUrl()).then().log().ifValidationFails().statusCode(400).body("error", Matchers.equalTo("Invalid RelayState! Must match the following regexp: ^[a-zA-Z0-9-_]{0,80}$"));
 
     }
 
@@ -156,7 +154,7 @@ public class AuthenticationRequestIntegrationTest extends TestsBase {
                 .queryParam("country","EE")
                 .config(RestAssured.config().encoderConfig(encoderConfig().defaultContentCharset("UTF-8")))
                 .when()
-                .get(spStartUrl).then().log().ifError().statusCode(200).extract().body().asString();
+                .get(testEidasClientProperties.getSpStartUrl()).then().log().ifError().statusCode(200).extract().body().asString();
 
         XmlPath samlRequest = getDecodedSamlRequestBodyXml(response);
         assertEquals("Correct LOA is returned","http://eidas.europa.eu/LoA/high", samlRequest.getString("AuthnRequest.RequestedAuthnContext.AuthnContextClassRef"));
@@ -171,7 +169,7 @@ public class AuthenticationRequestIntegrationTest extends TestsBase {
                 .queryParam("country","EE")
                 .config(RestAssured.config().encoderConfig(encoderConfig().defaultContentCharset("UTF-8")))
                 .when()
-                .get(spStartUrl).then().log().ifError().statusCode(200).extract().body().asString();
+                .get(testEidasClientProperties.getSpStartUrl()).then().log().ifError().statusCode(200).extract().body().asString();
 
         XmlPath html = new XmlPath(XmlPath.CompatibilityMode.HTML, response);
         assertEquals("Status is returned with correct relayState","RelayState123", html.getString("**.findAll { it.@name == 'RelayState' }.@value"));
@@ -184,7 +182,7 @@ public class AuthenticationRequestIntegrationTest extends TestsBase {
                 .queryParam("cOuNtRy","EE")
                 .config(RestAssured.config().encoderConfig(encoderConfig().defaultContentCharset("UTF-8")))
                 .when()
-                .get(spStartUrl).then().log().ifError().statusCode(200).extract().body().asString();
+                .get(testEidasClientProperties.getSpStartUrl()).then().log().ifError().statusCode(200).extract().body().asString();
 
         XmlPath html = new XmlPath(XmlPath.CompatibilityMode.HTML, response);
         assertEquals("Status is returned with correct relayState","EE", html.getString("**.findAll { it.@name == 'country' }.@value"));
