@@ -21,7 +21,7 @@ public class AuthenticationResponseIntegrationTest extends TestsBase {
         JsonPath loginResponseJson = sendSamlResponse("",base64Response );
         assertEquals("Expected statusCode: Success", STATUS_SUCCESS, loginResponseJson.getString(STATUS_CODE));
         assertEquals("Correct loa is returned", LOA_SUBSTANTIAL, loginResponseJson.getString(STATUS_LOA));
-        assertEquals("Correct person idendifier is returned", DEFATTR_PNO, loginResponseJson.getString(STATUS_PNO));
+        assertEquals("Correct person identifier is returned", DEFATTR_PNO, loginResponseJson.getString(STATUS_PNO));
         assertEquals("Correct date is returned", DEFATTR_DATE, loginResponseJson.getString(STATUS_DATE));
         assertEquals("Correct family name is returned", DEFATTR_FAMILY, loginResponseJson.getString(STATUS_FAMILY));
         assertEquals("Correct first name is returned", DEFATTR_FIRST, loginResponseJson.getString(STATUS_FIRST));
@@ -33,7 +33,7 @@ public class AuthenticationResponseIntegrationTest extends TestsBase {
         JsonPath loginResponseJson = sendSamlResponse("",base64Response );
         assertEquals("Expected statusCode: Success", STATUS_SUCCESS, loginResponseJson.getString(STATUS_CODE));
         assertEquals("Correct loa is returned", LOA_SUBSTANTIAL, loginResponseJson.getString(STATUS_LOA));
-        assertEquals("Correct person idendifier is returned", DEFATTR_PNO, loginResponseJson.getString(STATUS_PNO));
+        assertEquals("Correct person identifier is returned", DEFATTR_PNO, loginResponseJson.getString(STATUS_PNO));
         assertEquals("Correct date is returned", DEFATTR_DATE, loginResponseJson.getString(STATUS_DATE));
         assertEquals("Correct family name is returned", DEFATTR_FAMILY, loginResponseJson.getString(STATUS_FAMILY));
         assertEquals("Correct first name is returned", DEFATTR_FIRST, loginResponseJson.getString(STATUS_FIRST));
