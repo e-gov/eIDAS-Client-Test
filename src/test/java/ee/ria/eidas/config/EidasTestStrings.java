@@ -18,7 +18,7 @@ public class EidasTestStrings {
     public static final String STATUS_CODE = "statusCode";
     public static final String STATUS_LOA = "levelOfAssurance";
     public static final String STATUS_DATE = "attributes.DateOfBirth";
-    public static final String STATUS_PNO = "attributes.PersonIdendifier";
+    public static final String STATUS_PNO = "attributes.PersonIdentifier";
     public static final String STATUS_FAMILY = "attributes.FamilyName";
     public static final String STATUS_FIRST = "attributes.FirstName";
     public static final String STATUS_ADDR = "attributes.CurrentAddress";
