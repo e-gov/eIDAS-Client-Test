@@ -82,15 +82,6 @@ public class SamlResponseCorrectnessIntegrationTest extends TestsBase {
         assertEquals("","", loginResponse.getString("message"));
     }
 
-    @Ignore //TODO: Currently nameID presence is not checked
-    @Test
-    public void saml2_missingNameIdInResponseMustFail() {
-        String base64Response = getBase64SamlResponseMinimalAttributesWithoutNameId(getAuthenticationReqWithDefault());
-        JsonPath loginResponse = sendSamlResponse("",base64Response );
-        assertEquals("500", loginResponse.getString("status"));
-        assertEquals("","", loginResponse.getString("message"));
-    }
-
     @Ignore //TODO: Currently the loa format is not checked
     @Test
     public void saml2_notSupportedLoaInResponseMustFail() {
@@ -283,10 +274,112 @@ public class SamlResponseCorrectnessIntegrationTest extends TestsBase {
         assertEquals("SAML response with wrong metadata url should not be accepted","Error of some sort", loginResponse.getString(STATUS_ERROR_MESSAGE));
     }
 
+    @Ignore //TODO: Currently nameID presence is not checked
+    @Test
+    public void saml16_noNameIdErrorShouldBeReturned() {
+        String base64Response = getBase64SamlResponseNameIdCnt(getAuthenticationReqWithDefault(), 0, NAME_ID_FORMAT_UNSPECIFIED);
+        JsonPath loginResponse = sendSamlResponse("",base64Response );
+        assertEquals("500", loginResponse.getString("status"));
+        assertEquals("","", loginResponse.getString("message"));
+    }
+
+    @Ignore //TODO: Currently nameID presence is not checked
+    @Test //TODO: two nameId-s is currently not supported by base class
+    public void saml16_twoNameIdErrorShouldBeReturned() {
+        String base64Response = getBase64SamlResponseNameIdCnt(getAuthenticationReqWithDefault(), 2, NAME_ID_FORMAT_UNSPECIFIED);
+        JsonPath loginResponse = sendSamlResponse("",base64Response );
+        assertEquals("500", loginResponse.getString("status"));
+        assertEquals("","", loginResponse.getString("message"));
+    }
+
+    @Ignore //TODO: Currently nameID presence is not checked
+    @Test
+    public void saml16_notSupportedNameIdMethodErrorShouldBeReturned() {
+        String base64Response = getBase64SamlResponseNameIdCnt(getAuthenticationReqWithDefault(), 1, NAME_ID_FORMAT_ENCRYPTED);
+        JsonPath loginResponse = sendSamlResponse("",base64Response );
+        assertEquals("500", loginResponse.getString("status"));
+        assertEquals("","", loginResponse.getString("message"));
+    }
+
+    @Ignore //TODO: Currently nameID presence is not checked
+    @Test
+    public void saml16_nameIdMethodUnspecifiedSuccessShouldBeReturned() {
+        String base64Response = getBase64SamlResponseNameIdCnt(getAuthenticationReqWithDefault(), 1, NAME_ID_FORMAT_UNSPECIFIED);
+        JsonPath loginResponse = sendSamlResponse("",base64Response );
+        assertEquals("Expected statusCode: Success", STATUS_SUCCESS, loginResponse.getString(STATUS_CODE));
+        assertEquals("Correct loa is returned", LOA_SUBSTANTIAL, loginResponse.getString(STATUS_LOA));
+        assertEquals("Correct person idendifier is returned", DEFATTR_PNO, loginResponse.getString(STATUS_PNO));
+        assertEquals("Correct date is returned", DEFATTR_DATE, loginResponse.getString(STATUS_DATE));
+        assertEquals("Correct family name is returned", DEFATTR_FAMILY, loginResponse.getString(STATUS_FAMILY));
+        assertEquals("Correct first name is returned", DEFATTR_FIRST, loginResponse.getString(STATUS_FIRST));
+    }
+
+    @Ignore //TODO: Currently nameID presence is not checked
+    @Test
+    public void saml16_nameIdMethodTransientSuccessShouldBeReturned() {
+        String base64Response = getBase64SamlResponseNameIdCnt(getAuthenticationReqWithDefault(), 1, NAME_ID_FORMAT_TRANSIENT);
+        JsonPath loginResponse = sendSamlResponse("",base64Response );
+        assertEquals("Expected statusCode: Success", STATUS_SUCCESS, loginResponse.getString(STATUS_CODE));
+        assertEquals("Correct loa is returned", LOA_SUBSTANTIAL, loginResponse.getString(STATUS_LOA));
+        assertEquals("Correct person idendifier is returned", DEFATTR_PNO, loginResponse.getString(STATUS_PNO));
+        assertEquals("Correct date is returned", DEFATTR_DATE, loginResponse.getString(STATUS_DATE));
+        assertEquals("Correct family name is returned", DEFATTR_FAMILY, loginResponse.getString(STATUS_FAMILY));
+        assertEquals("Correct first name is returned", DEFATTR_FIRST, loginResponse.getString(STATUS_FIRST));
+    }
+
+    @Ignore //TODO: Currently nameID presence is not checked
+    @Test
+    public void saml16_nameIdMethodPersistentSuccessShouldBeReturned() {
+        String base64Response = getBase64SamlResponseNameIdCnt(getAuthenticationReqWithDefault(), 1, NAME_ID_FORMAT_PERSISTENT);
+        JsonPath loginResponse = sendSamlResponse("",base64Response );
+        assertEquals("Expected statusCode: Success", STATUS_SUCCESS, loginResponse.getString(STATUS_CODE));
+        assertEquals("Correct loa is returned", LOA_SUBSTANTIAL, loginResponse.getString(STATUS_LOA));
+        assertEquals("Correct person idendifier is returned", DEFATTR_PNO, loginResponse.getString(STATUS_PNO));
+        assertEquals("Correct date is returned", DEFATTR_DATE, loginResponse.getString(STATUS_DATE));
+        assertEquals("Correct family name is returned", DEFATTR_FAMILY, loginResponse.getString(STATUS_FAMILY));
+        assertEquals("Correct first name is returned", DEFATTR_FIRST, loginResponse.getString(STATUS_FIRST));
+    }
+
+    @Ignore //TODO: We do not receive a proper JSON error response yet
+    @Test
+    public void saml17_noSubjectConfirmationErrorShouldBeReturned() {
+        String base64Response = getBase64SamlResponseSubjectConfirmationCnt(getAuthenticationReqWithDefault(), 0, SUBJECT_CONFIRMATION_METHOD_BEARER);
+        JsonPath loginResponse = sendSamlResponse("",base64Response );
+        assertEquals("400", loginResponse.getString("status"));
+        assertEquals("Generic error should be returned", BAD_SAML, loginResponse.getString(STATUS_ERROR_MESSAGE));
+    }
+
+    @Ignore //TODO: We do not receive a proper JSON error response yet
+    @Test
+    public void saml17_twoSubjectConfirmationsErrorShouldBeReturned() {
+        String base64Response = getBase64SamlResponseSubjectConfirmationCnt(getAuthenticationReqWithDefault(), 2, SUBJECT_CONFIRMATION_METHOD_BEARER);
+        JsonPath loginResponse = sendSamlResponse("",base64Response );
+        assertEquals("400", loginResponse.getString("status"));
+        assertEquals("Generic error should be returned", BAD_SAML, loginResponse.getString(STATUS_ERROR_MESSAGE));
+    }
+
+    @Ignore //TODO: We do not receive a proper JSON error response yet
+    @Test
+    public void saml17_notSupportedSubjectConfirmationMethodErrorShouldBeReturned() {
+        String base64Response = getBase64SamlResponseSubjectConfirmationCnt(getAuthenticationReqWithDefault(), 1, SUBJECT_CONFIRMATION_METHOD_SENDER_VOUCHES);
+        JsonPath loginResponse = sendSamlResponse("",base64Response );
+        assertEquals("400", loginResponse.getString("status"));
+        assertEquals("Generic error should be returned", BAD_SAML, loginResponse.getString(STATUS_ERROR_MESSAGE));
+    }
+
     @Ignore //TODO: We do not receive a proper JSON error response yet
     @Test
     public void saml18_samlSubjectNotOnOrAfterInPastErrorShouldBeReturned() {
         String base64Response = getBase64SamlResponseTimeManipulation(getAuthenticationReqWithDefault(), 0, 0,-20, 0, 0);
+        JsonPath loginResponse = sendSamlResponse("",base64Response );
+        assertEquals("400", loginResponse.getString("status"));
+        assertEquals("Generic error should be returned", BAD_SAML, loginResponse.getString(STATUS_ERROR_MESSAGE));
+    }
+
+    @Ignore //TODO: We do not receive a proper JSON error response yet
+    @Test
+    public void saml19_wrongRecipientUrlInSubjectConfirmationDataErrorShouldBeReturned() {
+        String base64Response = getBase64SamlResponseRecipient(getAuthenticationReqWithDefault(), "randomRecipientUrl");
         JsonPath loginResponse = sendSamlResponse("",base64Response );
         assertEquals("400", loginResponse.getString("status"));
         assertEquals("Generic error should be returned", BAD_SAML, loginResponse.getString(STATUS_ERROR_MESSAGE));
@@ -377,4 +470,18 @@ public class SamlResponseCorrectnessIntegrationTest extends TestsBase {
         assertEquals("Generic error should be returned", BAD_SAML, loginResponse.getString(STATUS_ERROR_MESSAGE));
     }
 
+    @Ignore //TODO: We do not receive a proper JSON error response yet
+    @Test
+    public void saml26_noLegalAttributesAreAskedButAreReturned() {
+        String base64Response = getBase64SamlResponseLegalMinimalAttributes(getAuthenticationReqWithDefault(), DEFATTR_FIRST, DEFATTR_FAMILY, DEFATTR_PNO, DEFATTR_DATE, DEFATTR_LEGAL_NAME, DEFATTR_LEGAL_PNO);
+        JsonPath loginResponse = sendSamlResponse("",base64Response );
+        assertEquals("Expected statusCode: Success", STATUS_SUCCESS, loginResponse.getString(STATUS_CODE));
+        assertEquals("Correct loa is returned", LOA_SUBSTANTIAL, loginResponse.getString(STATUS_LOA));
+        assertEquals("Correct person idendifier is returned", DEFATTR_PNO, loginResponse.getString(STATUS_PNO));
+        assertEquals("Correct date is returned", DEFATTR_DATE, loginResponse.getString(STATUS_DATE));
+        assertEquals("Correct family name is returned", DEFATTR_FAMILY, loginResponse.getString(STATUS_FAMILY));
+        assertEquals("Correct first name is returned", DEFATTR_FIRST, loginResponse.getString(STATUS_FIRST));
+        assertEquals("Correct legal name is returned", DEFATTR_LEGAL_NAME, loginResponse.getString(STATUS_LEGAL_NAME));
+        assertEquals("Correct legal pno is returned", DEFATTR_LEGAL_PNO, loginResponse.getString(STATUS_LEGAL_PNO));
+    }
 }

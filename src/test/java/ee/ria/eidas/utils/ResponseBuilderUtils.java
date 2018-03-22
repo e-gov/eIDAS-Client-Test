@@ -27,6 +27,21 @@ public class ResponseBuilderUtils extends ResponseAssertionBuilderUtils {
         }
     }
 
+    public Response buildLegalAuthnResponse(Credential signCredential, Credential encCredential, String inResponseId, String recipient, String loa, String givenName, String familyName, String personIdentifier, String dateOfBirth, String legalName, String legalPno, String issuerValue, Integer acceptableTimeMin, String audienceUri) {
+        try {
+            Signature signature = prepareSignature(signCredential);
+            DateTime timeNow = new DateTime();
+            Response authnResponse = buildResponseForSigningWithoutAssertion(inResponseId, recipient, timeNow, issuerValue);
+            authnResponse.getEncryptedAssertions().add(buildEncrAssertionWithMinLegal(signCredential, encCredential, inResponseId, recipient, timeNow, acceptableTimeMin, loa, givenName, familyName, personIdentifier, dateOfBirth, legalName, legalPno, issuerValue, audienceUri));
+            authnResponse.setSignature(signature);
+            XMLObjectProviderRegistrySupport.getMarshallerFactory().getMarshaller(authnResponse).marshall(authnResponse);
+            Signer.signObject(signature);
+            return authnResponse;
+        } catch (Exception e) {
+            throw new RuntimeException("SAML error:" + e.getMessage(), e);
+        }
+    }
+
     public Response buildAuthnResponseWithMaxAttributes(Credential signCredential, Credential encCredential, String inResponseId, String recipient, String loa, String givenName, String familyName, String personIdentifier, String dateOfBirth, String birthName, String birthPlace, String address, String gender, String issuerValue, Integer acceptableTimeMin, String audienceUri) {
         try {
             Signature signature = prepareSignature(signCredential);
@@ -130,21 +145,6 @@ public class ResponseBuilderUtils extends ResponseAssertionBuilderUtils {
             authnResponse.getEncryptedAssertions().add(buildEncrAssertion(signCredential, encCredential, inResponseId, recipient, timeNow, acceptableTimeMin, loa, givenName, familyName, personIdentifier, dateOfBirth, issuerValue, audienceUri));
             authnResponse.setSignature(signature);
             XMLObjectProviderRegistrySupport.getMarshallerFactory().getMarshaller(authnResponse).marshall(authnResponse);
-            Signer.signObject(signature);
-            return authnResponse;
-        } catch (Exception e) {
-            throw new RuntimeException("SAML error:" + e.getMessage(), e);
-        }
-    }
-
-    public Response buildAuthnResponseWithoutNameID(Credential signCredential, Credential encCredential, String inResponseId, String recipient, String loa, String givenName, String familyName, String personIdentifier, String dateOfBirth, String issuerValue, Integer acceptableTimeMin, String audienceUri) {
-        try {
-            Signature signature = prepareSignature(signCredential);
-            DateTime timeNow = new DateTime();
-            Response authnResponse = buildResponseForSigningWithoutAssertion(inResponseId, recipient, timeNow, issuerValue);
-            authnResponse.getEncryptedAssertions().add(buildEncrAssertionWithoutNameId(signCredential, encCredential, inResponseId, recipient, timeNow, acceptableTimeMin, loa, givenName, familyName, personIdentifier, dateOfBirth, issuerValue, audienceUri));
-            XMLObjectProviderRegistrySupport.getMarshallerFactory().getMarshaller(authnResponse).marshall(authnResponse);
-            authnResponse.setSignature(signature);
             Signer.signObject(signature);
             return authnResponse;
         } catch (Exception e) {
@@ -335,5 +335,33 @@ public class ResponseBuilderUtils extends ResponseAssertionBuilderUtils {
         }
     }
 
+    public Response buildAuthnResponseSubjectConfirmationCnt(Integer subjectConfirmationCnt, String subjectConfirmationMethod, Credential signCredential, Credential encCredential, String inResponseId, String recipient, String loa, String givenName, String familyName, String personIdentifier, String dateOfBirth, String issuerValue, Integer acceptableTimeMin, String audienceUri) {
+        try {
+            Signature signature = prepareSignature(signCredential);
+            DateTime timeNow = new DateTime();
+            Response authnResponse = buildResponseForSigningWithoutAssertion(inResponseId, recipient, timeNow, issuerValue);
+            authnResponse.getEncryptedAssertions().add(buildEncrAssertionWithSubjectConfirmationCnt(subjectConfirmationCnt, subjectConfirmationMethod, signCredential, encCredential, inResponseId, recipient, timeNow, acceptableTimeMin, loa, givenName, familyName, personIdentifier, dateOfBirth, issuerValue, audienceUri));
+            authnResponse.setSignature(signature);
+            XMLObjectProviderRegistrySupport.getMarshallerFactory().getMarshaller(authnResponse).marshall(authnResponse);
+            Signer.signObject(signature);
+            return authnResponse;
+        } catch (Exception e) {
+            throw new RuntimeException("SAML error:" + e.getMessage(), e);
+        }
+    }
 
+    public Response buildAuthnResponseNameIdCnt(Integer nameIdCnt, String nameIdFormat , Credential signCredential, Credential encCredential, String inResponseId, String recipient, String loa, String givenName, String familyName, String personIdentifier, String dateOfBirth, String issuerValue, Integer acceptableTimeMin, String audienceUri) {
+        try {
+            Signature signature = prepareSignature(signCredential);
+            DateTime timeNow = new DateTime();
+            Response authnResponse = buildResponseForSigningWithoutAssertion(inResponseId, recipient, timeNow, issuerValue);
+            authnResponse.getEncryptedAssertions().add(buildEncrAssertionNameIdCnt(nameIdCnt, nameIdFormat, signCredential, encCredential, inResponseId, recipient, timeNow, acceptableTimeMin, loa, givenName, familyName, personIdentifier, dateOfBirth, issuerValue, audienceUri));
+            XMLObjectProviderRegistrySupport.getMarshallerFactory().getMarshaller(authnResponse).marshall(authnResponse);
+            authnResponse.setSignature(signature);
+            Signer.signObject(signature);
+            return authnResponse;
+        } catch (Exception e) {
+            throw new RuntimeException("SAML error:" + e.getMessage(), e);
+        }
+    }
 }

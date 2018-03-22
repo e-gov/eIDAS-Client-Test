@@ -7,6 +7,12 @@ public class EidasTestStrings {
     public static final String LOA_HIGH = "http://eidas.europa.eu/LoA/high";
     public static final String STATUS_SUCCESS = "urn:oasis:names:tc:SAML:2.0:status:Success";
     public static final String ISSUER_FORMAT = "urn:oasis:names:tc:SAML:2.0:nameid-format:entity";
+    public static final String SUBJECT_CONFIRMATION_METHOD_SENDER_VOUCHES = "urn:oasis:names:tc:SAML:2.0:cm:sender-vouches";
+    public static final String SUBJECT_CONFIRMATION_METHOD_BEARER = "urn:oasis:names:tc:SAML:2.0:cm:bearer";
+    public static final String NAME_ID_FORMAT_UNSPECIFIED = "urn:oasis:names:tc:SAML:1.1:nameid-format:unspecified";
+    public static final String NAME_ID_FORMAT_PERSISTENT = "urn:oasis:names:tc:SAML:2.0:nameid-format:persistent";
+    public static final String NAME_ID_FORMAT_TRANSIENT = "urn:oasis:names:tc:SAML:2.0:nameid-format:transient";
+    public static final String NAME_ID_FORMAT_ENCRYPTED = "urn:oasis:names:tc:SAML:2.0:nameid-format:encrypted";
 
     //JSON response strings
     public static final String STATUS_CODE = "statusCode";
@@ -19,6 +25,8 @@ public class EidasTestStrings {
     public static final String STATUS_GENDER = "attributes.Gender";
     public static final String STATUS_BIRTH_NAME = "attributes.BirthName";
     public static final String STATUS_BIRTH_PLACE = "attributes.PlaceOfBirth";
+    public static final String STATUS_LEGAL_NAME = "attributes.LegalName";
+    public static final String STATUS_LEGAL_PNO = "attributes.LegalPersonIdentifier";
 
     //JSON response error strings
     public static final String STATUS_ERROR = "error";
@@ -36,4 +44,6 @@ public class EidasTestStrings {
     public static final String DEFATTR_BIRTH_PLACE = "Country";
     public static final String DEFATTR_ADDR = "Street 1, Flat 3, Village 2, Country7";
     public static final String DEFATTR_GENDER = "Male";
+    public static final String DEFATTR_LEGAL_NAME = "Good Company a/s";
+    public static final String DEFATTR_LEGAL_PNO = "292938483902";
 }
