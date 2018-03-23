@@ -46,7 +46,7 @@ public class EndpointsIntegrationTest extends TestsBase {
         given()
                 .config(RestAssured.config().encoderConfig(encoderConfig().defaultContentCharset("UTF-8")))
                 .when()
-                .post(testEidasClientProperties.getSpMetadataUrl()).then().log().ifValidationFails().statusCode(405).header("Allow","GET").body("error",Matchers.equalTo("Method Not Allowed"));
+                .post(testEidasClientProperties.getSpMetadataUrl()).then().log().ifValidationFails().statusCode(405).body("message",Matchers.equalTo("Request method 'POST' not supported"));
     }
 
     @Test
@@ -54,7 +54,7 @@ public class EndpointsIntegrationTest extends TestsBase {
         given()
                 .config(RestAssured.config().encoderConfig(encoderConfig().defaultContentCharset("UTF-8")))
                 .when()
-                .put(testEidasClientProperties.getSpMetadataUrl()).then().log().ifValidationFails().statusCode(405).header("Allow","GET").body("error",Matchers.equalTo("Method Not Allowed"));
+                .put(testEidasClientProperties.getSpMetadataUrl()).then().log().ifValidationFails().statusCode(405).body("message",Matchers.equalTo("Request method 'PUT' not supported"));
     }
 
     @Test
@@ -70,7 +70,7 @@ public class EndpointsIntegrationTest extends TestsBase {
         given()
                 .config(RestAssured.config().encoderConfig(encoderConfig().defaultContentCharset("UTF-8")))
                 .when()
-                .delete(testEidasClientProperties.getSpMetadataUrl()).then().log().ifValidationFails().statusCode(405).header("Allow","GET").body("error", Matchers.equalTo("Method Not Allowed"));
+                .delete(testEidasClientProperties.getSpMetadataUrl()).then().log().ifValidationFails().statusCode(405).body("message", Matchers.equalTo("Request method 'DELETE' not supported"));
     }
 
     @Test
@@ -103,7 +103,7 @@ public class EndpointsIntegrationTest extends TestsBase {
                 .contentType("application/x-www-form-urlencoded")
                 .config(RestAssured.config().encoderConfig(encoderConfig().defaultContentCharset("UTF-8")))
                 .when()
-                .head(testEidasClientProperties.getSpStartUrl()).then().log().ifValidationFails().statusCode(400).body(isEmptyOrNullString());
+                .head(testEidasClientProperties.getSpStartUrl()).then().log().ifValidationFails().statusCode(500).body(isEmptyOrNullString());
     }
 
     @Test
