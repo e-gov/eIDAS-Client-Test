@@ -180,6 +180,16 @@ public abstract class TestsBase {
                 .post(testEidasClientProperties.getSpReturnUrl()).then().log().ifError().extract().body().jsonPath();
     }
 
+    protected io.restassured.response.Response sendSamlResponseExtractResponse(String relayState, String response) {
+        return given()
+                .formParam("relayState",relayState)
+                .formParam("SAMLResponse", response)
+                .contentType("application/x-www-form-urlencoded")
+                .config(config().encoderConfig(encoderConfig().defaultContentCharset("UTF-8")))
+                .when()
+                .post(testEidasClientProperties.getSpReturnUrl()).then().log().ifError().extract().response();
+    }
+
     protected void validateMetadataSignature(String body) {
         XmlPath metadataXml = new XmlPath(body);
         try {
@@ -261,6 +271,10 @@ public abstract class TestsBase {
         java.security.cert.X509Certificate x509Certificate = getEncryptionCertificate(body);
         BasicX509Credential encryptionCredential = new BasicX509Credential(x509Certificate);
         return encryptionCredential;
+    }
+
+    protected String getValueFromJsonResponse(io.restassured.response.Response response, String key) {
+        return response.getBody().jsonPath().getString(key);
     }
 
     protected String getBase64SamlResponseMinimalAttributes(String requestBody, String givenName, String familyName, String personIdentifier, String dateOfBirth, String loa) {

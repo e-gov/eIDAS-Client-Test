@@ -5,6 +5,7 @@ import ee.ria.eidas.config.IntegrationTest;
 import io.restassured.RestAssured;
 import io.restassured.path.json.JsonPath;
 import io.restassured.path.xml.XmlPath;
+import io.restassured.response.Response;
 import org.hamcrest.Matchers;
 import org.junit.Ignore;
 import org.junit.Test;
@@ -118,31 +119,31 @@ public class SamlResponseCorrectnessIntegrationTest extends TestsBase {
         assertEquals("Missing required attribute, error should be returned","Error of some sort", loginResponse.getString(STATUS_ERROR_MESSAGE));
     }
 
-    @Ignore //TODO: We do not receive a proper JSON error response yet
     @Test
     public void saml8_userAuthFailsErrorShouldBeReturned() {
         String base64Response = getBase64SamlResponseWithErrors(getAuthenticationReqWithDefault(), "AuthFailed");
-        JsonPath loginResponse = sendSamlResponse("",base64Response );
-        assertEquals("401", loginResponse.getString("status"));
-        assertEquals("User did not authenticate, error should be returned","Error of some sort", loginResponse.getString(STATUS_ERROR_MESSAGE));
+        Response loginResponse = sendSamlResponseExtractResponse("",base64Response );
+        assertEquals(401, loginResponse.getStatusCode());
+        assertEquals("User did not give consent, error should be returned", "Unauthorized", getValueFromJsonResponse(loginResponse, STATUS_ERROR));
+        assertEquals("User did not give consent, error should be returned", "Authentication failed.", getValueFromJsonResponse(loginResponse, STATUS_ERROR_MESSAGE));
     }
 
-    @Ignore //TODO: We do not receive a proper JSON error response yet
     @Test
     public void saml8_userConsentNotGiverErrorShouldBeReturned() {
         String base64Response = getBase64SamlResponseWithErrors(getAuthenticationReqWithDefault(), "ConsentNotGiven");
-        JsonPath loginResponse = sendSamlResponse("",base64Response );
-        assertEquals("401", loginResponse.getString("status"));
-        assertEquals("User did not give consent, error should be returned","Error of some sort", loginResponse.getString(STATUS_ERROR_MESSAGE));
+        Response loginResponse = sendSamlResponseExtractResponse("",base64Response );
+        assertEquals(401, loginResponse.getStatusCode());
+        assertEquals("User did not give consent, error should be returned", "Unauthorized", getValueFromJsonResponse(loginResponse, STATUS_ERROR));
+        assertEquals("User did not give consent, error should be returned", "No user consent received. User denied access.", getValueFromJsonResponse(loginResponse, STATUS_ERROR_MESSAGE));
     }
 
-    @Ignore //TODO: We do not receive a proper JSON error response yet
     @Test
     public void saml8_someOtherErrorStatusErrorShouldBeReturned() {
         String base64Response = getBase64SamlResponseWithErrors(getAuthenticationReqWithDefault(), "SomethingFailed");
-        JsonPath loginResponse = sendSamlResponse("",base64Response );
-        assertEquals("500", loginResponse.getString("status"));
-        assertEquals("Generic error should be returned","Error of some sort", loginResponse.getString(STATUS_ERROR_MESSAGE));
+        Response loginResponse = sendSamlResponseExtractResponse("",base64Response );
+        assertEquals(500, loginResponse.getStatusCode());
+        assertEquals("Some other reason for failure in authentication, Internal Server Error should be returned", "Internal Server Error", getValueFromJsonResponse(loginResponse, STATUS_ERROR));
+        assertEquals("Some other reason for failure in authentication, Internal Server Error should be returned", "Something went wrong internally. Please consult server logs for further details.", getValueFromJsonResponse(loginResponse, STATUS_ERROR_MESSAGE));
     }
 
     @Ignore //TODO: We do not receive a proper JSON error response yet
