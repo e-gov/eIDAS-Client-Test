@@ -106,4 +106,12 @@ public class AuthenticationResponseIntegrationTest extends TestsBase {
         JsonPath loginResponseJson = sendSamlResponse("",base64Response );
         assertEquals("Correct loa is returned", LOA_HIGH, loginResponseJson.getString(STATUS_LOA));
     }
+
+    @Ignore //TODO: We are getting internal server error
+    @Test
+    public void resp8_unsignedAssertionMustFailOnPostBinding() {
+        String base64Response = getBase64SamlResponseDefaultMinimalAttributesWithoutAssertionSignature(getAuthenticationReqWithDefault());
+        JsonPath loginResponse = sendSamlResponse("",base64Response );
+        assertEquals("Assertion must be signed on POST binding, error should be returned","The SAML Assertion was not signed", loginResponse.getString("message"));
+    }
 }

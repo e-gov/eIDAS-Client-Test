@@ -22,17 +22,9 @@ import static org.junit.Assert.assertEquals;
 @Category(IntegrationTest.class)
 public class SamlResponseCorrectnessIntegrationTest extends TestsBase {
 
-    @Ignore //TODO: We are getting internal server error
-    @Test
-    public void resp7_unsignedAssertionMustFailOnPostBinding() {
-        String base64Response = getBase64SamlResponseDefaultMinimalAttributesWithoutAssertionSignature(getAuthenticationReqWithDefault());
-        JsonPath loginResponse = sendSamlResponse("",base64Response );
-        assertEquals("Assertion must be signed on POST binding, error should be returned","The SAML Assertion was not signed", loginResponse.getString("message"));
-    }
-
     @Ignore //TODO: we are getting internal server error
     @Test
-    public void resp4_notEncryptedAssertionMustFail() {
+    public void saml1_notEncryptedAssertionMustFail() {
         String base64Response = getBase64SamlResponseDefaultMinimalAttributesWithoutEncryption(getAuthenticationReqWithDefault());
         JsonPath loginResponse = sendSamlResponse("",base64Response );
         assertEquals("Assertion must be encrypted, error should be returned","Saml Response does not contain any encrypted assertions", loginResponse.getString("message"));
@@ -101,15 +93,6 @@ public class SamlResponseCorrectnessIntegrationTest extends TestsBase {
         assertEquals("","", loginResponse.getString("message"));
     }
 
-    @Ignore //TODO: Currently the format name is not checked
-    @Test
-    public void saml2_wrongNameFormatInResponseMustFail() {
-        String base64Response = getBase64SamlResponseMinimalAttributesWithWrongNameFormat(getAuthenticationReqWithDefault());
-        JsonPath loginResponse = sendSamlResponse("", base64Response);
-        assertEquals("500", loginResponse.getString("status"));
-        assertEquals("","", loginResponse.getString("message"));
-    }
-
     @Ignore //TODO: There is no minimal attributes check!
     @Test
     public void saml3_faultyAuthenticationResponse() {
@@ -149,7 +132,7 @@ public class SamlResponseCorrectnessIntegrationTest extends TestsBase {
     @Ignore //TODO: We do not receive a proper JSON error response yet
     @Test
     public void saml9_samlResponseIssueInstantFarInPastErrorShouldBeReturned() {
-        String base64Response = getBase64SamlResponseTimeManipulation(getAuthenticationReqWithDefault(), -20, 0,0, 0, 0);
+        String base64Response = getBase64SamlResponseTimeManipulation(getAuthenticationReqWithDefault(), -20, 0, 0, 0, 0);
         JsonPath loginResponse = sendSamlResponse("",base64Response );
         assertEquals("400", loginResponse.getString("status"));
         assertEquals("Generic error should be returned", BAD_SAML, loginResponse.getString(STATUS_ERROR_MESSAGE));
@@ -158,7 +141,7 @@ public class SamlResponseCorrectnessIntegrationTest extends TestsBase {
     @Ignore //TODO: We do not receive a proper JSON error response yet
     @Test
     public void saml9_samlResponseIssueInstantInFutureErrorShouldBeReturned() {
-        String base64Response = getBase64SamlResponseTimeManipulation(getAuthenticationReqWithDefault(), 20, 0,0, 0, 0);
+        String base64Response = getBase64SamlResponseTimeManipulation(getAuthenticationReqWithDefault(), 20, 0, 0, 0, 0);
         JsonPath loginResponse = sendSamlResponse("",base64Response );
         assertEquals("400", loginResponse.getString("status"));
         assertEquals("Generic error should be returned", BAD_SAML, loginResponse.getString(STATUS_ERROR_MESSAGE));
@@ -242,7 +225,7 @@ public class SamlResponseCorrectnessIntegrationTest extends TestsBase {
     @Ignore //TODO: We do not receive a proper JSON error response yet
     @Test
     public void saml13_samlAssertionIssueInstantInFarPastErrorShouldBeReturned() {
-        String base64Response = getBase64SamlResponseTimeManipulation(getAuthenticationReqWithDefault(), 0, -20,0, 0, 0);
+        String base64Response = getBase64SamlResponseTimeManipulation(getAuthenticationReqWithDefault(), 0, -20, 0, 0, 0);
         JsonPath loginResponse = sendSamlResponse("",base64Response );
         assertEquals("400", loginResponse.getString("status"));
         assertEquals("Generic error should be returned", BAD_SAML, loginResponse.getString(STATUS_ERROR_MESSAGE));
@@ -251,7 +234,7 @@ public class SamlResponseCorrectnessIntegrationTest extends TestsBase {
     @Ignore //TODO: We do not receive a proper JSON error response yet
     @Test
     public void saml13_samlAssertionIssueInstantInFutureErrorShouldBeReturned() {
-        String base64Response = getBase64SamlResponseTimeManipulation(getAuthenticationReqWithDefault(), 0, 20,0, 0, 0);
+        String base64Response = getBase64SamlResponseTimeManipulation(getAuthenticationReqWithDefault(), 0, 20, 0, 0, 0);
         JsonPath loginResponse = sendSamlResponse("",base64Response );
         assertEquals("400", loginResponse.getString("status"));
         assertEquals("Generic error should be returned", BAD_SAML, loginResponse.getString(STATUS_ERROR_MESSAGE));
@@ -371,7 +354,7 @@ public class SamlResponseCorrectnessIntegrationTest extends TestsBase {
     @Ignore //TODO: We do not receive a proper JSON error response yet
     @Test
     public void saml18_samlSubjectNotOnOrAfterInPastErrorShouldBeReturned() {
-        String base64Response = getBase64SamlResponseTimeManipulation(getAuthenticationReqWithDefault(), 0, 0,-20, 0, 0);
+        String base64Response = getBase64SamlResponseTimeManipulation(getAuthenticationReqWithDefault(), 0, 0, -20, 0, 0);
         JsonPath loginResponse = sendSamlResponse("",base64Response );
         assertEquals("400", loginResponse.getString("status"));
         assertEquals("Generic error should be returned", BAD_SAML, loginResponse.getString(STATUS_ERROR_MESSAGE));
@@ -389,7 +372,7 @@ public class SamlResponseCorrectnessIntegrationTest extends TestsBase {
     @Ignore //TODO: We do not receive a proper JSON error response yet
     @Test
     public void saml21_samlConditionsNotOnOrAfterInPastErrorShouldBeReturned() {
-        String base64Response = getBase64SamlResponseTimeManipulation(getAuthenticationReqWithDefault(), 0, 0,0, -20, 0);
+        String base64Response = getBase64SamlResponseTimeManipulation(getAuthenticationReqWithDefault(), 0, 0, 0, -20, 0);
         JsonPath loginResponse = sendSamlResponse("",base64Response );
         assertEquals("400", loginResponse.getString("status"));
         assertEquals("Generic error should be returned", BAD_SAML, loginResponse.getString(STATUS_ERROR_MESSAGE));
@@ -398,7 +381,7 @@ public class SamlResponseCorrectnessIntegrationTest extends TestsBase {
     @Ignore //TODO: We do not receive a proper JSON error response yet
     @Test
     public void saml21_samlConditionsNotBeforeInFutureErrorShouldBeReturned() {
-        String base64Response = getBase64SamlResponseTimeManipulation(getAuthenticationReqWithDefault(), 0, 0,0, 20, 0);
+        String base64Response = getBase64SamlResponseTimeManipulation(getAuthenticationReqWithDefault(), 0, 0, 0, 20, 0);
         JsonPath loginResponse = sendSamlResponse("",base64Response );
         assertEquals("400", loginResponse.getString("status"));
         assertEquals("Generic error should be returned", BAD_SAML, loginResponse.getString(STATUS_ERROR_MESSAGE));
@@ -456,7 +439,7 @@ public class SamlResponseCorrectnessIntegrationTest extends TestsBase {
     @Ignore //TODO: We do not receive a proper JSON error response yet
     @Test
     public void saml24_samlAuthnInstantInFarPastErrorShouldBeReturned() {
-        String base64Response = getBase64SamlResponseTimeManipulation(getAuthenticationReqWithDefault(), 0, 0,0, 0, -20);
+        String base64Response = getBase64SamlResponseTimeManipulation(getAuthenticationReqWithDefault(), 0, 0, 0, 0, -20);
         JsonPath loginResponse = sendSamlResponse("",base64Response );
         assertEquals("400", loginResponse.getString("status"));
         assertEquals("Generic error should be returned", BAD_SAML, loginResponse.getString(STATUS_ERROR_MESSAGE));
@@ -465,7 +448,7 @@ public class SamlResponseCorrectnessIntegrationTest extends TestsBase {
     @Ignore //TODO: We do not receive a proper JSON error response yet
     @Test
     public void saml24_samlAuthnInstantInFutureErrorShouldBeReturned() {
-        String base64Response = getBase64SamlResponseTimeManipulation(getAuthenticationReqWithDefault(), 0, 0,0, 0, 20);
+        String base64Response = getBase64SamlResponseTimeManipulation(getAuthenticationReqWithDefault(), 0, 0, 0, 0, 20);
         JsonPath loginResponse = sendSamlResponse("",base64Response );
         assertEquals("400", loginResponse.getString("status"));
         assertEquals("Generic error should be returned", BAD_SAML, loginResponse.getString(STATUS_ERROR_MESSAGE));
