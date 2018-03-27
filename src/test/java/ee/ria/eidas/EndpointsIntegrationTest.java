@@ -3,23 +3,17 @@ package ee.ria.eidas;
 
 import ee.ria.eidas.config.IntegrationTest;
 import io.restassured.RestAssured;
-import io.restassured.path.xml.XmlPath;
 import org.hamcrest.Matchers;
-import org.junit.Assert;
 import org.junit.Ignore;
 import org.junit.Test;
 import org.junit.experimental.categories.Category;
 import org.springframework.boot.test.context.SpringBootTest;
 
-import java.util.List;
 
+import static ee.ria.eidas.config.EidasTestStrings.*;
 import static io.restassured.RestAssured.given;
 import static io.restassured.config.EncoderConfig.encoderConfig;
-import static io.restassured.path.xml.config.XmlPathConfig.xmlPathConfig;
-import static org.hamcrest.MatcherAssert.assertThat;
 import static org.hamcrest.Matchers.*;
-import static org.junit.Assert.assertEquals;
-import static org.junit.Assert.assertTrue;
 
 @SpringBootTest(classes = EndpointsIntegrationTest.class)
 @Category(IntegrationTest.class)
@@ -85,9 +79,9 @@ public class EndpointsIntegrationTest extends TestsBase {
     @Test
     public void autend1_optionsMethodShouldReturnAllowedMethods() {
         given()
-                .formParam("relayState","")
-                .formParam("loa","LOW")
-                .formParam("country","CA")
+                .formParam(RELAY_STATE,"")
+                .formParam(LOA,"LOW")
+                .formParam(COUNTRY,"CA")
                 .contentType("application/x-www-form-urlencoded")
                 .config(RestAssured.config().encoderConfig(encoderConfig().defaultContentCharset("UTF-8")))
                 .when()
@@ -97,9 +91,9 @@ public class EndpointsIntegrationTest extends TestsBase {
     @Test
     public void autend1_headHttpMethodShouldNotReturnBody() {
         given()
-                .formParam("relayState","")
-                .formParam("loa","LOW")
-                .formParam("country","CA")
+                .formParam(RELAY_STATE,"")
+                .formParam(LOA,"LOW")
+                .formParam(COUNTRY,"CA")
                 .contentType("application/x-www-form-urlencoded")
                 .config(RestAssured.config().encoderConfig(encoderConfig().defaultContentCharset("UTF-8")))
                 .when()
@@ -109,9 +103,9 @@ public class EndpointsIntegrationTest extends TestsBase {
     @Test
     public void autend1_notSupportedHttpPutMethodShouldReturnError() {
         given()
-                .formParam("relayState","")
-                .formParam("loa","LOW")
-                .formParam("country","CA")
+                .formParam(RELAY_STATE,"")
+                .formParam(LOA,"LOW")
+                .formParam(COUNTRY,"CA")
                 .contentType("application/x-www-form-urlencoded")
                 .config(RestAssured.config().encoderConfig(encoderConfig().defaultContentCharset("UTF-8")))
                 .when()
@@ -121,9 +115,9 @@ public class EndpointsIntegrationTest extends TestsBase {
     @Test
     public void autend1_notSupportedHttpDeleteMethodShouldReturnError() {
         given()
-                .formParam("relayState","")
-                .formParam("loa","LOW")
-                .formParam("country","CA")
+                .formParam(RELAY_STATE,"")
+                .formParam(LOA,"LOW")
+                .formParam(COUNTRY,"CA")
                 .contentType("application/x-www-form-urlencoded")
                 .config(RestAssured.config().encoderConfig(encoderConfig().defaultContentCharset("UTF-8")))
                 .when()
@@ -133,8 +127,8 @@ public class EndpointsIntegrationTest extends TestsBase {
     @Test
     public void resend1_caseSensitivityOnEndpoint() {
         given()
-                .formParam("relayState","")
-                .formParam("SAMLResponse",getBase64SamlResponseMinimalAttributes(getAuthenticationReqWithDefault(), "TestFamily", "TestGiven", "TestPNO", "TestDate", null))
+                .formParam(RELAY_STATE,"")
+                .formParam(SAML_RESPONSE,getBase64SamlResponseMinimalAttributes(getAuthenticationReqWithDefault(), "TestFamily", "TestGiven", "TestPNO", "TestDate", null))
                 .contentType("application/x-www-form-urlencoded")
                 .config(RestAssured.config().encoderConfig(encoderConfig().defaultContentCharset("UTF-8")))
                 .when()
@@ -145,8 +139,8 @@ public class EndpointsIntegrationTest extends TestsBase {
     @Test //TODO: Need clarification what should be returned, currently there is inconsistency between endpoints
     public void resend1_optionsMethodShouldReturnAllowedMethods() {
         given()
-                .formParam("relayState","")
-                .formParam("SAMLResponse",getBase64SamlResponseMinimalAttributes(getAuthenticationReqWithDefault(), "TestFamily", "TestGiven", "TestPNO", "TestDate", null))
+                .formParam(RELAY_STATE,"")
+                .formParam(SAML_RESPONSE,getBase64SamlResponseMinimalAttributes(getAuthenticationReqWithDefault(), "TestFamily", "TestGiven", "TestPNO", "TestDate", null))
                 .contentType("application/x-www-form-urlencoded")
                 .config(RestAssured.config().encoderConfig(encoderConfig().defaultContentCharset("UTF-8")))
                 .when()
@@ -157,8 +151,8 @@ public class EndpointsIntegrationTest extends TestsBase {
     @Test
     public void resend1_headHttpMethodShouldNotReturnBody() {
         given()
-                .formParam("relayState","")
-                .formParam("SAMLResponse",getBase64SamlResponseMinimalAttributes(getAuthenticationReqWithDefault(), "TestFamily", "TestGiven", "TestPNO", "TestDate", null))
+                .formParam(RELAY_STATE,"")
+                .formParam(SAML_RESPONSE,getBase64SamlResponseMinimalAttributes(getAuthenticationReqWithDefault(), "TestFamily", "TestGiven", "TestPNO", "TestDate", null))
                 .contentType("application/x-www-form-urlencoded")
                 .config(RestAssured.config().encoderConfig(encoderConfig().defaultContentCharset("UTF-8")))
                 .when()
@@ -169,8 +163,8 @@ public class EndpointsIntegrationTest extends TestsBase {
     @Test
     public void resend1_notSupportedHttpPutMethodShouldReturnError() {
         given()
-                .formParam("relayState","")
-                .formParam("SAMLResponse",getBase64SamlResponseMinimalAttributes(getAuthenticationReqWithDefault(), "TestFamily", "TestGiven", "TestPNO", "TestDate", null))
+                .formParam(RELAY_STATE,"")
+                .formParam(SAML_RESPONSE,getBase64SamlResponseMinimalAttributes(getAuthenticationReqWithDefault(), "TestFamily", "TestGiven", "TestPNO", "TestDate", null))
                 .contentType("application/x-www-form-urlencoded")
                 .config(RestAssured.config().encoderConfig(encoderConfig().defaultContentCharset("UTF-8")))
                 .when()
@@ -181,8 +175,8 @@ public class EndpointsIntegrationTest extends TestsBase {
     @Test
     public void resend1_notSupportedHttpGetMethodShouldReturnError() {
         given()
-                .formParam("relayState","")
-                .formParam("SAMLResponse",getBase64SamlResponseMinimalAttributes(getAuthenticationReqWithDefault(), "TestFamily", "TestGiven", "TestPNO", "TestDate", null))
+                .formParam(RELAY_STATE,"")
+                .formParam(SAML_RESPONSE,getBase64SamlResponseMinimalAttributes(getAuthenticationReqWithDefault(), "TestFamily", "TestGiven", "TestPNO", "TestDate", null))
                 .contentType("application/x-www-form-urlencoded")
                 .config(RestAssured.config().encoderConfig(encoderConfig().defaultContentCharset("UTF-8")))
                 .when()
@@ -193,8 +187,8 @@ public class EndpointsIntegrationTest extends TestsBase {
     @Test
     public void resend1_notSupportedHttpDeleteMethodShouldReturnError() {
         given()
-                .formParam("relayState","")
-                .formParam("SAMLResponse",getBase64SamlResponseMinimalAttributes(getAuthenticationReqWithDefault(), "TestFamily", "TestGiven", "TestPNO", "TestDate", null))
+                .formParam(RELAY_STATE,"")
+                .formParam(SAML_RESPONSE,getBase64SamlResponseMinimalAttributes(getAuthenticationReqWithDefault(), "TestFamily", "TestGiven", "TestPNO", "TestDate", null))
                 .contentType("application/x-www-form-urlencoded")
                 .config(RestAssured.config().encoderConfig(encoderConfig().defaultContentCharset("UTF-8")))
                 .when()

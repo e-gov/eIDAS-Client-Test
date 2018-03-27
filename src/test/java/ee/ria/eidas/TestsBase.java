@@ -154,26 +154,36 @@ public abstract class TestsBase {
 
     protected String getAuthenticationReq(String country, String loa, String relayState) {
         return given()
-                .queryParam("relayState",relayState)
-                .queryParam("loa",loa)
-                .queryParam("country",country)
+                .queryParam(RELAY_STATE, relayState)
+                .queryParam(LOA, loa)
+                .queryParam(COUNTRY, country)
                 .config(config().encoderConfig(encoderConfig().defaultContentCharset("UTF-8")))
                 .when()
                 .get(testEidasClientProperties.getSpStartUrl()).then().log().ifError().extract().body().asString();
     }
 
-    protected String getAuthenticationReqForm(Map<String,String> values) {
+    protected io.restassured.response.Response getAuthenticationReqResponse(String country, String loa, String relayState) {
+        return given()
+                .queryParam(RELAY_STATE, relayState)
+                .queryParam(LOA, loa)
+                .queryParam(COUNTRY, country)
+                .config(config().encoderConfig(encoderConfig().defaultContentCharset("UTF-8")))
+                .when()
+                .get(testEidasClientProperties.getSpStartUrl()).then().log().ifError().extract().response();
+    }
+
+    protected io.restassured.response.Response getAuthenticationReqForm(Map<String,String> values) {
         return given()
                 .queryParams(values)
                 .config(config().encoderConfig(encoderConfig().defaultContentCharset("UTF-8")))
                 .when()
-                .get(testEidasClientProperties.getSpStartUrl()).then().log().ifError().extract().body().asString();
+                .get(testEidasClientProperties.getSpStartUrl()).then().log().ifError().extract().response();
     }
 
     protected JsonPath sendSamlResponse(String relayState, String response) {
         return given()
-                .formParam("relayState",relayState)
-                .formParam("SAMLResponse", response)
+                .formParam(RELAY_STATE,relayState)
+                .formParam(SAML_RESPONSE, response)
                 .contentType("application/x-www-form-urlencoded")
                 .config(config().encoderConfig(encoderConfig().defaultContentCharset("UTF-8")))
                 .when()
@@ -182,8 +192,8 @@ public abstract class TestsBase {
 
     protected io.restassured.response.Response sendSamlResponseExtractResponse(String relayState, String response) {
         return given()
-                .formParam("relayState",relayState)
-                .formParam("SAMLResponse", response)
+                .formParam(RELAY_STATE,relayState)
+                .formParam(SAML_RESPONSE, response)
                 .contentType("application/x-www-form-urlencoded")
                 .config(config().encoderConfig(encoderConfig().defaultContentCharset("UTF-8")))
                 .when()

@@ -2,26 +2,111 @@ package ee.ria.eidas;
 
 
 import ee.ria.eidas.config.IntegrationTest;
-import io.restassured.RestAssured;
 import io.restassured.path.xml.XmlPath;
-import org.apache.commons.lang3.RandomStringUtils;
-import org.hamcrest.Matchers;
+import org.hamcrest.text.MatchesPattern;
+import org.junit.Assert;
 import org.junit.Ignore;
 import org.junit.Test;
 import org.junit.experimental.categories.Category;
 import org.springframework.boot.test.context.SpringBootTest;
 
-import java.util.HashMap;
-import java.util.Map;
+import java.time.Duration;
+import java.time.Instant;
+import java.util.List;
 
-import static io.restassured.RestAssured.given;
-import static io.restassured.config.EncoderConfig.encoderConfig;
-import static org.hamcrest.Matchers.equalTo;
+import static org.hamcrest.MatcherAssert.assertThat;
+import static org.hamcrest.Matchers.*;
 import static org.junit.Assert.assertEquals;
 
 @SpringBootTest(classes = AuthenticationRequestIntegrationTest.class)
 @Category(IntegrationTest.class)
 public class AuthenticationRequestIntegrationTest extends TestsBase {
+
+    @Test
+    public  void auth1_hasValidSignature() {
+        try {
+            validateSamlReqSignature(getDecodedSamlRequestBody(getAuthenticationReqWithDefault()));
+        } catch (Exception e) {
+            e.printStackTrace();
+            Assert.fail("Authentication request must have valid signature:  " + e.getMessage());
+        }
+    }
+
+    @Test
+    public void auth1_parametersArePresent() {
+        XmlPath html = new XmlPath(XmlPath.CompatibilityMode.HTML, getAuthenticationReq("EE", "LOW", "relayState"));
+        assertEquals("Country code is present","EE", html.getString("**.findAll { it.@name == 'country' }.@value"));
+        assertEquals("RelayState is present","relayState", html.getString("**.findAll { it.@name == 'RelayState' }.@value"));
+    }
+
+    @Test
+    public void auth1_verifyUsedDigestAlgosInSignature() {
+        XmlPath xmlPath = getDecodedSamlRequestBodyXml(getAuthenticationReqWithDefault());
+
+        List<String> digestMethods = xmlPath.getList("EntityDescriptor.Signature.SignedInfo.Reference.DigestMethod.@Algorithm");
+        assertThat("One of the accepted digest algorithms must be present", digestMethods,
+                anyOf(hasItem("http://www.w3.org/2001/04/xmlenc#sha512"), hasItem("http://www.w3.org/2001/04/xmlenc#sha256")));
+    }
+
+    @Test
+    public void auth1_verifyUsedSignatureAlgosInSignature() {
+        XmlPath xmlPath = getDecodedSamlRequestBodyXml(getAuthenticationReqWithDefault());
+
+        List<String> signingMethods = xmlPath.getList("EntityDescriptor.Signature.SignedInfo.SignatureMethod.@Algorithm");
+        assertThat("One of the accepted signing algorithms must be present", signingMethods,
+                anyOf(hasItem("http://www.w3.org/2001/04/xmldsig-more#ecdsa-sha512"), hasItem("http://www.w3.org/2001/04/xmldsig-more#ecdsa-sha256"),
+                        hasItem("http://www.w3.org/2007/05/xmldsig-more#sha512-rsa-MGF1"), hasItem("http://www.w3.org/2007/05/xmldsig-more#sha256-rsa-MGF1")));
+    }
+
+    @Ignore
+    @Test //TODO: Does SAML request has also schema to validate against?
+    public void auth1_verifySamlAuthRequestSchema() {
+        //assertTrue("Metadata must be based on urn:oasis:names:tc:SAML:2.0:metadata schema", validateMetadataSchema());
+    }
+
+    @Test
+    public void auth2_mandatoryAttributessArePresentAndSetTrueForNaturalPersons() {
+        XmlPath xmlPath = getDecodedSamlRequestBodyXml(getAuthenticationReqWithDefault());
+        assertEquals("Family name must be present and required set to: true", "true",
+                xmlPath.getString("**.findAll { it.@Name == 'http://eidas.europa.eu/attributes/naturalperson/CurrentFamilyName' }.@isRequired"));
+        assertEquals("First name must be present and required set to: true", "true",
+                xmlPath.getString("**.findAll { it.@Name == 'http://eidas.europa.eu/attributes/naturalperson/CurrentGivenName' }.@isRequired"));
+        assertEquals("Date of birth must be present and required set to: true", "true",
+                xmlPath.getString("**.findAll { it.@Name == 'http://eidas.europa.eu/attributes/naturalperson/DateOfBirth' }.@isRequired"));
+        assertEquals("Person identifier must be present and required set to: true", "true",
+                xmlPath.getString("**.findAll { it.@Name == 'http://eidas.europa.eu/attributes/naturalperson/PersonIdentifier' }.@isRequired"));
+    }
+
+    @Test
+    public void auth2_mandatoryValuesArePresent() {
+        XmlPath xmlPath = getDecodedSamlRequestBodyXml(getAuthenticationReqWithDefault());
+        assertEquals("SPType must be: public", "public", xmlPath.getString("AuthnRequest.Extensions.SPType"));
+        assertEquals("The NameID policy must be: unspecified", "urn:oasis:names:tc:SAML:1.1:nameid-format:unspecified", xmlPath.getString("AuthnRequest.NameIDPolicy.@Format"));
+        assertThat("Issuer must point to Metadata url", xmlPath.getString("AuthnRequest.Issuer"), endsWith(testEidasClientProperties.getSpMetadataUrl()));
+    }
+
+    @Test
+    public void auth2_authenticationLevelIsPresent() {
+        XmlPath xmlPath = getDecodedSamlRequestBodyXml(getAuthenticationReqWithDefault());
+        List<String> loa = xmlPath.getList("AuthnRequest.RequestedAuthnContext.AuthnContextClassRef");
+        assertThat("One of the accepted authentication levels must be present", loa,
+                anyOf(hasItem("http://eidas.europa.eu/LoA/low"), hasItem("http://eidas.europa.eu/LoA/substantial"), hasItem("http://eidas.europa.eu/LoA/high")));
+    }
+
+    @Test
+    public void auth3_mandatoryValuesArePresentInEntityDescriptor() {
+        XmlPath xmlPath = getDecodedSamlRequestBodyXml(getAuthenticationReqWithDefault());
+        assertThat("The Destination must be the connected eIDAS node URL", xmlPath.getString("AuthnRequest.@Destination"), endsWith(testEidasClientProperties.getIdpStartUrl()));
+        assertThat("ID must be in NCName format" ,  xmlPath.getString("AuthnRequest.@ID"), MatchesPattern.matchesPattern("^[a-zA-Z0-9_.]*$"));
+        assertEquals("The ForceAuthn must be: true", "true", xmlPath.getString("AuthnRequest.@ForceAuthn"));
+        assertEquals("The IsPassive must be: false", "false", xmlPath.getString("AuthnRequest.@IsPassive"));
+        assertEquals("The Version must be: 2.0", "2.0", xmlPath.getString("AuthnRequest.@Version"));
+        assertEquals("ProviderName must be correct", testEidasClientProperties.getSpProviderName(), xmlPath.getString("AuthnRequest.@ProviderName"));
+        Instant currentTime = Instant.now();
+        Instant issuingTime = Instant.parse(xmlPath.getString("AuthnRequest.@IssueInstant"));
+        // This assertion may cause flakyness if the client server clock is different
+        assertThat("The issuing time should be within 5 seconds of current time",issuingTime, allOf(lessThan(currentTime), greaterThan(currentTime.minus(Duration.ofMillis(5000)))));
+    }
 
     @Test
     public void auth4_allLoaLevelsAreAccepted() {
@@ -34,158 +119,4 @@ public class AuthenticationRequestIntegrationTest extends TestsBase {
         samlRequest = getDecodedSamlRequestBodyXml(getAuthenticationReq("EE", "HIGH", "relayState"));
         assertEquals("Correct LOA is returned","http://eidas.europa.eu/LoA/high", samlRequest.getString("AuthnRequest.RequestedAuthnContext.AuthnContextClassRef"));
     }
-
-    @Test
-    public void auth6_invalidLoaLevelsAreNotAccepted() {
-        given()
-                .queryParam("relayState","")
-                .queryParam("loa","SUPER")
-                .queryParam("country","EE")
-                .config(RestAssured.config().encoderConfig(encoderConfig().defaultContentCharset("UTF-8")))
-                .when()
-                .get(testEidasClientProperties.getSpStartUrl()).then().log().ifError().statusCode(500).body("message",equalTo("Something went wrong internally. Please consult server logs for further details."));
-
-        XmlPath samlRequest = getDecodedSamlRequestBodyXml(getAuthenticationReq("EE", "HIGH", "relayState"));
-        assertEquals("Correct LOA is returned","http://eidas.europa.eu/LoA/high", samlRequest.getString("AuthnRequest.RequestedAuthnContext.AuthnContextClassRef"));
-    }
-
-    @Test //TODO: needs a method to fetch the supported country codes
-    public void auth6_invalidCountryIsNotAccepted() {
-        given()
-                .queryParam("relayState","")
-                .queryParam("loa","LOW")
-                .queryParam("country","Est")
-                .config(RestAssured.config().encoderConfig(encoderConfig().defaultContentCharset("UTF-8")))
-                .when()
-                .get(testEidasClientProperties.getSpStartUrl()).then().log().ifValidationFails().statusCode(400).body("message", Matchers.startsWith("Invalid country! Valid countries:["));
-
-        given()
-                .queryParam("relayState","")
-                .queryParam("loa","LOW")
-                .queryParam("country","ee")
-                .config(RestAssured.config().encoderConfig(encoderConfig().defaultContentCharset("UTF-8")))
-                .when()
-                .get(testEidasClientProperties.getSpStartUrl()).then().log().ifValidationFails().statusCode(400).body("message", Matchers.startsWith("Invalid country! Valid countries:["));
-
-        XmlPath samlRequest = getDecodedSamlRequestBodyXml(getAuthenticationReq("EE", "HIGH", "relayState"));
-        assertEquals("Correct LOA is returned","http://eidas.europa.eu/LoA/high", samlRequest.getString("AuthnRequest.RequestedAuthnContext.AuthnContextClassRef"));
-    }
-
-    @Test
-    public void auth6_notSupportedCountryIsNotAccepted() {
-        given()
-                .queryParam("relayState","")
-                .queryParam("loa","LOW")
-                .queryParam("country","SZ")
-                .config(RestAssured.config().encoderConfig(encoderConfig().defaultContentCharset("UTF-8")))
-                .when()
-                .get(testEidasClientProperties.getSpStartUrl()).then().log().ifValidationFails().statusCode(400).body("message", Matchers.startsWith("Invalid country! Valid countries:["));
-
-        XmlPath samlRequest = getDecodedSamlRequestBodyXml(getAuthenticationReq("EE", "HIGH", "relayState"));
-        assertEquals("Correct LOA is returned","http://eidas.europa.eu/LoA/high", samlRequest.getString("AuthnRequest.RequestedAuthnContext.AuthnContextClassRef"));
-    }
-
-    @Test
-    public void auth6_loaMissingValueShouldReturnDefault() {
-        String body = given()
-                .queryParam("relayState","")
-                .queryParam("loa","")
-                .queryParam("country","CA")
-                .config(RestAssured.config().encoderConfig(encoderConfig().defaultContentCharset("UTF-8")))
-                .when()
-                .get(testEidasClientProperties.getSpStartUrl()).then().log().ifValidationFails().statusCode(200).extract().body().asString();
-
-        XmlPath samlRequest = getDecodedSamlRequestBodyXml(body);
-        assertEquals("Correct LOA is returned","http://eidas.europa.eu/LoA/substantial", samlRequest.getString("AuthnRequest.RequestedAuthnContext.AuthnContextClassRef"));
-    }
-
-    @Test
-    public void auth6_optionalParametersMissingShouldReturnDefault() {
-        String body = given()
-                .queryParam("country","CA")
-                .config(RestAssured.config().encoderConfig(encoderConfig().defaultContentCharset("UTF-8")))
-                .when()
-                .get(testEidasClientProperties.getSpStartUrl()).then().log().ifValidationFails().statusCode(200).extract().body().asString();
-
-        XmlPath samlRequest = getDecodedSamlRequestBodyXml(body);
-        assertEquals("Correct LOA is returned","http://eidas.europa.eu/LoA/substantial", samlRequest.getString("AuthnRequest.RequestedAuthnContext.AuthnContextClassRef"));
-    }
-
-    @Test
-    public void auth6_invalidParametersAreNotBlocking() {
-        Map<String,String> formParams = new HashMap<String,String>();
-        formParams.put("randomParam", "random");
-        formParams.put("loa", "LOW");
-        formParams.put("country", "EE");
-        formParams.put("relayState", "1234abcd");
-
-        XmlPath html = new XmlPath(XmlPath.CompatibilityMode.HTML, getAuthenticationReqForm(formParams));
-        assertEquals("Status is returned with correct relayState","1234abcd", html.getString("**.findAll { it.@name == 'RelayState' }.@value"));
-    }
-
-    @Test
-    public void auth6_errorIsReturnedOnWrongRelayStatePattern() {
-        String relayState = RandomStringUtils.randomAlphanumeric(81);
-        given()
-                .queryParam("relayState",relayState)
-                .queryParam("loa","LOW")
-                .queryParam("country","CA")
-                .config(RestAssured.config().encoderConfig(encoderConfig().defaultContentCharset("UTF-8")))
-                .when()
-                .get(testEidasClientProperties.getSpStartUrl()).then().log().ifValidationFails().statusCode(400).body("message", Matchers.equalTo("Invalid RelayState! Must match the following regexp: ^[a-zA-Z0-9-_]{0,80}$"));
-
-        relayState = "<>$";
-        given()
-                .queryParam("relayState",relayState)
-                .queryParam("loa","LOW")
-                .queryParam("country","CA")
-                .config(RestAssured.config().encoderConfig(encoderConfig().defaultContentCharset("UTF-8")))
-                .when()
-                .get(testEidasClientProperties.getSpStartUrl()).then().log().ifValidationFails().statusCode(400).body("message", Matchers.equalTo("Invalid RelayState! Must match the following regexp: ^[a-zA-Z0-9-_]{0,80}$"));
-
-    }
-
-    @Ignore
-    @Test
-    public void auth6_loaLevelCaseSensitivity() {
-        String response = given()
-                .queryParam("relayState","")
-                .queryParam("lOa","high")
-                .queryParam("country","EE")
-                .config(RestAssured.config().encoderConfig(encoderConfig().defaultContentCharset("UTF-8")))
-                .when()
-                .get(testEidasClientProperties.getSpStartUrl()).then().log().ifError().statusCode(200).extract().body().asString();
-
-        XmlPath samlRequest = getDecodedSamlRequestBodyXml(response);
-        assertEquals("Correct LOA is returned","http://eidas.europa.eu/LoA/high", samlRequest.getString("AuthnRequest.RequestedAuthnContext.AuthnContextClassRef"));
-    }
-
-    @Ignore
-    @Test
-    public void auth6_relayStateCaseSensitivity() {
-        String response = given()
-                .queryParam("ReLaYStAtE","RelayState123")
-                .queryParam("loa","HIGH")
-                .queryParam("country","EE")
-                .config(RestAssured.config().encoderConfig(encoderConfig().defaultContentCharset("UTF-8")))
-                .when()
-                .get(testEidasClientProperties.getSpStartUrl()).then().log().ifError().statusCode(200).extract().body().asString();
-
-        XmlPath html = new XmlPath(XmlPath.CompatibilityMode.HTML, response);
-        assertEquals("Status is returned with correct relayState","RelayState123", html.getString("**.findAll { it.@name == 'RelayState' }.@value"));
-    }
-
-    @Ignore
-    @Test
-    public void auth6_countryCaseSensitivity() {
-        String response = given()
-                .queryParam("cOuNtRy","EE")
-                .config(RestAssured.config().encoderConfig(encoderConfig().defaultContentCharset("UTF-8")))
-                .when()
-                .get(testEidasClientProperties.getSpStartUrl()).then().log().ifError().statusCode(200).extract().body().asString();
-
-        XmlPath html = new XmlPath(XmlPath.CompatibilityMode.HTML, response);
-        assertEquals("Status is returned with correct relayState","EE", html.getString("**.findAll { it.@name == 'country' }.@value"));
-    }
-
 }

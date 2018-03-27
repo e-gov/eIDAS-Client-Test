@@ -1,6 +1,14 @@
 package ee.ria.eidas.config;
 
 public class EidasTestStrings {
+    //eIDAS client API strings
+    public static final String COUNTRY = "country";
+    public static final String LOA = "loa";
+    public static final String RELAY_STATE = "relayState";
+    public static final String ADDITIONAL_ATTRIBUTES = "AdditionalAttributes";
+    public static final String SAML_REQUEST = "SAMLRequest";
+    public static final String SAML_RESPONSE = "SAMLResponse";
+
     //SAML response strings
     public static final String LOA_LOW = "http://eidas.europa.eu/LoA/low";
     public static final String LOA_SUBSTANTIAL = "http://eidas.europa.eu/LoA/substantial";
@@ -34,6 +42,10 @@ public class EidasTestStrings {
 
     //JSON response error messages
     public static final String BAD_SAML = "Bad SAML message";
+    public static final String BAD_REQUEST = "Bad Request";
+
+    //XML response strings
+    public static final String XML_LOA =  "AuthnRequest.RequestedAuthnContext.AuthnContextClassRef";
 
     //Test data strings
     public static final String DEFATTR_FIRST = "Test-FirstName";
