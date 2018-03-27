@@ -175,6 +175,7 @@ public abstract class TestsBase {
     protected io.restassured.response.Response getAuthenticationReqForm(Map<String,String> values) {
         return given()
                 .queryParams(values)
+                .contentType("application/x-www-form-urlencoded")
                 .config(config().encoderConfig(encoderConfig().defaultContentCharset("UTF-8")))
                 .when()
                 .get(testEidasClientProperties.getSpStartUrl()).then().log().ifError().extract().response();

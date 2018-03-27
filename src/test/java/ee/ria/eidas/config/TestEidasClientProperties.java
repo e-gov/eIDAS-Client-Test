@@ -142,6 +142,10 @@ public class TestEidasClientProperties {
         return idpUrl + idpMetadataUrl;
     }
 
+    public String getFullIdpStartUrl () {
+        return idpUrl + idpStartUrl;
+    }
+
     public String getFullSpReturnUrl () {
         return targetSpUrl+spReturnUrl;
     }
