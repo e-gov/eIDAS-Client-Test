@@ -20,76 +20,66 @@ import static org.hamcrest.Matchers.*;
 public class EndpointsIntegrationTest extends TestsBase {
 
     @Test
-    public void metend1_caseSensitivityOnEndpoint() {
+    public void metEnd1_caseSensitivityOnEndpoint() {
         given()
                 .config(RestAssured.config().encoderConfig(encoderConfig().defaultContentCharset("UTF-8")))
                 .when()
-                .get("/MeTaDaTa").then().log().ifValidationFails().statusCode(404).body("error",equalTo("Not Found"));
+                .get(testEidasClientProperties.getSpMetadataUrl().toUpperCase()).then().log().ifValidationFails().statusCode(404).body("error",equalTo("Not Found"));
     }
 
+    @Ignore //TODO: TARAEI-102
     @Test
-    public void metend1_optionsMethodShouldReturnAllowedMethods() {
+    public void metEnd1_notSupportedHttpOptionsMethodShouldReturnError() {
         given()
                 .config(RestAssured.config().encoderConfig(encoderConfig().defaultContentCharset("UTF-8")))
                 .when()
-                .options(testEidasClientProperties.getSpMetadataUrl()).then().log().ifValidationFails().statusCode(200).header("Allow","GET,HEAD");
+                .options(testEidasClientProperties.getSpMetadataUrl()).then().log().ifValidationFails().statusCode(405).body("error", Matchers.equalTo("Method Not Allowed"));
     }
 
     @Test
-    public void metend1_notSupportedHttpPostMethodShouldReturnError() {
+    public void metEnd1_notSupportedHttpPostMethodShouldReturnError() {
         given()
                 .config(RestAssured.config().encoderConfig(encoderConfig().defaultContentCharset("UTF-8")))
                 .when()
-                .post(testEidasClientProperties.getSpMetadataUrl()).then().log().ifValidationFails().statusCode(405).body("message",Matchers.equalTo("Request method 'POST' not supported"));
+                .post(testEidasClientProperties.getSpMetadataUrl()).then().log().ifValidationFails().statusCode(405).body("error", Matchers.equalTo("Method Not Allowed"));
     }
 
     @Test
-    public void metend1_notSupportedHttpPutMethodShouldReturnError() {
+    public void metEnd1_notSupportedHttpPutMethodShouldReturnError() {
         given()
                 .config(RestAssured.config().encoderConfig(encoderConfig().defaultContentCharset("UTF-8")))
                 .when()
-                .put(testEidasClientProperties.getSpMetadataUrl()).then().log().ifValidationFails().statusCode(405).body("message",Matchers.equalTo("Request method 'PUT' not supported"));
+                .put(testEidasClientProperties.getSpMetadataUrl()).then().log().ifValidationFails().statusCode(405).body("error", Matchers.equalTo("Method Not Allowed"));
     }
 
+    @Ignore //TODO: TARAEI-102
     @Test
-    public void metend1_headHttpMethodShouldNotReturnBody() {
+    public void metEnd1_notSupportedHttpHeadMethodShouldReturnError() {
         given()
                 .config(RestAssured.config().encoderConfig(encoderConfig().defaultContentCharset("UTF-8")))
                 .when()
-                .head(testEidasClientProperties.getSpMetadataUrl()).then().log().ifValidationFails().statusCode(200).body(isEmptyOrNullString());
+                .head(testEidasClientProperties.getSpMetadataUrl()).then().log().ifValidationFails().statusCode(405).body("error", Matchers.equalTo("Method Not Allowed"));
     }
 
     @Test
-    public void metend1_notSupportedHttpDeleteMethodShouldReturnError() {
+    public void metEnd1_notSupportedHttpDeleteMethodShouldReturnError() {
         given()
                 .config(RestAssured.config().encoderConfig(encoderConfig().defaultContentCharset("UTF-8")))
                 .when()
-                .delete(testEidasClientProperties.getSpMetadataUrl()).then().log().ifValidationFails().statusCode(405).body("message", Matchers.equalTo("Request method 'DELETE' not supported"));
+                .delete(testEidasClientProperties.getSpMetadataUrl()).then().log().ifValidationFails().statusCode(405).body("error", Matchers.equalTo("Method Not Allowed"));
     }
 
     @Test
-    public void autend1_caseSensitivityOnGet() {
+    public void autEnd1_caseSensitivityOnGet() {
         given()
                 .config(RestAssured.config().encoderConfig(encoderConfig().defaultContentCharset("UTF-8")))
                 .when()
-                .get("/LoGiN").then().log().ifValidationFails().statusCode(404).body("error",equalTo("Not Found"));
+                .get(testEidasClientProperties.getSpStartUrl().toUpperCase()).then().log().ifValidationFails().statusCode(404).body("error",equalTo("Not Found"));
     }
 
-    @Ignore //TODO: Returns POST but logical would be GET
+    @Ignore //TODO: TARAEI-102
     @Test
-    public void autend1_optionsMethodShouldReturnAllowedMethods() {
-        given()
-                .formParam(RELAY_STATE,"")
-                .formParam(LOA,"LOW")
-                .formParam(COUNTRY,"CA")
-                .contentType("application/x-www-form-urlencoded")
-                .config(RestAssured.config().encoderConfig(encoderConfig().defaultContentCharset("UTF-8")))
-                .when()
-                .options(testEidasClientProperties.getSpStartUrl()).then().log().ifValidationFails().statusCode(200).header("Allow",Matchers.equalTo("POST,GET,HEAD"));
-    }
-
-    @Test
-    public void autend1_headHttpMethodShouldNotReturnBody() {
+    public void autEnd1_notSupportedHttpOptionsMethodShouldReturnError() {
         given()
                 .formParam(RELAY_STATE,"")
                 .formParam(LOA,"LOW")
@@ -97,11 +87,24 @@ public class EndpointsIntegrationTest extends TestsBase {
                 .contentType("application/x-www-form-urlencoded")
                 .config(RestAssured.config().encoderConfig(encoderConfig().defaultContentCharset("UTF-8")))
                 .when()
-                .head(testEidasClientProperties.getSpStartUrl()).then().log().ifValidationFails().statusCode(500).body(isEmptyOrNullString());
+                .options(testEidasClientProperties.getSpStartUrl()).then().log().ifValidationFails().statusCode(405).body("error", Matchers.equalTo("Method Not Allowed"));
+    }
+
+    @Ignore //TODO: TARAEI-102
+    @Test
+    public void autEnd1_notSupportedHttpHeadMethodShouldReturnError() {
+        given()
+                .formParam(RELAY_STATE,"")
+                .formParam(LOA,"LOW")
+                .formParam(COUNTRY,"CA")
+                .contentType("application/x-www-form-urlencoded")
+                .config(RestAssured.config().encoderConfig(encoderConfig().defaultContentCharset("UTF-8")))
+                .when()
+                .head(testEidasClientProperties.getSpStartUrl()).then().log().ifValidationFails().statusCode(405).body("error", Matchers.equalTo("Method Not Allowed"));
     }
 
     @Test
-    public void autend1_notSupportedHttpPutMethodShouldReturnError() {
+    public void autEnd1_notSupportedHttpPutMethodShouldReturnError() {
         given()
                 .formParam(RELAY_STATE,"")
                 .formParam(LOA,"LOW")
@@ -113,7 +116,7 @@ public class EndpointsIntegrationTest extends TestsBase {
     }
 
     @Test
-    public void autend1_notSupportedHttpDeleteMethodShouldReturnError() {
+    public void autEnd1_notSupportedHttpDeleteMethodShouldReturnError() {
         given()
                 .formParam(RELAY_STATE,"")
                 .formParam(LOA,"LOW")
@@ -121,78 +124,85 @@ public class EndpointsIntegrationTest extends TestsBase {
                 .contentType("application/x-www-form-urlencoded")
                 .config(RestAssured.config().encoderConfig(encoderConfig().defaultContentCharset("UTF-8")))
                 .when()
-                .delete(testEidasClientProperties.getSpStartUrl()).then().log().ifValidationFails().statusCode(405).body("error",Matchers.equalTo("Method Not Allowed"));
+                .delete(testEidasClientProperties.getSpStartUrl()).then().log().ifValidationFails().statusCode(405).body("error", Matchers.equalTo("Method Not Allowed"));
     }
 
     @Test
-    public void resend1_caseSensitivityOnEndpoint() {
+    public void autEnd1_notSupportedHttpPostMethodShouldReturnError() {
         given()
                 .formParam(RELAY_STATE,"")
-                .formParam(SAML_RESPONSE,getBase64SamlResponseMinimalAttributes(getAuthenticationReqWithDefault(), "TestFamily", "TestGiven", "TestPNO", "TestDate", null))
+                .formParam(LOA,"LOW")
+                .formParam(COUNTRY,"CA")
                 .contentType("application/x-www-form-urlencoded")
                 .config(RestAssured.config().encoderConfig(encoderConfig().defaultContentCharset("UTF-8")))
                 .when()
-                .post("/ReTuRnUrL").then().log().ifValidationFails().statusCode(404).body("error",equalTo("Not Found"));
+                .post(testEidasClientProperties.getSpStartUrl()).then().log().ifValidationFails().statusCode(405).body("error", Matchers.equalTo("Method Not Allowed"));
     }
 
-    @Ignore
-    @Test //TODO: Need clarification what should be returned, currently there is inconsistency between endpoints
-    public void resend1_optionsMethodShouldReturnAllowedMethods() {
-        given()
-                .formParam(RELAY_STATE,"")
-                .formParam(SAML_RESPONSE,getBase64SamlResponseMinimalAttributes(getAuthenticationReqWithDefault(), "TestFamily", "TestGiven", "TestPNO", "TestDate", null))
-                .contentType("application/x-www-form-urlencoded")
-                .config(RestAssured.config().encoderConfig(encoderConfig().defaultContentCharset("UTF-8")))
-                .when()
-                .options(testEidasClientProperties.getSpReturnUrl()).then().log().ifValidationFails().statusCode(200).header("Allow",Matchers.equalTo("POST, OPTIONS"));
-    }
-
-    @Ignore //TODO: Inconsistency, this returns method not allowed in this endpoint (without body), others 200
     @Test
-    public void resend1_headHttpMethodShouldNotReturnBody() {
+    public void resEnd1_caseSensitivityOnEndpoint() {
         given()
                 .formParam(RELAY_STATE,"")
                 .formParam(SAML_RESPONSE,getBase64SamlResponseMinimalAttributes(getAuthenticationReqWithDefault(), "TestFamily", "TestGiven", "TestPNO", "TestDate", null))
                 .contentType("application/x-www-form-urlencoded")
                 .config(RestAssured.config().encoderConfig(encoderConfig().defaultContentCharset("UTF-8")))
                 .when()
-                .head(testEidasClientProperties.getSpReturnUrl()).then().log().ifValidationFails().statusCode(200).body(isEmptyOrNullString());
+                .post(testEidasClientProperties.getSpReturnUrl().toUpperCase()).then().log().ifValidationFails().statusCode(404).body("error",equalTo("Not Found"));
     }
 
-    @Ignore
+    @Ignore //TODO: TARAEI-102
     @Test
-    public void resend1_notSupportedHttpPutMethodShouldReturnError() {
+    public void resEnd1_notSupportedHttpOptionsMethodShouldReturnError() {
         given()
                 .formParam(RELAY_STATE,"")
-                .formParam(SAML_RESPONSE,getBase64SamlResponseMinimalAttributes(getAuthenticationReqWithDefault(), "TestFamily", "TestGiven", "TestPNO", "TestDate", null))
+                .formParam(SAML_RESPONSE, getBase64SamlResponseMinimalAttributes(getAuthenticationReqWithDefault(), "TestFamily", "TestGiven", "TestPNO", "TestDate", null))
                 .contentType("application/x-www-form-urlencoded")
                 .config(RestAssured.config().encoderConfig(encoderConfig().defaultContentCharset("UTF-8")))
                 .when()
-                .put(testEidasClientProperties.getSpReturnUrl()).then().log().ifValidationFails().statusCode(405).body("error",Matchers.equalTo("Method Not Allowed"));
+                .options(testEidasClientProperties.getSpReturnUrl()).then().log().ifValidationFails().statusCode(405).body("error", Matchers.equalTo("Method Not Allowed"));
     }
 
-    @Ignore //TODO: This return HTTP 400 in this endpoint
+    @Ignore //TODO: TARAEI-102
     @Test
-    public void resend1_notSupportedHttpGetMethodShouldReturnError() {
+    public void resEnd1_notSupportedHttpHeadMethodShouldReturnError() {
         given()
                 .formParam(RELAY_STATE,"")
-                .formParam(SAML_RESPONSE,getBase64SamlResponseMinimalAttributes(getAuthenticationReqWithDefault(), "TestFamily", "TestGiven", "TestPNO", "TestDate", null))
+                .formParam(SAML_RESPONSE, getBase64SamlResponseMinimalAttributes(getAuthenticationReqWithDefault(), "TestFamily", "TestGiven", "TestPNO", "TestDate", null))
                 .contentType("application/x-www-form-urlencoded")
                 .config(RestAssured.config().encoderConfig(encoderConfig().defaultContentCharset("UTF-8")))
                 .when()
-                .get(testEidasClientProperties.getSpReturnUrl()).then().log().ifValidationFails().statusCode(405).body("error",Matchers.equalTo("Method Not Allowed"));
+                .head(testEidasClientProperties.getSpReturnUrl()).then().log().ifValidationFails().statusCode(405).body("error", Matchers.equalTo("Method Not Allowed"));
     }
 
-    @Ignore
     @Test
-    public void resend1_notSupportedHttpDeleteMethodShouldReturnError() {
+    public void resEnd1_notSupportedHttpPutMethodShouldReturnError() {
         given()
                 .formParam(RELAY_STATE,"")
                 .formParam(SAML_RESPONSE,getBase64SamlResponseMinimalAttributes(getAuthenticationReqWithDefault(), "TestFamily", "TestGiven", "TestPNO", "TestDate", null))
                 .contentType("application/x-www-form-urlencoded")
                 .config(RestAssured.config().encoderConfig(encoderConfig().defaultContentCharset("UTF-8")))
                 .when()
-                .delete(testEidasClientProperties.getSpReturnUrl()).then().log().ifValidationFails().statusCode(405).body("error",Matchers.equalTo("Method Not Allowed"));
+                .put(testEidasClientProperties.getSpReturnUrl()).then().log().ifValidationFails().statusCode(405).body("error", Matchers.equalTo("Method Not Allowed"));
+    }
+
+    @Test
+    public void resEnd1_notSupportedHttpGetMethodShouldReturnError() {
+        given()
+                .contentType("application/x-www-form-urlencoded")
+                .config(RestAssured.config().encoderConfig(encoderConfig().defaultContentCharset("UTF-8")))
+                .when()
+                .get(testEidasClientProperties.getSpReturnUrl()).then().log().ifValidationFails().statusCode(405).body("error", Matchers.equalTo("Method Not Allowed"));
+    }
+
+    @Test
+    public void resEnd1_notSupportedHttpDeleteMethodShouldReturnError() {
+        given()
+                .formParam(RELAY_STATE,"")
+                .formParam(SAML_RESPONSE,getBase64SamlResponseMinimalAttributes(getAuthenticationReqWithDefault(), "TestFamily", "TestGiven", "TestPNO", "TestDate", null))
+                .contentType("application/x-www-form-urlencoded")
+                .config(RestAssured.config().encoderConfig(encoderConfig().defaultContentCharset("UTF-8")))
+                .when()
+                .delete(testEidasClientProperties.getSpReturnUrl()).then().log().ifValidationFails().statusCode(405).body("error", Matchers.equalTo("Method Not Allowed"));
     }
 
 }
