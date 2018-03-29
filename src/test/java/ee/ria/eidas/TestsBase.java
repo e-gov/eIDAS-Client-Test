@@ -191,6 +191,16 @@ public abstract class TestsBase {
                 .post(testEidasClientProperties.getSpReturnUrl()).then().log().ifError().extract().body().jsonPath();
     }
 
+    protected io.restassured.response.Response sendSamlResponseGetStatus(String relayState, String response) {
+        return given()
+                .formParam(RELAY_STATE,relayState)
+                .formParam(SAML_RESPONSE, response)
+                .contentType("application/x-www-form-urlencoded")
+                .config(config().encoderConfig(encoderConfig().defaultContentCharset("UTF-8")))
+                .when()
+                .post(testEidasClientProperties.getSpReturnUrl()).then().log().ifError().extract().response();
+    }
+
     protected io.restassured.response.Response sendSamlResponseExtractResponse(String relayState, String response) {
         return given()
                 .formParam(RELAY_STATE,relayState)
