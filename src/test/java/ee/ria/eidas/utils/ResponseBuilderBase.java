@@ -11,6 +11,7 @@ import org.opensaml.xmlsec.signature.support.SignatureConstants;
 import javax.xml.namespace.QName;
 
 import static org.opensaml.saml.common.SAMLVersion.VERSION_20;
+import static org.opensaml.saml.saml2.core.StatusCode.*;
 
 public class ResponseBuilderBase {
 
@@ -25,19 +26,18 @@ public class ResponseBuilderBase {
     protected StatusCode buildStatusCode (String error) {
         StatusCode statusCode = new StatusCodeBuilder().buildObject();
         StatusCode statCode = new StatusCodeBuilder().buildObject();
-        String valueUrn = "urn:oasis:names:tc:SAML:2.0:status:";
         switch(error) {
             case "AuthFailed":
-                statusCode.setValue(valueUrn + "Responder");
-                statCode.setValue(valueUrn + "AuthnFailed");
+                statusCode.setValue(RESPONDER);
+                statCode.setValue(AUTHN_FAILED);
                 break;
             case "ConsentNotGiven":
-                statusCode.setValue(valueUrn + "Requester");
-                statCode.setValue(valueUrn + "RequestDenied");
+                statusCode.setValue(REQUESTER);
+                statCode.setValue(REQUEST_DENIED);
                 break;
             default:
-                statusCode.setValue("Not existing keyword for error:" + error);
-                statCode.setValue("Not existing keyword for error:");
+                statusCode.setValue(RESPONDER);
+                statCode.setValue(INVALID_NAMEID_POLICY);
                 break;
         }
         statusCode.setStatusCode(statCode);
