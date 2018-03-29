@@ -129,22 +129,22 @@ public class SamlResponseCorrectnessIntegrationTest extends TestsBase {
         assertEquals("Some other reason for failure in authentication, Internal Server Error should be returned", "Something went wrong internally. Please consult server logs for further details.", getValueFromJsonResponse(loginResponse, STATUS_ERROR_MESSAGE));
     }
 
-    @Ignore //TODO: We do not receive a proper JSON error response yet
     @Test
     public void saml9_samlResponseIssueInstantFarInPastErrorShouldBeReturned() {
         String base64Response = getBase64SamlResponseTimeManipulation(getAuthenticationReqWithDefault(), -20, 0, 0, 0, 0);
-        JsonPath loginResponse = sendSamlResponse("",base64Response );
-        assertEquals("400", loginResponse.getString("status"));
-        assertEquals("Generic error should be returned", BAD_SAML, loginResponse.getString(STATUS_ERROR_MESSAGE));
+        Response loginResponse = sendSamlResponseExtractResponse("",base64Response );
+        assertEquals(400, loginResponse.getStatusCode());
+        assertEquals("Generic error should be returned", BAD_REQUEST, getValueFromJsonResponse(loginResponse, STATUS_ERROR));
+        assertEquals("Correct error message is returned", "Error handling message: Message was rejected due to issue instant expiration", getValueFromJsonResponse(loginResponse, STATUS_ERROR_MESSAGE));
     }
 
-    @Ignore //TODO: We do not receive a proper JSON error response yet
     @Test
     public void saml9_samlResponseIssueInstantInFutureErrorShouldBeReturned() {
         String base64Response = getBase64SamlResponseTimeManipulation(getAuthenticationReqWithDefault(), 20, 0, 0, 0, 0);
-        JsonPath loginResponse = sendSamlResponse("",base64Response );
-        assertEquals("400", loginResponse.getString("status"));
-        assertEquals("Generic error should be returned", BAD_SAML, loginResponse.getString(STATUS_ERROR_MESSAGE));
+        Response loginResponse = sendSamlResponseExtractResponse("",base64Response );
+        assertEquals(400, loginResponse.getStatusCode());
+        assertEquals("Generic error should be returned", BAD_REQUEST, getValueFromJsonResponse(loginResponse, STATUS_ERROR));
+        assertEquals("Correct error message is returned", "Error handling message: Message was rejected because it was issued in the future", getValueFromJsonResponse(loginResponse, STATUS_ERROR_MESSAGE));
     }
 
     @Ignore //TODO: Currently there is no replay check!
@@ -152,9 +152,10 @@ public class SamlResponseCorrectnessIntegrationTest extends TestsBase {
     public void saml10_replayAttackShouldReturnError() {
         String base64Response = getBase64SamlResponseDefaultMinimalAttributes(getAuthenticationReqWithDefault());
         sendSamlResponse("", base64Response );
-        JsonPath loginResponse = sendSamlResponse("",base64Response);
-        assertEquals("400", loginResponse.getString("status"));
-        assertEquals("Repeated SAML response should not be accepted","Error of some sort", loginResponse.getString(STATUS_ERROR_MESSAGE));
+        Response loginResponse = sendSamlResponseExtractResponse("", base64Response );
+        assertEquals(400, loginResponse.getStatusCode());
+        assertEquals("Generic error should be returned", BAD_REQUEST, getValueFromJsonResponse(loginResponse, STATUS_ERROR));
+        assertEquals("Correct error message is returned", "", getValueFromJsonResponse(loginResponse, STATUS_ERROR_MESSAGE));
     }
 
     @Ignore //TODO: Currently there is no ID check!
@@ -162,9 +163,10 @@ public class SamlResponseCorrectnessIntegrationTest extends TestsBase {
     public void saml10_wrongInResponseToInResponse() {
         XmlPath xmlPath = getDecodedSamlRequestBodyXml(getAuthenticationReqWithDefault());
         String base64Response = getBase64SamlResponseInResponseTo("SomeWrongID", xmlPath.getString("AuthnRequest.@ID"));
-        JsonPath loginResponse = sendSamlResponse("",base64Response);
-        assertEquals("400", loginResponse.getString("status"));
-        assertEquals("SAML response with unregistered ID should not be accepted","Error of some sort", loginResponse.getString(STATUS_ERROR_MESSAGE));
+        Response loginResponse = sendSamlResponseExtractResponse("", base64Response );
+        assertEquals(400, loginResponse.getStatusCode());
+        assertEquals("Generic error should be returned", BAD_REQUEST, getValueFromJsonResponse(loginResponse, STATUS_ERROR));
+        assertEquals("Correct error message is returned", "", getValueFromJsonResponse(loginResponse, STATUS_ERROR_MESSAGE));
     }
 
     @Ignore //TODO: Currently there is no ID check!
@@ -172,9 +174,10 @@ public class SamlResponseCorrectnessIntegrationTest extends TestsBase {
     public void saml10_wrongInResponseToInSubject() {
         XmlPath xmlPath = getDecodedSamlRequestBodyXml(getAuthenticationReqWithDefault());
         String base64Response = getBase64SamlResponseInResponseTo(xmlPath.getString("AuthnRequest.@ID"), "SomeWrongIDForSubject");
-        JsonPath loginResponse = sendSamlResponse("",base64Response);
-        assertEquals("400", loginResponse.getString("status"));
-        assertEquals("SAML response with unregistered ID should not be accepted","Error of some sort", loginResponse.getString(STATUS_ERROR_MESSAGE));
+        Response loginResponse = sendSamlResponseExtractResponse("",base64Response );
+        assertEquals(400, loginResponse.getStatusCode());
+        assertEquals("Generic error should be returned", BAD_REQUEST, getValueFromJsonResponse(loginResponse, STATUS_ERROR));
+        assertEquals("Correct error message is returned", "", getValueFromJsonResponse(loginResponse, STATUS_ERROR_MESSAGE));
     }
 
     @Ignore //TODO: Currently there is no check!
