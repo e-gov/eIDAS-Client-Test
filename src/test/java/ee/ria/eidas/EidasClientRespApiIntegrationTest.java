@@ -31,7 +31,7 @@ public class EidasClientRespApiIntegrationTest extends TestsBase {
     public void respApi2_errorIsReturnedOnTooLongRelayState() {
         String relayState = RandomStringUtils.randomAlphanumeric(81);
 
-        String base64Response = getBase64SamlResponseMinimalAttributes(getAuthenticationReq("CA","SUBSTANTIAL",""), "TestGiven","TestFamily","TestPNO", "TestDate", LOA_LOW);
+        String base64Response = getBase64SamlResponseMinimalAttributes(getAuthenticationReq("CA","SUBSTANTIAL",""), "TestGiven","TestFamily","TestPNO", "TestDate", LOA_SUBSTANTIAL);
         Response response = sendSamlResponseGetStatus(relayState, base64Response );
 
         assertEquals("Status code should be: 400", 400, response.statusCode());
@@ -44,7 +44,7 @@ public class EidasClientRespApiIntegrationTest extends TestsBase {
     public void respApi2_errorIsReturnedOnWrongCharactersInRelayState() {
         String relayState = "<>$";
 
-        String base64Response = getBase64SamlResponseMinimalAttributes(getAuthenticationReq("CA","SUBSTANTIAL",""), "TestGiven","TestFamily","TestPNO", "TestDate", LOA_LOW);
+        String base64Response = getBase64SamlResponseMinimalAttributes(getAuthenticationReq("CA","SUBSTANTIAL",""), "TestGiven","TestFamily","TestPNO", "TestDate", LOA_SUBSTANTIAL);
         Response response = sendSamlResponseGetStatus(relayState, base64Response );
 
         assertEquals("Status code should be: 400", 400, response.statusCode());
@@ -52,131 +52,100 @@ public class EidasClientRespApiIntegrationTest extends TestsBase {
         assertThat("Correct error message", getValueFromJsonResponse(response, STATUS_ERROR_MESSAGE), startsWith("Invalid RelayState! Must match the following regexp:"));
     }
 
-
-
     @Test
-    public void authApi3_relayStateMissingValueShouldReturnOkStatus() {
-        Response response = getAuthenticationReqResponse("CA", "", "");
+    public void respApi2_relayStateMissingValueShouldReturnOkStatus() {
+        String base64Response = getBase64SamlResponseMinimalAttributes(getAuthenticationReq("CA","SUBSTANTIAL",""), "TestGiven","TestFamily","TestPNO", "TestDate", LOA_SUBSTANTIAL);
 
-        assertEquals("Status code should be: 200", 200, response.statusCode());
-    }
-
-    @Test
-    public void authApi3_relayStateMissingShouldReturnOkStatus() {
-        Map<String,String> formParams = new HashMap<String,String>();
-        formParams.put(COUNTRY, "EE");
-
-        Response response = getAuthenticationReqForm(formParams);
-
-        assertEquals("Status code should be: 200", 200, response.statusCode());
-    }
-
-    @Ignore //TODO: Currently there is no additional attributes support
-    @Test
-    public void authApi4_notSupportedAdditionalAttributeShouldReturnError() {
-        Map<String,String> formParams = new HashMap<String,String>();
-        formParams.put(LOA, "HIGH");
-        formParams.put(ADDITIONAL_ATTRIBUTES, "NotExistingAttribute");
-        formParams.put(COUNTRY, "EE");
-        formParams.put(RELAY_STATE, "1234abcd");
-
-        Response response = getAuthenticationReqForm(formParams);
-
-        assertEquals("Status code should be: 400", 400, response.statusCode());
-        assertEquals("Bad request error should be returned", BAD_REQUEST, getValueFromJsonResponse(response, STATUS_ERROR));
-        assertThat("Correct error message", getValueFromJsonResponse(response, STATUS_ERROR_MESSAGE), startsWith("Invalid AdditionalParameters! Unrecognized attibute(s) provided:"));
-    }
-
-    @Ignore //TODO: Currently there is no additional attributes support
-    @Test
-    public void authApi4_additionalAttributesNotSepparatedCorrectlyShouldReturnError() {
-        Map<String,String> formParams = new HashMap<String,String>();
-        formParams.put(LOA, "HIGH");
-        formParams.put(ADDITIONAL_ATTRIBUTES, "LegalPersonIdentifierCurrentAddressGender");
-        formParams.put(COUNTRY, "EE");
-        formParams.put(RELAY_STATE, "1234abcd");
-
-        Response response = getAuthenticationReqForm(formParams);
-
-        assertEquals("Status code should be: 400", 400, response.statusCode());
-        assertEquals("Bad request error should be returned", BAD_REQUEST, getValueFromJsonResponse(response, STATUS_ERROR));
-        assertThat("Correct error message", getValueFromJsonResponse(response, STATUS_ERROR_MESSAGE), startsWith("Invalid AdditionalParameters! Unrecognized attibute(s) provided:"));
-    }
-
-    @Ignore //TODO: Currently there is no additional attributes support
-    @Test
-    public void authApi4_additionalAttributesSepparatedWithWrongCharacterShouldReturnError() {
-        Map<String,String> formParams = new HashMap<String,String>();
-        formParams.put(LOA, "HIGH");
-        formParams.put(ADDITIONAL_ATTRIBUTES, "LegalPersonIdentifier&CurrentAddress&Gender");
-        formParams.put(COUNTRY, "EE");
-        formParams.put(RELAY_STATE, "1234abcd");
-
-        Response response = getAuthenticationReqForm(formParams);
-
-        assertEquals("Status code should be: 400", 400, response.statusCode());
-        assertEquals("Bad request error should be returned", BAD_REQUEST, getValueFromJsonResponse(response, STATUS_ERROR));
-        assertThat("Correct error message", getValueFromJsonResponse(response, STATUS_ERROR_MESSAGE), startsWith("Invalid AdditionalParameters! Unrecognized attibute(s) provided:"));
-    }
-
-    @Ignore //TODO: Currently there is no additional attributes support
-    @Test
-    public void authApi4_additionalAttributesSepparatedWithoutUrlEncodingShouldReturnError() {
-        Map<String,String> formParams = new HashMap<String,String>();
-        formParams.put(LOA, "HIGH");
-        formParams.put(ADDITIONAL_ATTRIBUTES, "LegalPersonIdentifier CurrentAddress Gender");
-        formParams.put(COUNTRY, "EE");
-        formParams.put(RELAY_STATE, "1234abcd");
-
-        Response response = given()
-                .queryParams(formParams)
-   //             .contentType("application/x-www-form-urlencoded") //TODO: what is default behavior in restAssured? Needs to be rechecked when additional Attributes are implemented
+        Response response =  given()
+                .formParam(RELAY_STATE, "")
+                .formParam(SAML_RESPONSE, base64Response)
+                .contentType("application/x-www-form-urlencoded")
                 .config(config().encoderConfig(encoderConfig().defaultContentCharset("UTF-8")))
                 .when()
-                .get(testEidasClientProperties.getSpStartUrl()).then().log().ifError().extract().response();
+                .post(testEidasClientProperties.getSpReturnUrl()).then().log().ifError().extract().response();
+
+        assertEquals("Status code should be: 200", 200, response.statusCode());
+    }
+
+    @Test
+    public void respApi2_relayStateMissingShouldReturnOkStatus() {
+        Map<String,String> formParams = new HashMap<String,String>();
+        formParams.put(COUNTRY, "EE");
+
+        String base64Response = getBase64SamlResponseMinimalAttributes(getAuthenticationReqForm(formParams).getBody().asString(), "TestGiven","TestFamily","TestPNO", "TestDate", LOA_SUBSTANTIAL);
+
+        Response response =  given()
+                .formParam(SAML_RESPONSE, base64Response)
+                .contentType("application/x-www-form-urlencoded")
+                .config(config().encoderConfig(encoderConfig().defaultContentCharset("UTF-8")))
+                .when()
+                .post(testEidasClientProperties.getSpReturnUrl()).then().log().ifError().extract().response();
+
+        assertEquals("Status code should be: 200", 200, response.statusCode());
+    }
+
+    @Ignore //TODO: What error should we get?
+    @Test
+    public void respApi3_samlResponseMissingShouldReturnErrorStatus() {
+        String base64Response = getBase64SamlResponseMinimalAttributes(getAuthenticationReqWithDefault(), "TestGiven","TestFamily","TestPNO", "TestDate", LOA_SUBSTANTIAL);
+
+        Response response =  given()
+                .formParam(RELAY_STATE, "")
+                .contentType("application/x-www-form-urlencoded")
+                .config(config().encoderConfig(encoderConfig().defaultContentCharset("UTF-8")))
+                .when()
+                .post(testEidasClientProperties.getSpReturnUrl()).then().log().ifError().extract().response();
 
         assertEquals("Status code should be: 400", 400, response.statusCode());
-        assertEquals("Bad request error should be returned", BAD_REQUEST, getValueFromJsonResponse(response, STATUS_ERROR));
-        assertThat("Correct error message", getValueFromJsonResponse(response, STATUS_ERROR_MESSAGE), startsWith("Invalid AdditionalParameters! Unrecognized attibute(s) provided:"));
     }
 
+    @Ignore //TODO: What error should we get?
     @Test
-    public void authApi5_checkHtmlValues() {
-        String response = getAuthenticationReq("CA", "SUBSTANTIAL", "RelayState");
+    public void respApi3_samlResponseNotBase64ShouldReturnErrorStatus() {
+        String base64Response = getBase64SamlResponseMinimalAttributes(getAuthenticationReqWithDefault(), "TestGiven","TestFamily","TestPNO", "TestDate", LOA_SUBSTANTIAL);
 
-        XmlPath html = new XmlPath(XmlPath.CompatibilityMode.HTML, response);
+        Response response =  given()
+                .formParam(SAML_RESPONSE, base64Response+"&/!")
+                .contentType("application/x-www-form-urlencoded")
+                .config(config().encoderConfig(encoderConfig().defaultContentCharset("UTF-8")))
+                .when()
+                .post(testEidasClientProperties.getSpReturnUrl()).then().log().ifError().extract().response();
 
-        assertEquals("Target url is present", testEidasClientProperties.getFullIdpStartUrl(), html.getString("html.body.form.@action"));
-        assertEquals("Method is post", "post", html.getString("html.body.form.@method"));
-        assertEquals("Relay state is present", "RelayState", html.getString("**.findAll { it.@name == 'RelayState' }.@value"));
-        assertEquals("Country is present", "CA", html.getString("**.findAll { it.@name == 'country' }.@value")); //TODO: Should be Country?
-        assertEquals("SAML request is present because LoA is accessible", LOA_SUBSTANTIAL, getDecodedSamlRequestBodyXml(response).getString(XML_LOA));
+        assertEquals("Status code should be: 400", 400, response.statusCode());
     }
 
+    @Ignore //TODO: Currently there is no additional attributes support
     @Test
-    public void authApi6_multipleParametersAreNotBlocking() {
-        Map<String,String> formParams = new HashMap<String,String>();
-        formParams.put(LOA, "HIGH");
-        formParams.put(LOA, "LOW");
-        formParams.put(COUNTRY, "EE");
-        formParams.put(RELAY_STATE, "1234abcd");
+    public void respApi4_additionalParametersShouldReturnOk() {
+        String base64Response = getBase64SamlResponseMinimalAttributes(getAuthenticationReqWithDefault(), "TestGiven","TestFamily","TestPNO", "TestDate", LOA_SUBSTANTIAL);
 
-        XmlPath samlRequest = getDecodedSamlRequestBodyXml(getAuthenticationReqForm(formParams).getBody().asString());
+        Response response =  given()
+                .formParam("randomParam", "randomValue")
+                .formParam(SAML_RESPONSE, base64Response)
+                .contentType("application/x-www-form-urlencoded")
+                .config(config().encoderConfig(encoderConfig().defaultContentCharset("UTF-8")))
+                .when()
+                .post(testEidasClientProperties.getSpReturnUrl()).then().log().ifError().extract().response();
 
-        assertEquals("Correct LOA is returned", LOA_LOW, samlRequest.getString(XML_LOA)); //TODO: Is it ok to take last?
-        }
-
-    @Test
-    public void authApi6_invalidParametersAreNotBlocking() {
-        Map<String,String> formParams = new HashMap<String,String>();
-        formParams.put("randomParam", "random");
-        formParams.put(LOA, "LOW");
-        formParams.put(COUNTRY, "EE");
-        formParams.put(RELAY_STATE, "1234abcd");
-
-        Response response = getAuthenticationReqForm(formParams);
-
-        assertEquals("Status is returned with correct relayState","1234abcd", response.getBody().xmlPath(XmlPath.CompatibilityMode.HTML).getString("**.findAll { it.@name == 'RelayState' }.@value"));
+        assertEquals("Status code should be: 200", 200, response.statusCode());
+        assertEquals("Name is returned", "TestGiven", getValueFromJsonResponse(response, STATUS_FIRST));
     }
 
+    @Ignore //TODO: Currently there is no additional attributes support
+    @Test
+    public void respApi4_multipleParametersAreNotBlocking() {
+        String base64Response = getBase64SamlResponseMinimalAttributes(getAuthenticationReqWithDefault(), "TestGiven","TestFamily","TestPNO", "TestDate", LOA_SUBSTANTIAL);
+        String base64Response2 = getBase64SamlResponseMinimalAttributes(getAuthenticationReqWithDefault(), "TestGiven2","TestFamily2","TestPNO", "TestDate", LOA_SUBSTANTIAL);
+
+        Response response =  given()
+                .formParam(SAML_RESPONSE, base64Response)
+                .formParam(SAML_RESPONSE, base64Response2)
+                .contentType("application/x-www-form-urlencoded")
+                .config(config().encoderConfig(encoderConfig().defaultContentCharset("UTF-8")))
+                .when()
+                .post(testEidasClientProperties.getSpReturnUrl()).then().log().ifError().extract().response();
+
+        assertEquals("Status code should be: 200", 200, response.statusCode());
+        assertEquals("Last used parameter is returned", "TestGiven2", getValueFromJsonResponse(response, STATUS_FIRST));
+     }
 }
