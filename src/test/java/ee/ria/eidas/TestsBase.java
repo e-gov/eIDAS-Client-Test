@@ -304,7 +304,7 @@ public abstract class TestsBase {
             loa =  xmlPath.getString("AuthnRequest.RequestedAuthnContext.AuthnContextClassRef");
         }
         Response response = new ResponseBuilderUtils().buildAuthnResponse(signatureCredential, encryptionCredential, xmlPath.getString("AuthnRequest.@ID"),
-                testEidasClientProperties.getFullSpReturnUrl(), loa, givenName, familyName, personIdentifier, dateOfBirth, testEidasClientProperties.getFullIdpMetadataUrl(), testEidasClientProperties.getAcceptableTimeDiffMin(), testEidasClientProperties.getFullSpReturnUrl());
+                testEidasClientProperties.getFullSpReturnUrl(), loa, givenName, familyName, personIdentifier, dateOfBirth, testEidasClientProperties.getFullIdpMetadataUrl(), testEidasClientProperties.getAcceptableTimeDiffMin(), testEidasClientProperties.getFullSpMetadataUrl());
         String stringResponse = OpenSAMLUtils.getXmlString(response);
         validateSamlResponseSignature(stringResponse);
         return new String(Base64.getEncoder().encode(stringResponse.getBytes()));
@@ -323,7 +323,7 @@ public abstract class TestsBase {
         XmlPath xmlPath = getDecodedSamlRequestBodyXml(requestBody);
         String loa =  xmlPath.getString("AuthnRequest.RequestedAuthnContext.AuthnContextClassRef");
         Response response = new ResponseBuilderUtils().buildAuthnResponseWithMaxAttributes(signatureCredential, encryptionCredential, xmlPath.getString("AuthnRequest.@ID"),
-                testEidasClientProperties.getFullSpReturnUrl(), loa, DEFATTR_FIRST, DEFATTR_FAMILY, DEFATTR_PNO, DEFATTR_DATE, DEFATTR_BIRTH_NAME, DEFATTR_BIRTH_PLACE, DEFATTR_ADDR, DEFATTR_GENDER, testEidasClientProperties.getFullIdpMetadataUrl(), testEidasClientProperties.getAcceptableTimeDiffMin(), testEidasClientProperties.getFullSpReturnUrl());
+                testEidasClientProperties.getFullSpReturnUrl(), loa, DEFATTR_FIRST, DEFATTR_FAMILY, DEFATTR_PNO, DEFATTR_DATE, DEFATTR_BIRTH_NAME, DEFATTR_BIRTH_PLACE, DEFATTR_ADDR, DEFATTR_GENDER, testEidasClientProperties.getFullIdpMetadataUrl(), testEidasClientProperties.getAcceptableTimeDiffMin(), testEidasClientProperties.getFullSpMetadataUrl());
         String stringResponse = OpenSAMLUtils.getXmlString(response);
         validateSamlResponseSignature(stringResponse);
         return new String(Base64.getEncoder().encode(stringResponse.getBytes()));

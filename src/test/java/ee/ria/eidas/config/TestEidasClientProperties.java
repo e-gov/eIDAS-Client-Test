@@ -91,7 +91,7 @@ public class TestEidasClientProperties {
     }
 
     public String getFullSpMetadataUrl() {
-        return spMetadataUrl;
+        return targetSpUrl+spMetadataUrl;
     }
 
     public String getSpStartUrl() {
