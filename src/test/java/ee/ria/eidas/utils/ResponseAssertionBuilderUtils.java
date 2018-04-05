@@ -346,7 +346,12 @@ public class ResponseAssertionBuilderUtils extends ResponseBuilderBase {
             subject.getSubjectConfirmations().add(subjectConf);
             SubjectConfirmation subjectConf2 = new SubjectConfirmationBuilder().buildObject();
             subjectConf2.setMethod(subjectConfMethod);
-            subjectConf2.setSubjectConfirmationData(subConfData);
+            SubjectConfirmationData subConfData2 = new SubjectConfirmationDataBuilder().buildObject();
+            subConfData2.setAddress("172.24.0.1"); //TODO: this needs to be configurable probably
+            subConfData2.setInResponseTo(inResponseId);
+            subConfData2.setNotOnOrAfter(issueInstant.plusMinutes(acceptableTimeMin));
+            subConfData2.setRecipient(recipient);
+            subjectConf2.setSubjectConfirmationData(subConfData2);
             subject.getSubjectConfirmations().add(subjectConf2);
             assertion.setSubject(subject);
         }

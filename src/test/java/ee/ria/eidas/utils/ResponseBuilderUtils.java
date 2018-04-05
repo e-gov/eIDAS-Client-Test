@@ -356,8 +356,8 @@ public class ResponseBuilderUtils extends ResponseAssertionBuilderUtils {
             DateTime timeNow = new DateTime();
             Response authnResponse = buildResponseForSigningWithoutAssertion(inResponseId, recipient, timeNow, issuerValue);
             authnResponse.getEncryptedAssertions().add(buildEncrAssertionNameIdCnt(nameIdCnt, nameIdFormat, signCredential, encCredential, inResponseId, recipient, timeNow, acceptableTimeMin, loa, givenName, familyName, personIdentifier, dateOfBirth, issuerValue, audienceUri));
-            XMLObjectProviderRegistrySupport.getMarshallerFactory().getMarshaller(authnResponse).marshall(authnResponse);
             authnResponse.setSignature(signature);
+            XMLObjectProviderRegistrySupport.getMarshallerFactory().getMarshaller(authnResponse).marshall(authnResponse);
             Signer.signObject(signature);
             return authnResponse;
         } catch (Exception e) {
