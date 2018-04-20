@@ -2,9 +2,9 @@ package ee.ria.eidas.config;
 
 public class EidasTestStrings {
     //eIDAS client API strings
-    public static final String COUNTRY = "country";
-    public static final String LOA = "loa";
-    public static final String RELAY_STATE = "relayState";
+    public static final String COUNTRY = "Country";
+    public static final String LOA = "LoA";
+    public static final String RELAY_STATE = "RelayState";
     public static final String ADDITIONAL_ATTRIBUTES = "AdditionalAttributes";
     public static final String SAML_REQUEST = "SAMLRequest";
     public static final String SAML_RESPONSE = "SAMLResponse";

@@ -35,12 +35,9 @@ public class EidasClientAuthApiIntegrationTest extends TestsBase {
     }
 
     @Test
-    public void authApi1_countryCodeCaseSensitiveShouldReturnError() {
-        Response response =  getAuthenticationReqResponse("ee", "", "");
-
-        assertEquals("Status code should be: 400", 400, response.statusCode());
-        assertEquals("Bad request error should be returned", BAD_REQUEST, getValueFromJsonResponse(response, STATUS_ERROR));
-        assertThat("Correct error message", getValueFromJsonResponse(response, STATUS_ERROR_MESSAGE), startsWith("Invalid country! Valid countries:"));
+    public void authApi1_countryCodeCaseSensitiveShouldPass() {
+        XmlPath samlRequest = getDecodedSamlRequestBodyXml(getAuthenticationReq("eE", "", ""));
+        assertEquals("Correct LOA is returned", LOA_SUBSTANTIAL, samlRequest.getString(XML_LOA));
     }
 
     @Test
