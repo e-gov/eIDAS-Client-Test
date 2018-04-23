@@ -49,7 +49,6 @@ public class EidasClientAuthApiIntegrationTest extends TestsBase {
         assertThat("Correct error message", getValueFromJsonResponse(response, STATUS_ERROR_MESSAGE), startsWith("Invalid country! Valid countries:"));
     }
 
-    @Ignore //TODO: Internal Server Error is returned
     @Test
     public void authApi1_countryParameterMissingShouldReturnError() {
         Map<String,String> formParams = new HashMap<String,String>();
@@ -59,17 +58,16 @@ public class EidasClientAuthApiIntegrationTest extends TestsBase {
 
         assertEquals("Status code should be: 400", 400, response.statusCode());
         assertEquals("Bad request error should be returned", BAD_REQUEST, getValueFromJsonResponse(response, STATUS_ERROR));
-        assertEquals("Bad request error should be returned", "Required String parameter 'country' is not present", getValueFromJsonResponse(response, STATUS_ERROR_MESSAGE));
+        assertEquals("Bad request error should be returned", "Required String parameter 'Country' is not present", getValueFromJsonResponse(response, STATUS_ERROR_MESSAGE));
     }
 
-    @Ignore //TODO: Internal Server Error is returned
     @Test
     public void authApi2_invalidLoaLevelsAreNotAccepted() {
         Response response =  getAuthenticationReqResponse("EE", "SUPER", "");
 
         assertEquals("Status code should be: 400", 400, response.statusCode());
         assertEquals("Bad request error should be returned", BAD_REQUEST, getValueFromJsonResponse(response, STATUS_ERROR));
-        assertThat("Correct error message", getValueFromJsonResponse(response, STATUS_ERROR_MESSAGE), startsWith("Invalid LoA! One of"));
+        assertThat("Correct error message", getValueFromJsonResponse(response, STATUS_ERROR_MESSAGE), startsWith("Invalid value for parameter LoA"));
     }
 
     @Test

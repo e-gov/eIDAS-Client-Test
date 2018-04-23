@@ -229,14 +229,13 @@ public class SamlResponseCorrectnessIntegrationTest extends TestsBase {
         assertEquals("Message about AuthnStatement should be returned", "Assertion must contain exactly 1 AuthnStatement!", getValueFromJsonResponse(loginResponse, STATUS_ERROR_MESSAGE));
     }
 
-    @Ignore //TODO: There might be issue with issueInstant handling
     @Test
     public void saml13_samlAssertionIssueInstantInFarPastErrorShouldBeReturned() {
         String base64Response = getBase64SamlResponseTimeManipulation(getAuthenticationReqWithDefault(), 0, -20, 0, 0, 0);
         Response loginResponse = sendSamlResponseExtractResponse("", base64Response);
         assertEquals(400, loginResponse.getStatusCode());
         assertEquals("Generic error should be returned", BAD_REQUEST, getValueFromJsonResponse(loginResponse, STATUS_ERROR));
-        assertEquals("Message about incorrect issue time should be returned", "Assertion issue instant is too old or in the future!", getValueFromJsonResponse(loginResponse, STATUS_ERROR_MESSAGE));
+        assertEquals("Message about incorrect issue time should be returned", "Assertion issue instant is expired!", getValueFromJsonResponse(loginResponse, STATUS_ERROR_MESSAGE));
     }
 
     @Test
@@ -245,7 +244,7 @@ public class SamlResponseCorrectnessIntegrationTest extends TestsBase {
         Response loginResponse = sendSamlResponseExtractResponse("", base64Response);
         assertEquals(400, loginResponse.getStatusCode());
         assertEquals("Generic error should be returned", BAD_REQUEST, getValueFromJsonResponse(loginResponse, STATUS_ERROR));
-        assertEquals("Message about incorrect issue time should be returned", "Assertion issue instant is expired!", getValueFromJsonResponse(loginResponse, STATUS_ERROR_MESSAGE));
+        assertEquals("Message about incorrect issue time should be returned", "Assertion issue instant is in the future!", getValueFromJsonResponse(loginResponse, STATUS_ERROR_MESSAGE));
     }
 
     @Test
@@ -477,7 +476,6 @@ public class SamlResponseCorrectnessIntegrationTest extends TestsBase {
         assertEquals("Correct legal pno is returned", DEFATTR_LEGAL_PNO, loginResponse.getString(STATUS_LEGAL_PNO));
     }
 
-    @Ignore //TODO: There is no check for missing mandatory attributes
     @Test
     public void saml26_mandatoryLegalAttributesAreAskedButNotReturned() {
 
@@ -491,7 +489,7 @@ public class SamlResponseCorrectnessIntegrationTest extends TestsBase {
         Response response = sendSamlResponseGetStatus("", base64Response );
         assertEquals("Status code should be: 400", 400, response.statusCode());
         assertEquals("Bad request error should be returned", BAD_REQUEST, getValueFromJsonResponse(response, STATUS_ERROR));
-        assertThat("Correct error message", getValueFromJsonResponse(response, STATUS_ERROR_MESSAGE), startsWith("AuthnContextClassRef is not greater or equal to the request level of assurance!"));
+        assertThat("Correct error message", getValueFromJsonResponse(response, STATUS_ERROR_MESSAGE), startsWith("Missing mandatory attributes in the response assertion: [LegalPersonIdentifier, LegalName]"));
     }
 
     @Test
