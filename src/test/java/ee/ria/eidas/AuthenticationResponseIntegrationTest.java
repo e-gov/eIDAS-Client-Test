@@ -3,12 +3,15 @@ package ee.ria.eidas;
 
 import ee.ria.eidas.config.IntegrationTest;
 import io.restassured.path.json.JsonPath;
+import io.restassured.response.Response;
 import org.junit.Ignore;
 import org.junit.Test;
 import org.junit.experimental.categories.Category;
 import org.springframework.boot.test.context.SpringBootTest;
 
 import static ee.ria.eidas.config.EidasTestStrings.*;
+import static org.hamcrest.MatcherAssert.assertThat;
+import static org.hamcrest.Matchers.startsWith;
 import static org.junit.Assert.assertEquals;
 
 @SpringBootTest(classes = AuthenticationResponseIntegrationTest.class)
@@ -41,28 +44,31 @@ public class AuthenticationResponseIntegrationTest extends TestsBase {
         assertEquals("Correct address is returned", DEFATTR_ADDR, loginResponseJson.getString(STATUS_ADDR));
     }
 
-    @Ignore //TODO: Need a specification for error statuses
     @Test
     public void resp4_responseWithLowLoaShouldNotBeAcceptedWhenSubstantialWasRequired() {
         String base64Response = getBase64SamlResponseMinimalAttributes(getAuthenticationReq("CA","SUBSTANTIAL",""), "TestGiven","TestFamily","TestPNO", "TestDate", LOA_LOW);
-        JsonPath loginResponseJson = sendSamlResponse("",base64Response );
-        assertEquals("Error message is expected", "", loginResponseJson.getString(STATUS_ERROR_MESSAGE));
+        Response response = sendSamlResponseGetStatus("", base64Response );
+        assertEquals("Status code should be: 400", 400, response.statusCode());
+        assertEquals("Bad request error should be returned", BAD_REQUEST, getValueFromJsonResponse(response, STATUS_ERROR));
+        assertThat("Correct error message", getValueFromJsonResponse(response, STATUS_ERROR_MESSAGE), startsWith("AuthnContextClassRef is not greater or equal to the request level of assurance!"));
     }
 
-    @Ignore //TODO: Need a specification for error statuses
     @Test
     public void resp4_responseWithLowLoaShouldNotBeAcceptedWhenHighWasRequired() {
         String base64Response = getBase64SamlResponseMinimalAttributes(getAuthenticationReq("CA","HIGH",""), "TestGiven","TestFamily","TestPNO", "TestDate", LOA_LOW);
-        JsonPath loginResponseJson = sendSamlResponse("",base64Response );
-        assertEquals("Error message is expected", "", loginResponseJson.getString(STATUS_ERROR_MESSAGE));
+        Response response = sendSamlResponseGetStatus("", base64Response );
+        assertEquals("Status code should be: 400", 400, response.statusCode());
+        assertEquals("Bad request error should be returned", BAD_REQUEST, getValueFromJsonResponse(response, STATUS_ERROR));
+        assertThat("Correct error message", getValueFromJsonResponse(response, STATUS_ERROR_MESSAGE), startsWith("AuthnContextClassRef is not greater or equal to the request level of assurance!"));
     }
 
-    @Ignore //TODO: Need a specification for error statuses
     @Test
     public void resp4_responseWithSubstantialLoaShouldNotBeAcceptedWhenHighWasRequired() {
         String base64Response = getBase64SamlResponseMinimalAttributes(getAuthenticationReq("CA","HIGH",""), "TestGiven","TestFamily","TestPNO", "TestDate", LOA_SUBSTANTIAL);
-        JsonPath loginResponseJson = sendSamlResponse("",base64Response );
-        assertEquals("Error message is expected", "", loginResponseJson.getString(STATUS_ERROR_MESSAGE));
+        Response response = sendSamlResponseGetStatus("", base64Response );
+        assertEquals("Status code should be: 400", 400, response.statusCode());
+        assertEquals("Bad request error should be returned", BAD_REQUEST, getValueFromJsonResponse(response, STATUS_ERROR));
+        assertThat("Correct error message", getValueFromJsonResponse(response, STATUS_ERROR_MESSAGE), startsWith("AuthnContextClassRef is not greater or equal to the request level of assurance!"));
     }
 
     @Test
@@ -107,7 +113,6 @@ public class AuthenticationResponseIntegrationTest extends TestsBase {
         assertEquals("Correct loa is returned", LOA_HIGH, loginResponseJson.getString(STATUS_LOA));
     }
 
-    @Ignore //TODO: We are getting internal server error
     @Test
     public void resp8_unsignedAssertionMustFailOnPostBinding() {
         String base64Response = getBase64SamlResponseDefaultMinimalAttributesWithoutAssertionSignature(getAuthenticationReqWithDefault());

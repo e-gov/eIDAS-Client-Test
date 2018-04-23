@@ -159,7 +159,9 @@ public abstract class TestsBase {
                 .queryParam(COUNTRY, country)
                 .config(config().encoderConfig(encoderConfig().defaultContentCharset("UTF-8")))
                 .when()
-                .get(testEidasClientProperties.getSpStartUrl()).then().log().ifError().extract().body().asString();
+                .get(testEidasClientProperties.getSpStartUrl())
+                .then()
+                .extract().body().asString();
     }
 
     protected io.restassured.response.Response getAuthenticationReqResponse(String country, String loa, String relayState) {
@@ -169,7 +171,9 @@ public abstract class TestsBase {
                 .queryParam(COUNTRY, country)
                 .config(config().encoderConfig(encoderConfig().defaultContentCharset("UTF-8")))
                 .when()
-                .get(testEidasClientProperties.getSpStartUrl()).then().log().ifError().extract().response();
+                .get(testEidasClientProperties.getSpStartUrl())
+                .then()
+                .extract().response();
     }
 
     protected io.restassured.response.Response getAuthenticationReqForm(Map<String,String> values) {
@@ -178,7 +182,9 @@ public abstract class TestsBase {
                 .contentType("application/x-www-form-urlencoded")
                 .config(config().encoderConfig(encoderConfig().defaultContentCharset("UTF-8")))
                 .when()
-                .get(testEidasClientProperties.getSpStartUrl()).then().log().ifError().extract().response();
+                .get(testEidasClientProperties.getSpStartUrl())
+                .then()
+                .extract().response();
     }
 
     protected JsonPath sendSamlResponse(String relayState, String response) {
@@ -188,7 +194,9 @@ public abstract class TestsBase {
                 .contentType("application/x-www-form-urlencoded")
                 .config(config().encoderConfig(encoderConfig().defaultContentCharset("UTF-8")))
                 .when()
-                .post(testEidasClientProperties.getSpReturnUrl()).then().log().ifError().extract().body().jsonPath();
+                .post(testEidasClientProperties.getSpReturnUrl())
+                .then()
+                .extract().body().jsonPath();
     }
 
     protected io.restassured.response.Response sendSamlResponseGetStatus(String relayState, String response) {
@@ -198,7 +206,9 @@ public abstract class TestsBase {
                 .contentType("application/x-www-form-urlencoded")
                 .config(config().encoderConfig(encoderConfig().defaultContentCharset("UTF-8")))
                 .when()
-                .post(testEidasClientProperties.getSpReturnUrl()).then().log().ifError().extract().response();
+                .post(testEidasClientProperties.getSpReturnUrl())
+                .then()
+                .extract().response();
     }
 
     protected io.restassured.response.Response sendSamlResponseExtractResponse(String relayState, String response) {
@@ -208,7 +218,9 @@ public abstract class TestsBase {
                 .contentType("application/x-www-form-urlencoded")
                 .config(config().encoderConfig(encoderConfig().defaultContentCharset("UTF-8")))
                 .when()
-                .post(testEidasClientProperties.getSpReturnUrl()).then().log().ifError().extract().response();
+                .post(testEidasClientProperties.getSpReturnUrl())
+                .then()
+                .extract().response();
     }
 
     protected void validateMetadataSignature(String body) {

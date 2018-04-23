@@ -139,7 +139,6 @@ public class EidasClientAuthApiIntegrationTest extends TestsBase {
         assertEquals("Status code should be: 200", 200, response.statusCode());
     }
 
-    @Ignore //TODO: Currently there is no additional attributes support
     @Test
     public void authApi4_notSupportedAdditionalAttributeShouldReturnError() {
         Map<String,String> formParams = new HashMap<String,String>();
@@ -152,12 +151,11 @@ public class EidasClientAuthApiIntegrationTest extends TestsBase {
 
         assertEquals("Status code should be: 400", 400, response.statusCode());
         assertEquals("Bad request error should be returned", BAD_REQUEST, getValueFromJsonResponse(response, STATUS_ERROR));
-        assertThat("Correct error message", getValueFromJsonResponse(response, STATUS_ERROR_MESSAGE), startsWith("Invalid AdditionalParameters! Unrecognized attibute(s) provided:"));
+        assertThat("Correct error message", getValueFromJsonResponse(response, STATUS_ERROR_MESSAGE), startsWith("Found one or more invalid AdditionalAttributes value(s). Allowed values are:"));
     }
 
-    @Ignore //TODO: Currently there is no additional attributes support
     @Test
-    public void authApi4_additionalAttributesNotSepparatedCorrectlyShouldReturnError() {
+    public void authApi4_additionalAttributesNotSeparatedCorrectlyShouldReturnError() {
         Map<String,String> formParams = new HashMap<String,String>();
         formParams.put(LOA, "HIGH");
         formParams.put(ADDITIONAL_ATTRIBUTES, "LegalPersonIdentifierCurrentAddressGender");
@@ -168,12 +166,11 @@ public class EidasClientAuthApiIntegrationTest extends TestsBase {
 
         assertEquals("Status code should be: 400", 400, response.statusCode());
         assertEquals("Bad request error should be returned", BAD_REQUEST, getValueFromJsonResponse(response, STATUS_ERROR));
-        assertThat("Correct error message", getValueFromJsonResponse(response, STATUS_ERROR_MESSAGE), startsWith("Invalid AdditionalParameters! Unrecognized attibute(s) provided:"));
+        assertThat("Correct error message", getValueFromJsonResponse(response, STATUS_ERROR_MESSAGE), startsWith("Found one or more invalid AdditionalAttributes value(s). Allowed values are:"));
     }
 
-    @Ignore //TODO: Currently there is no additional attributes support
     @Test
-    public void authApi4_additionalAttributesSepparatedWithWrongCharacterShouldReturnError() {
+    public void authApi4_additionalAttributesSeparatedWithWrongCharacterShouldReturnError() {
         Map<String,String> formParams = new HashMap<String,String>();
         formParams.put(LOA, "HIGH");
         formParams.put(ADDITIONAL_ATTRIBUTES, "LegalPersonIdentifier&CurrentAddress&Gender");
@@ -184,12 +181,12 @@ public class EidasClientAuthApiIntegrationTest extends TestsBase {
 
         assertEquals("Status code should be: 400", 400, response.statusCode());
         assertEquals("Bad request error should be returned", BAD_REQUEST, getValueFromJsonResponse(response, STATUS_ERROR));
-        assertThat("Correct error message", getValueFromJsonResponse(response, STATUS_ERROR_MESSAGE), startsWith("Invalid AdditionalParameters! Unrecognized attibute(s) provided:"));
+        assertThat("Correct error message", getValueFromJsonResponse(response, STATUS_ERROR_MESSAGE), startsWith("Found one or more invalid AdditionalAttributes value(s). Allowed values are:"));
     }
 
-    @Ignore //TODO: Currently there is no additional attributes support
+    @Ignore //TODO: Need a way to force the attributes without URL encoding
     @Test
-    public void authApi4_additionalAttributesSepparatedWithoutUrlEncodingShouldReturnError() {
+    public void authApi4_additionalAttributesSeparatedWithoutUrlEncodingShouldReturnError() {
         Map<String,String> formParams = new HashMap<String,String>();
         formParams.put(LOA, "HIGH");
         formParams.put(ADDITIONAL_ATTRIBUTES, "LegalPersonIdentifier CurrentAddress Gender");
@@ -198,10 +195,15 @@ public class EidasClientAuthApiIntegrationTest extends TestsBase {
 
         Response response = given()
                 .queryParams(formParams)
-   //             .contentType("application/x-www-form-urlencoded") //TODO: what is default behavior in restAssured? Needs to be rechecked when additional Attributes are implemented
+                .config(config())
+//                .contentType("application/x-www-form-urlencoded") //TODO: what is default behavior in restAssured? Needs to be rechecked when additional Attributes are implemented
                 .config(config().encoderConfig(encoderConfig().defaultContentCharset("UTF-8")))
+                .log().all()
                 .when()
-                .get(testEidasClientProperties.getSpStartUrl()).then().log().ifError().extract().response();
+                .get(testEidasClientProperties.getSpStartUrl())
+                .then()
+                .log().ifError()
+                .extract().response();
 
         assertEquals("Status code should be: 400", 400, response.statusCode());
         assertEquals("Bad request error should be returned", BAD_REQUEST, getValueFromJsonResponse(response, STATUS_ERROR));

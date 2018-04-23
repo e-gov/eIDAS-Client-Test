@@ -62,7 +62,9 @@ public class EidasClientRespApiIntegrationTest extends TestsBase {
                 .contentType("application/x-www-form-urlencoded")
                 .config(config().encoderConfig(encoderConfig().defaultContentCharset("UTF-8")))
                 .when()
-                .post(testEidasClientProperties.getSpReturnUrl()).then().log().ifError().extract().response();
+                .post(testEidasClientProperties.getSpReturnUrl())
+                .then()
+                .extract().response();
 
         assertEquals("Status code should be: 200", 200, response.statusCode());
     }
@@ -79,12 +81,13 @@ public class EidasClientRespApiIntegrationTest extends TestsBase {
                 .contentType("application/x-www-form-urlencoded")
                 .config(config().encoderConfig(encoderConfig().defaultContentCharset("UTF-8")))
                 .when()
-                .post(testEidasClientProperties.getSpReturnUrl()).then().log().ifError().extract().response();
+                .post(testEidasClientProperties.getSpReturnUrl())
+                .then()
+                .extract().response();
 
         assertEquals("Status code should be: 200", 200, response.statusCode());
     }
 
-    @Ignore //TODO: What error should we get?
     @Test
     public void respApi3_samlResponseMissingShouldReturnErrorStatus() {
         String base64Response = getBase64SamlResponseMinimalAttributes(getAuthenticationReqWithDefault(), "TestGiven","TestFamily","TestPNO", "TestDate", LOA_SUBSTANTIAL);
@@ -94,12 +97,15 @@ public class EidasClientRespApiIntegrationTest extends TestsBase {
                 .contentType("application/x-www-form-urlencoded")
                 .config(config().encoderConfig(encoderConfig().defaultContentCharset("UTF-8")))
                 .when()
-                .post(testEidasClientProperties.getSpReturnUrl()).then().log().ifError().extract().response();
+                .post(testEidasClientProperties.getSpReturnUrl())
+                .then()
+                .extract().response();
 
         assertEquals("Status code should be: 400", 400, response.statusCode());
+        assertEquals("Bad request error should be returned", BAD_REQUEST, getValueFromJsonResponse(response, STATUS_ERROR));
+        assertThat("Correct error message", getValueFromJsonResponse(response, STATUS_ERROR_MESSAGE), startsWith("Failed to read SAMLResponse."));
     }
 
-    @Ignore //TODO: What error should we get?
     @Test
     public void respApi3_samlResponseNotBase64ShouldReturnErrorStatus() {
         String base64Response = getBase64SamlResponseMinimalAttributes(getAuthenticationReqWithDefault(), "TestGiven","TestFamily","TestPNO", "TestDate", LOA_SUBSTANTIAL);
@@ -109,12 +115,15 @@ public class EidasClientRespApiIntegrationTest extends TestsBase {
                 .contentType("application/x-www-form-urlencoded")
                 .config(config().encoderConfig(encoderConfig().defaultContentCharset("UTF-8")))
                 .when()
-                .post(testEidasClientProperties.getSpReturnUrl()).then().log().ifError().extract().response();
+                .post(testEidasClientProperties.getSpReturnUrl())
+                .then()
+                .extract().response();
 
         assertEquals("Status code should be: 400", 400, response.statusCode());
+        assertEquals("Bad request error should be returned", BAD_REQUEST, getValueFromJsonResponse(response, STATUS_ERROR));
+        assertThat("Correct error message", getValueFromJsonResponse(response, STATUS_ERROR_MESSAGE), startsWith("Failed to read SAMLResponse."));
     }
 
-    @Ignore //TODO: Currently there is no additional attributes support
     @Test
     public void respApi4_additionalParametersShouldReturnOk() {
         String base64Response = getBase64SamlResponseMinimalAttributes(getAuthenticationReqWithDefault(), "TestGiven","TestFamily","TestPNO", "TestDate", LOA_SUBSTANTIAL);
@@ -125,13 +134,14 @@ public class EidasClientRespApiIntegrationTest extends TestsBase {
                 .contentType("application/x-www-form-urlencoded")
                 .config(config().encoderConfig(encoderConfig().defaultContentCharset("UTF-8")))
                 .when()
-                .post(testEidasClientProperties.getSpReturnUrl()).then().log().ifError().extract().response();
+                .post(testEidasClientProperties.getSpReturnUrl())
+                .then()
+                .extract().response();
 
         assertEquals("Status code should be: 200", 200, response.statusCode());
         assertEquals("Name is returned", "TestGiven", getValueFromJsonResponse(response, STATUS_FIRST));
     }
 
-    @Ignore //TODO: Currently there is no additional attributes support
     @Test
     public void respApi4_multipleParametersAreNotBlocking() {
         String base64Response = getBase64SamlResponseMinimalAttributes(getAuthenticationReqWithDefault(), "TestGiven","TestFamily","TestPNO", "TestDate", LOA_SUBSTANTIAL);
@@ -143,9 +153,11 @@ public class EidasClientRespApiIntegrationTest extends TestsBase {
                 .contentType("application/x-www-form-urlencoded")
                 .config(config().encoderConfig(encoderConfig().defaultContentCharset("UTF-8")))
                 .when()
-                .post(testEidasClientProperties.getSpReturnUrl()).then().log().ifError().extract().response();
+                .post(testEidasClientProperties.getSpReturnUrl())
+                .then()
+                .extract().response();
 
         assertEquals("Status code should be: 200", 200, response.statusCode());
-        assertEquals("Last used parameter is returned", "TestGiven2", getValueFromJsonResponse(response, STATUS_FIRST));
+        assertEquals("Last used parameter is returned", "TestGiven", getValueFromJsonResponse(response, STATUS_FIRST));
      }
 }
