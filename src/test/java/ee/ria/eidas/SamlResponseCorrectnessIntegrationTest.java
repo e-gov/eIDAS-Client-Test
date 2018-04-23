@@ -12,10 +12,15 @@ import org.junit.Test;
 import org.junit.experimental.categories.Category;
 import org.springframework.boot.test.context.SpringBootTest;
 
+import java.util.HashMap;
+import java.util.Map;
+
 import static ee.ria.eidas.config.EidasTestStrings.*;
 import static io.restassured.RestAssured.given;
 import static io.restassured.config.EncoderConfig.encoderConfig;
+import static org.hamcrest.MatcherAssert.assertThat;
 import static org.hamcrest.Matchers.isEmptyOrNullString;
+import static org.hamcrest.Matchers.startsWith;
 import static org.junit.Assert.assertEquals;
 
 @SpringBootTest(classes = SamlResponseCorrectnessIntegrationTest.class)
@@ -96,10 +101,11 @@ public class SamlResponseCorrectnessIntegrationTest extends TestsBase {
     @Ignore //TODO: There is no minimal attributes check!
     @Test
     public void saml3_faultyAuthenticationResponse() {
-        String base64Response = getBase64SamlResponseMinimalAttributes(getAuthenticationReqWithDefault(), null,"TestFamily", "TestPNO", "TestDate", null);
-        JsonPath loginResponse = sendSamlResponse("", base64Response);
-        assertEquals("400", loginResponse.getString("status"));
-        assertEquals("Missing required attribute, error should be returned","Error of some sort", loginResponse.getString(STATUS_ERROR_MESSAGE));
+        String base64Response = getBase64SamlResponseMinimalAttributes(getAuthenticationReqWithDefault(), null,"", "TestPNO", "TestDate", null);
+        Response response = sendSamlResponseGetStatus("", base64Response );
+        assertEquals("Status code should be: 400", 400, response.statusCode());
+        assertEquals("Bad request error should be returned", BAD_REQUEST, getValueFromJsonResponse(response, STATUS_ERROR));
+        assertThat("Correct error message", getValueFromJsonResponse(response, STATUS_ERROR_MESSAGE), startsWith("AuthnContextClassRef is not greater or equal to the request level of assurance!"));
     }
 
     @Test
@@ -449,6 +455,43 @@ public class SamlResponseCorrectnessIntegrationTest extends TestsBase {
         assertEquals(400, loginResponse.getStatusCode());
         assertEquals("Generic error should be returned", BAD_REQUEST, getValueFromJsonResponse(loginResponse, STATUS_ERROR));
         assertEquals("Error should be returned as time is future", "AuthnInstant is in the future!", getValueFromJsonResponse(loginResponse, STATUS_ERROR_MESSAGE));
+    }
+
+    @Test
+    public void saml26_mandatoryLegalAttributesAreAskedAndReturned() {
+
+        Map<String,String> formParams = new HashMap<String,String>();
+        formParams.put(LOA, "HIGH");
+        formParams.put(ADDITIONAL_ATTRIBUTES, "LegalPersonIdentifier LegalName");
+        formParams.put(COUNTRY, "EE");
+        formParams.put(RELAY_STATE, "1234abcd");
+
+        String base64Response = getBase64SamlResponseLegalMinimalAttributes(getAuthenticationReqForm(formParams).getBody().asString(), DEFATTR_FIRST, DEFATTR_FAMILY, DEFATTR_PNO, DEFATTR_DATE, DEFATTR_LEGAL_NAME, DEFATTR_LEGAL_PNO);
+        JsonPath loginResponse = sendSamlResponse("", base64Response);
+        assertEquals("Correct loa is returned", LOA_HIGH, loginResponse.getString(STATUS_LOA));
+        assertEquals("Correct person idendifier is returned", DEFATTR_PNO, loginResponse.getString(STATUS_PNO));
+        assertEquals("Correct date is returned", DEFATTR_DATE, loginResponse.getString(STATUS_DATE));
+        assertEquals("Correct family name is returned", DEFATTR_FAMILY, loginResponse.getString(STATUS_FAMILY));
+        assertEquals("Correct first name is returned", DEFATTR_FIRST, loginResponse.getString(STATUS_FIRST));
+        assertEquals("Correct legal name is returned", DEFATTR_LEGAL_NAME, loginResponse.getString(STATUS_LEGAL_NAME));
+        assertEquals("Correct legal pno is returned", DEFATTR_LEGAL_PNO, loginResponse.getString(STATUS_LEGAL_PNO));
+    }
+
+    @Ignore //TODO: There is no check for missing mandatory attributes
+    @Test
+    public void saml26_mandatoryLegalAttributesAreAskedButNotReturned() {
+
+        Map<String,String> formParams = new HashMap<String,String>();
+        formParams.put(LOA, "HIGH");
+        formParams.put(ADDITIONAL_ATTRIBUTES, "LegalPersonIdentifier LegalName");
+        formParams.put(COUNTRY, "EE");
+        formParams.put(RELAY_STATE, "1234abcd");
+
+        String base64Response = getBase64SamlResponseMinimalAttributes(getAuthenticationReqForm(formParams).getBody().asString(), DEFATTR_FIRST, DEFATTR_FAMILY, DEFATTR_PNO, DEFATTR_DATE, LOA_HIGH);
+        Response response = sendSamlResponseGetStatus("", base64Response );
+        assertEquals("Status code should be: 400", 400, response.statusCode());
+        assertEquals("Bad request error should be returned", BAD_REQUEST, getValueFromJsonResponse(response, STATUS_ERROR));
+        assertThat("Correct error message", getValueFromJsonResponse(response, STATUS_ERROR_MESSAGE), startsWith("AuthnContextClassRef is not greater or equal to the request level of assurance!"));
     }
 
     @Test
