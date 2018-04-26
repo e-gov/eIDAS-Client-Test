@@ -57,6 +57,21 @@ public class ResponseBuilderUtils extends ResponseAssertionBuilderUtils {
         }
     }
 
+    public Response buildAuthnResponseWithMaxLegalAttributes(Credential signCredential, Credential encCredential, String inResponseId, String recipient, String loa, String givenName, String familyName, String personIdentifier, String dateOfBirth, String legalName, String legalPno, String issuerValue, Integer acceptableTimeMin, String audienceUri, String legalAddress, String vatRegistration, String taxReference, String businessCodes, String lei, String eori, String seed, String sic, String d201217EuIdendifier) {
+        try {
+            Signature signature = prepareSignature(signCredential);
+            DateTime timeNow = new DateTime();
+            Response authnResponse = buildResponseForSigningWithoutAssertion(inResponseId, recipient, timeNow, issuerValue);
+            authnResponse.getEncryptedAssertions().add(buildEncrAssertionWithMaxLegal(signCredential, encCredential, inResponseId, recipient, timeNow, acceptableTimeMin, loa, givenName, familyName, personIdentifier, dateOfBirth, legalName, legalPno, issuerValue, audienceUri, legalAddress, vatRegistration, taxReference, businessCodes, lei, eori, seed, sic, d201217EuIdendifier));
+            authnResponse.setSignature(signature);
+            XMLObjectProviderRegistrySupport.getMarshallerFactory().getMarshaller(authnResponse).marshall(authnResponse);
+            Signer.signObject(signature);
+            return authnResponse;
+        } catch (Exception e) {
+            throw new RuntimeException("SAML error:" + e.getMessage(), e);
+        }
+    }
+
     public Response buildAuthnResponseWithUnsignedAssertions(Credential signCredential, Credential encCredential, String inResponseId, String recipient, String loa, String givenName, String familyName, String personIdentifier, String dateOfBirth, String issuerValue, Integer acceptableTimeMin, String audienceUri) {
         try {
             Signature signature = prepareSignature(signCredential);

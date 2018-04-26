@@ -181,6 +181,21 @@ public abstract class TestsBase {
                 .queryParams(values)
                 .contentType("application/x-www-form-urlencoded")
                 .config(config().encoderConfig(encoderConfig().defaultContentCharset("UTF-8")))
+                //.log().all()
+                .when()
+                .get(testEidasClientProperties.getSpStartUrl())
+                .then()
+                .log().ifValidationFails()
+                .statusCode(200)
+                .extract().response();
+    }
+
+    protected io.restassured.response.Response getAuthenticationReqFormFail(Map<String,String> values) {
+        return given()
+                .queryParams(values)
+                .contentType("application/x-www-form-urlencoded")
+                .config(config().encoderConfig(encoderConfig().defaultContentCharset("UTF-8")))
+                //.log().all()
                 .when()
                 .get(testEidasClientProperties.getSpStartUrl())
                 .then()
@@ -193,9 +208,11 @@ public abstract class TestsBase {
                 .formParam(SAML_RESPONSE, response)
                 .contentType("application/x-www-form-urlencoded")
                 .config(config().encoderConfig(encoderConfig().defaultContentCharset("UTF-8")))
+                .log().all()
                 .when()
                 .post(testEidasClientProperties.getSpReturnUrl())
                 .then()
+                .log().all()
                 .extract().body().jsonPath();
     }
 
@@ -326,6 +343,17 @@ public abstract class TestsBase {
         XmlPath xmlPath = getDecodedSamlRequestBodyXml(requestBody);
         Response response = new ResponseBuilderUtils().buildLegalAuthnResponse(signatureCredential, encryptionCredential, xmlPath.getString("AuthnRequest.@ID"),
                 testEidasClientProperties.getFullSpReturnUrl(), xmlPath.getString("AuthnRequest.RequestedAuthnContext.AuthnContextClassRef"), givenName, familyName, personIdentifier, dateOfBirth, legalName, legalPno, testEidasClientProperties.getFullIdpMetadataUrl(), testEidasClientProperties.getAcceptableTimeDiffMin(), testEidasClientProperties.getFullSpMetadataUrl());
+        String stringResponse = OpenSAMLUtils.getXmlString(response);
+        validateSamlResponseSignature(stringResponse);
+        return new String(Base64.getEncoder().encode(stringResponse.getBytes()));
+    }
+
+    protected String getBase64SamlResponseLegalMaximalAttributes(String requestBody) {
+        XmlPath xmlPath = getDecodedSamlRequestBodyXml(requestBody);
+        Response response = new ResponseBuilderUtils().buildAuthnResponseWithMaxLegalAttributes(signatureCredential, encryptionCredential, xmlPath.getString("AuthnRequest.@ID"),
+                testEidasClientProperties.getFullSpReturnUrl(), xmlPath.getString("AuthnRequest.RequestedAuthnContext.AuthnContextClassRef"), DEFATTR_FIRST, DEFATTR_FAMILY, DEFATTR_PNO,
+                DEFATTR_DATE, DEFATTR_LEGAL_NAME, DEFATTR_LEGAL_PNO, testEidasClientProperties.getFullIdpMetadataUrl(), testEidasClientProperties.getAcceptableTimeDiffMin(), testEidasClientProperties.getFullSpMetadataUrl(),
+                DEFATTR_LEGAL_ADDRESS, DEFATTR_LEGAL_VATREGISTRATION, DEFATTR_LEGAL_TAXREFERENCE, DEFATTR_LEGAL_BUSINESSCODES, DEFATTR_LEGAL_LEI, DEFATTR_LEGAL_EORI, DEFATTR_LEGAL_SEED, DEFATTR_LEGAL_SIC, DEFATTR_LEGAL_D201217EUIDENTIFIER);
         String stringResponse = OpenSAMLUtils.getXmlString(response);
         validateSamlResponseSignature(stringResponse);
         return new String(Base64.getEncoder().encode(stringResponse.getBytes()));

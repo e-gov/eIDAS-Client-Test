@@ -54,7 +54,7 @@ public class EidasClientAuthApiIntegrationTest extends TestsBase {
         Map<String,String> formParams = new HashMap<String,String>();
         formParams.put(RELAY_STATE, "1234abcd");
 
-        Response response = getAuthenticationReqForm(formParams);
+        Response response = getAuthenticationReqFormFail(formParams);
 
         assertEquals("Status code should be: 400", 400, response.statusCode());
         assertEquals("Bad request error should be returned", BAD_REQUEST, getValueFromJsonResponse(response, STATUS_ERROR));
@@ -145,7 +145,7 @@ public class EidasClientAuthApiIntegrationTest extends TestsBase {
         formParams.put(COUNTRY, "EE");
         formParams.put(RELAY_STATE, "1234abcd");
 
-        Response response = getAuthenticationReqForm(formParams);
+        Response response = getAuthenticationReqFormFail(formParams);
 
         assertEquals("Status code should be: 400", 400, response.statusCode());
         assertEquals("Bad request error should be returned", BAD_REQUEST, getValueFromJsonResponse(response, STATUS_ERROR));
@@ -160,7 +160,7 @@ public class EidasClientAuthApiIntegrationTest extends TestsBase {
         formParams.put(COUNTRY, "EE");
         formParams.put(RELAY_STATE, "1234abcd");
 
-        Response response = getAuthenticationReqForm(formParams);
+        Response response = getAuthenticationReqFormFail(formParams);
 
         assertEquals("Status code should be: 400", 400, response.statusCode());
         assertEquals("Bad request error should be returned", BAD_REQUEST, getValueFromJsonResponse(response, STATUS_ERROR));
@@ -175,7 +175,7 @@ public class EidasClientAuthApiIntegrationTest extends TestsBase {
         formParams.put(COUNTRY, "EE");
         formParams.put(RELAY_STATE, "1234abcd");
 
-        Response response = getAuthenticationReqForm(formParams);
+        Response response = getAuthenticationReqFormFail(formParams);
 
         assertEquals("Status code should be: 400", 400, response.statusCode());
         assertEquals("Bad request error should be returned", BAD_REQUEST, getValueFromJsonResponse(response, STATUS_ERROR));

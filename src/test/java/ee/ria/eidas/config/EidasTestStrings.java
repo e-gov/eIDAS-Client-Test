@@ -35,6 +35,14 @@ public class EidasTestStrings {
     public static final String STATUS_BIRTH_PLACE = "attributes.PlaceOfBirth";
     public static final String STATUS_LEGAL_NAME = "attributes.LegalName";
     public static final String STATUS_LEGAL_PNO = "attributes.LegalPersonIdentifier";
+    public static final String STATUS_LEGAL_ADDRESS = "attributes.LegalAddress";
+    public static final String STATUS_LEGAL_VAT = "attributes.VATRegistration";
+    public static final String STATUS_LEGAL_TAX = "attributes.TaxReference";
+    public static final String STATUS_LEGAL_LEI = "attributes.LEI";
+    public static final String STATUS_LEGAL_EORI = "attributes.EORI";
+    public static final String STATUS_LEGAL_SEED = "attributes.SEED";
+    public static final String STATUS_LEGAL_SIC = "attributes.SIC";
+    public static final String STATUS_LEGAL_D2012 = "attributes.D-2012-17-EUIdentifier";
 
     //JSON response error strings
     public static final String STATUS_ERROR = "error";
@@ -58,4 +66,13 @@ public class EidasTestStrings {
     public static final String DEFATTR_GENDER = "Male";
     public static final String DEFATTR_LEGAL_NAME = "Good Company a/s";
     public static final String DEFATTR_LEGAL_PNO = "292938483902";
+    public static final String DEFATTR_LEGAL_ADDRESS = "PGVpZGFzOkxvY2F0b3JEZXNpZ25hdG9yPjEyNTwvZWlkYXM6TG9jYXRvckRlc2lnbmF0b3I+DQo8ZWlkYXM6VGhvcm91Z2hmYXJlPktpbmdzd2F5PC9laWRhczpUaG9yb3VnaGZhcmU+DQo8ZWlkYXM6UG9zdE5hbWU+TG9uZG9uPC9laWRhczpQb3N0TmFtZT4gDQo8ZWlkYXM6UG9zdENvZGU+V0MyQiA2Tkg8L2VpZGFzOlBvc3Rjb2RlPg==";
+    public static final String DEFATTR_LEGAL_VATREGISTRATION = "GB 730 7577 27";
+    public static final String DEFATTR_LEGAL_TAXREFERENCE = "ABZ1230789";
+    public static final String DEFATTR_LEGAL_BUSINESSCODES = "ABZ1230789";
+    public static final String DEFATTR_LEGAL_D201217EUIDENTIFIER = "GB 755 267 1243";
+    public static final String DEFATTR_LEGAL_LEI = "ES123567983568437254K";
+    public static final String DEFATTR_LEGAL_EORI = "GB123456789000";
+    public static final String DEFATTR_LEGAL_SEED = "GB 00000987ABC";
+    public static final String DEFATTR_LEGAL_SIC = "3730";
 }

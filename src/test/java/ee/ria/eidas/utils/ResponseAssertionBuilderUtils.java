@@ -53,6 +53,16 @@ public class ResponseAssertionBuilderUtils extends ResponseBuilderBase {
         return encryptAssertion(assertion, encCredential);
     }
 
+    protected EncryptedAssertion buildEncrAssertionWithMaxLegal(Credential signCredential, Credential encCredential, String inResponseId, String recipient, DateTime issueInstant, Integer acceptableTimeMin, String loa, String givenName, String familyName, String personIdentifier, String dateOfBirth, String legalName, String legalPno, String issuerValue, String audienceUri, String legalAddress, String vatRegistration, String taxReference, String businessCodes, String lei, String eori, String seed, String sic, String d201217EuIdendifier) throws SecurityException, SignatureException, MarshallingException, EncryptionException {
+        Signature signature = prepareSignature(signCredential);
+        Assertion assertion = buildMaxLegalAssertionForSigning(inResponseId, recipient ,issueInstant, acceptableTimeMin, loa, givenName, familyName, personIdentifier, dateOfBirth, legalName, legalPno, issuerValue, audienceUri, legalAddress, vatRegistration, taxReference, businessCodes, lei, eori, seed, sic, d201217EuIdendifier);
+        assertion.setSignature(signature);
+        XMLObjectProviderRegistrySupport.getMarshallerFactory().getMarshaller(assertion).marshall(assertion);
+        Signer.signObject(signature);
+
+        return encryptAssertion(assertion, encCredential);
+    }
+
     protected Assertion buildAssertionForSigning(String inResponseId, String recipient, DateTime issueInstant, Integer acceptableTimeMin, String loa, String givenName, String familyName, String personIdentifier, String dateOfBirth, String issuerValue, String audienceUri) {
         Assertion assertion = new AssertionBuilder().buildObject();
         assertion.setIssueInstant(issueInstant);
@@ -76,6 +86,19 @@ public class ResponseAssertionBuilderUtils extends ResponseBuilderBase {
         assertion.setConditions(buildConditions(audienceUri, issueInstant, acceptableTimeMin));
         assertion.getAuthnStatements().add(buildAuthnStatement(issueInstant,loa));
         assertion.getAttributeStatements().add(buildMinimalAttributeStatementWithLegalPerson(givenName, familyName, personIdentifier, dateOfBirth, legalName, legalPno));
+        return assertion;
+    }
+
+    protected Assertion buildMaxLegalAssertionForSigning(String inResponseId, String recipient, DateTime issueInstant, Integer acceptableTimeMin, String loa, String givenName, String familyName, String personIdentifier, String dateOfBirth, String legalName, String legalPno, String issuerValue, String audienceUri, String legalAddress, String vatRegistration, String taxReference, String businessCodes, String lei, String eori, String seed, String sic, String d201217EuIdendifier) {
+        Assertion assertion = new AssertionBuilder().buildObject();
+        assertion.setIssueInstant(issueInstant);
+        assertion.setID(OpenSAMLUtils.generateSecureRandomId());
+        assertion.setVersion(SAMLVersion.VERSION_20);
+        assertion.setIssuer(buildIssuer(issuerValue));
+        assertion.setSubject(buildSubject(inResponseId, recipient, issueInstant, acceptableTimeMin, personIdentifier));
+        assertion.setConditions(buildConditions(audienceUri, issueInstant, acceptableTimeMin));
+        assertion.getAuthnStatements().add(buildAuthnStatement(issueInstant,loa));
+        assertion.getAttributeStatements().add(buildMaximalAttributeStatementWithLegalPerson(givenName, familyName, personIdentifier, dateOfBirth, legalName, legalPno, legalAddress, vatRegistration, taxReference, businessCodes, lei, eori, seed, sic, d201217EuIdendifier));
         return assertion;
     }
 

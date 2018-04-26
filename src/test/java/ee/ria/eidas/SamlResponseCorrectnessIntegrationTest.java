@@ -35,13 +35,13 @@ public class SamlResponseCorrectnessIntegrationTest extends TestsBase {
         assertEquals("Assertion must be encrypted, error should be returned","Saml Response does not contain any encrypted assertions", loginResponse.getString("message"));
     }
 
-    @Ignore //TODO: Currently it is only checked that encrypted assertion is present.
     @Test
     public void saml1_notEncryptedAndEncryptedAssertionsMixedMustFail() {
         String base64Response = getBase64SamlResponseDefaultMinimalAttributesWithMixedEncryption(getAuthenticationReqWithDefault());
-        JsonPath loginResponse = sendSamlResponse("", base64Response);
-        assertEquals("500", loginResponse.getString("status"));
-        assertEquals("Assertion must be encrypted, error should be returned","Saml Response does not contain any encrypted assertions", loginResponse.getString("message"));
+        Response loginResponse = sendSamlResponseExtractResponse("", base64Response);
+        assertEquals(400, loginResponse.getStatusCode());
+        assertEquals("Generic error should be returned", BAD_REQUEST, getValueFromJsonResponse(loginResponse, STATUS_ERROR));
+        assertEquals("Correct error message is returned", "Error handling message: Message is not schema-valid.", getValueFromJsonResponse(loginResponse, STATUS_ERROR_MESSAGE));
     }
 
     @Ignore //TODO: Currently it is only checked that encrypted assertion is present.
@@ -53,22 +53,22 @@ public class SamlResponseCorrectnessIntegrationTest extends TestsBase {
         assertEquals("","Saml Response does not contain any encrypted assertions", loginResponse.getString("message"));
     }
 
-    @Ignore //TODO: Currently NPE is returned
     @Test
     public void saml2_missingStatusInResponseMustFail() {
         String base64Response = getBase64SamlResponseMinimalAttributesWithoutStatus(getAuthenticationReqWithDefault());
-        JsonPath loginResponse = sendSamlResponse("", base64Response);
-        assertEquals("500", loginResponse.getString("status"));
-        assertEquals("","", loginResponse.getString("message"));
+        Response loginResponse = sendSamlResponseExtractResponse("", base64Response);
+        assertEquals(400, loginResponse.getStatusCode());
+        assertEquals("Generic error should be returned", BAD_REQUEST, getValueFromJsonResponse(loginResponse, STATUS_ERROR));
+        assertEquals("The response is not schema valid", "Error handling message: Message is not schema-valid.", getValueFromJsonResponse(loginResponse, STATUS_ERROR_MESSAGE));
     }
 
-    @Ignore //TODO: Currently NPE is returned
     @Test
     public void saml2_missingStatusCodeInResponseMustFail() {
         String base64Response = getBase64SamlResponseMinimalAttributesWithStatusCodes(getAuthenticationReqWithDefault(), 0);
-        JsonPath loginResponse = sendSamlResponse("", base64Response);
-        assertEquals("500", loginResponse.getString("status"));
-        assertEquals("","", loginResponse.getString("message"));
+        Response loginResponse = sendSamlResponseExtractResponse("", base64Response);
+        assertEquals(400, loginResponse.getStatusCode());
+        assertEquals("Generic error should be returned", BAD_REQUEST, getValueFromJsonResponse(loginResponse, STATUS_ERROR));
+        assertEquals("The response is not schema valid", "Error handling message: Message is not schema-valid.", getValueFromJsonResponse(loginResponse, STATUS_ERROR_MESSAGE));
     }
 
     @Ignore //TODO: Currently this passes, it is unclear what it should do...
@@ -80,32 +80,31 @@ public class SamlResponseCorrectnessIntegrationTest extends TestsBase {
         assertEquals("","", loginResponse.getString("message"));
     }
 
-    @Ignore //TODO: Currently the loa format is not checked
     @Test
     public void saml2_notSupportedLoaInResponseMustFail() {
         String base64Response = getBase64SamlResponseMinimalAttributesWithNotExistingLoa(getAuthenticationReqWithDefault(), "http://eidas.europa.eu/LoA/extreme");
-        JsonPath loginResponse = sendSamlResponse("", base64Response);
-        assertEquals("500", loginResponse.getString("status"));
-        assertEquals("","", loginResponse.getString("message"));
+        Response loginResponse = sendSamlResponseExtractResponse("", base64Response);
+        assertEquals(400, loginResponse.getStatusCode());
+        assertEquals("Generic error should be returned", BAD_REQUEST, getValueFromJsonResponse(loginResponse, STATUS_ERROR));
+        assertEquals("Loa values are defined and other values should not be accepted", "AuthnContextClassRef is not greater or equal to the request level of assurance!", getValueFromJsonResponse(loginResponse, STATUS_ERROR_MESSAGE));
     }
 
-    @Ignore //TODO: Currently the loa format is not checked
     @Test
     public void saml2_emptyLoaInResponseMustFail() {
         String base64Response = getBase64SamlResponseMinimalAttributesWithNotExistingLoa(getAuthenticationReqWithDefault(), "");
-        JsonPath loginResponse = sendSamlResponse("", base64Response);
-        assertEquals("500", loginResponse.getString("status"));
-        assertEquals("","", loginResponse.getString("message"));
+        Response loginResponse = sendSamlResponseExtractResponse("", base64Response);
+        assertEquals(400, loginResponse.getStatusCode());
+        assertEquals("Generic error should be returned", BAD_REQUEST, getValueFromJsonResponse(loginResponse, STATUS_ERROR));
+        assertEquals("Loa can not be empty", "AuthnContextClassRef is not greater or equal to the request level of assurance!", getValueFromJsonResponse(loginResponse, STATUS_ERROR_MESSAGE));
     }
 
-    @Ignore //TODO: There is no minimal attributes check!
     @Test
     public void saml3_faultyAuthenticationResponse() {
-        String base64Response = getBase64SamlResponseMinimalAttributes(getAuthenticationReqWithDefault(), null,"", "TestPNO", "TestDate", null);
+        String base64Response = getBase64SamlResponseMinimalAttributes(getAuthenticationReqWithDefault(), null,"SomeName", "TestPNO", "TestDate", null);
         Response response = sendSamlResponseGetStatus("", base64Response );
         assertEquals("Status code should be: 400", 400, response.statusCode());
         assertEquals("Bad request error should be returned", BAD_REQUEST, getValueFromJsonResponse(response, STATUS_ERROR));
-        assertThat("Correct error message", getValueFromJsonResponse(response, STATUS_ERROR_MESSAGE), startsWith("AuthnContextClassRef is not greater or equal to the request level of assurance!"));
+        assertThat("Correct error message", getValueFromJsonResponse(response, STATUS_ERROR_MESSAGE), startsWith("Missing mandatory attributes in the response assertion:"));
     }
 
     @Test
@@ -113,8 +112,8 @@ public class SamlResponseCorrectnessIntegrationTest extends TestsBase {
         String base64Response = getBase64SamlResponseWithErrors(getAuthenticationReqWithDefault(), "AuthFailed");
         Response loginResponse = sendSamlResponseExtractResponse("", base64Response);
         assertEquals(401, loginResponse.getStatusCode());
-        assertEquals("User did not give consent, error should be returned", "Unauthorized", getValueFromJsonResponse(loginResponse, STATUS_ERROR));
-        assertEquals("User did not give consent, error should be returned", "Authentication failed.", getValueFromJsonResponse(loginResponse, STATUS_ERROR_MESSAGE));
+        assertEquals("User did not authenticate, error should be returned", "Unauthorized", getValueFromJsonResponse(loginResponse, STATUS_ERROR));
+        assertEquals("User did not authenticate, error should be returned", "Authentication failed.", getValueFromJsonResponse(loginResponse, STATUS_ERROR_MESSAGE));
     }
 
     @Test
@@ -163,7 +162,7 @@ public class SamlResponseCorrectnessIntegrationTest extends TestsBase {
         assertEquals("Correct error message is returned", "No corresponding SAML request session found for the given response assertion!", getValueFromJsonResponse(loginResponse, STATUS_ERROR_MESSAGE));
     }
 
-    @Ignore
+    @Ignore //TODO: This needs investigation as it currently passes!
     @Test
     public void saml10_wrongInResponseToInResponse() {
         XmlPath xmlPath = getDecodedSamlRequestBodyXml(getAuthenticationReqWithDefault());
@@ -184,25 +183,25 @@ public class SamlResponseCorrectnessIntegrationTest extends TestsBase {
         assertEquals("Correct error message is returned", "No corresponding SAML request session found for the given response assertion!", getValueFromJsonResponse(loginResponse, STATUS_ERROR_MESSAGE));
     }
 
-    @Ignore //TODO: Currently there is no check!
     @Test
     public void saml11_noAttributeStatementInResponseShouldReturnError() {
         String base64Response = getBase64SamlResponseWithAttributeCnt(0, getAuthenticationReqWithDefault());
-        JsonPath loginResponse = sendSamlResponse("", base64Response);
-        assertEquals("400", loginResponse.getString("status"));
-        assertEquals("Generic error should be returned", BAD_SAML, loginResponse.getString(STATUS_ERROR_MESSAGE));
+        Response loginResponse = sendSamlResponseExtractResponse("", base64Response);
+        assertEquals(400, loginResponse.getStatusCode());
+        assertEquals("Generic error should be returned", BAD_REQUEST, getValueFromJsonResponse(loginResponse, STATUS_ERROR));
+        assertEquals("Correct error message is returned", "Assertion must contain exactly 1 AttributeStatement!", getValueFromJsonResponse(loginResponse, STATUS_ERROR_MESSAGE));
     }
 
-    @Ignore //TODO: Currently there is no check!
     @Test
     public void saml11_twoAttributeStatementInResponseShouldReturnError() {
         String base64Response = getBase64SamlResponseWithAttributeCnt(2, getAuthenticationReqWithDefault());
-        JsonPath loginResponse = sendSamlResponse("", base64Response);
-        assertEquals("400", loginResponse.getString("status"));
-        assertEquals("Generic error should be returned", BAD_SAML, loginResponse.getString(STATUS_ERROR_MESSAGE));
+        Response loginResponse = sendSamlResponseExtractResponse("", base64Response);
+        assertEquals(400, loginResponse.getStatusCode());
+        assertEquals("Generic error should be returned", BAD_REQUEST, getValueFromJsonResponse(loginResponse, STATUS_ERROR));
+        assertEquals("Correct error message is returned", "Assertion must contain exactly 1 AttributeStatement!", getValueFromJsonResponse(loginResponse, STATUS_ERROR_MESSAGE));
     }
 
-    @Ignore //TODO: Currently there is no check!
+    @Ignore //TODO: Internal server error is returned
     @Test
     public void saml11_noSubjectInResponseShouldReturnError() {
         String base64Response = getBase64SamlResponseWithoutSubject(getAuthenticationReqWithDefault());
@@ -343,7 +342,6 @@ public class SamlResponseCorrectnessIntegrationTest extends TestsBase {
         assertEquals(400, loginResponse.getStatusCode());
         assertEquals("Generic error should be returned", BAD_REQUEST, getValueFromJsonResponse(loginResponse, STATUS_ERROR));
         assertEquals("Only one subject confirmation value is accepted", "Assertion subject must contain exactly 1 SubjectConfirmation!", getValueFromJsonResponse(loginResponse, STATUS_ERROR_MESSAGE));
-
     }
 
     @Test
@@ -490,6 +488,100 @@ public class SamlResponseCorrectnessIntegrationTest extends TestsBase {
         assertEquals("Status code should be: 400", 400, response.statusCode());
         assertEquals("Bad request error should be returned", BAD_REQUEST, getValueFromJsonResponse(response, STATUS_ERROR));
         assertThat("Correct error message", getValueFromJsonResponse(response, STATUS_ERROR_MESSAGE), startsWith("Missing mandatory attributes in the response assertion: [LegalPersonIdentifier, LegalName]"));
+    }
+
+    @Test
+    public void saml26_mandatoryLegalNameIsAskedButNotReturned() {
+
+        Map<String,String> formParams = new HashMap<String,String>();
+        formParams.put(LOA, "HIGH");
+        formParams.put(ADDITIONAL_ATTRIBUTES, "LegalName");
+        formParams.put(COUNTRY, "EE");
+        formParams.put(RELAY_STATE, "1234abcd");
+
+        String base64Response = getBase64SamlResponseMinimalAttributes(getAuthenticationReqForm(formParams).getBody().asString(), DEFATTR_FIRST, DEFATTR_FAMILY, DEFATTR_PNO, DEFATTR_DATE, LOA_HIGH);
+        Response response = sendSamlResponseGetStatus("", base64Response );
+        assertEquals("Status code should be: 400", 400, response.statusCode());
+        assertEquals("Bad request error should be returned", BAD_REQUEST, getValueFromJsonResponse(response, STATUS_ERROR));
+        assertThat("Correct error message", getValueFromJsonResponse(response, STATUS_ERROR_MESSAGE), startsWith("Missing mandatory attributes in the response assertion: [LegalName]"));
+    }
+
+    @Test
+    public void saml26_mandatoryLegalPersonIdentifierIsAskedButNotReturned() {
+
+        Map<String,String> formParams = new HashMap<String,String>();
+        formParams.put(LOA, "HIGH");
+        formParams.put(ADDITIONAL_ATTRIBUTES, "LegalPersonIdentifier");
+        formParams.put(COUNTRY, "EE");
+        formParams.put(RELAY_STATE, "1234abcd");
+
+        String base64Response = getBase64SamlResponseMinimalAttributes(getAuthenticationReqForm(formParams).getBody().asString(), DEFATTR_FIRST, DEFATTR_FAMILY, DEFATTR_PNO, DEFATTR_DATE, LOA_HIGH);
+        Response response = sendSamlResponseGetStatus("", base64Response );
+        assertEquals("Status code should be: 400", 400, response.statusCode());
+        assertEquals("Bad request error should be returned", BAD_REQUEST, getValueFromJsonResponse(response, STATUS_ERROR));
+        assertThat("Correct error message", getValueFromJsonResponse(response, STATUS_ERROR_MESSAGE), startsWith("Missing mandatory attributes in the response assertion: [LegalPersonIdentifier]"));
+    }
+
+    @Test
+    public void saml26_mandatoryLegalAttributesAreAskedButOnlyLegalPersonIdentifierReturned() {
+
+        Map<String,String> formParams = new HashMap<String,String>();
+        formParams.put(LOA, "HIGH");
+        formParams.put(ADDITIONAL_ATTRIBUTES, "LegalPersonIdentifier LegalName");
+        formParams.put(COUNTRY, "EE");
+        formParams.put(RELAY_STATE, "1234abcd");
+
+        String base64Response = getBase64SamlResponseLegalMinimalAttributes(getAuthenticationReqForm(formParams).getBody().asString(), DEFATTR_FIRST, DEFATTR_FAMILY, DEFATTR_PNO, DEFATTR_DATE, null, DEFATTR_LEGAL_PNO);
+        Response response = sendSamlResponseGetStatus("", base64Response );
+        assertEquals("Status code should be: 400", 400, response.statusCode());
+        assertEquals("Bad request error should be returned", BAD_REQUEST, getValueFromJsonResponse(response, STATUS_ERROR));
+        assertThat("Correct error message", getValueFromJsonResponse(response, STATUS_ERROR_MESSAGE), startsWith("Missing mandatory attributes in the response assertion: [LegalName]"));
+    }
+
+    @Test
+    public void saml26_mandatoryLegalAttributesAreAskedButOnlyLegalNameReturned() {
+
+        Map<String,String> formParams = new HashMap<String,String>();
+        formParams.put(LOA, "HIGH");
+        formParams.put(ADDITIONAL_ATTRIBUTES, "LegalPersonIdentifier LegalName");
+        formParams.put(COUNTRY, "EE");
+        formParams.put(RELAY_STATE, "1234abcd");
+
+        String base64Response = getBase64SamlResponseLegalMinimalAttributes(getAuthenticationReqForm(formParams).getBody().asString(), DEFATTR_FIRST, DEFATTR_FAMILY, DEFATTR_PNO, DEFATTR_DATE, DEFATTR_LEGAL_NAME, null);
+        Response response = sendSamlResponseGetStatus("", base64Response );
+        assertEquals("Status code should be: 400", 400, response.statusCode());
+        assertEquals("Bad request error should be returned", BAD_REQUEST, getValueFromJsonResponse(response, STATUS_ERROR));
+        assertThat("Correct error message", getValueFromJsonResponse(response, STATUS_ERROR_MESSAGE), startsWith("Missing mandatory attributes in the response assertion: [LegalPersonIdentifier]"));
+    }
+
+    @Test
+    public void saml26_allLegalAttributesAreAskedAndReturned() {
+
+        Map<String,String> formParams = new HashMap<String,String>();
+        formParams.put(LOA, "HIGH");
+        formParams.put(ADDITIONAL_ATTRIBUTES, "LegalPersonIdentifier LegalName LegalAddress VATRegistrationNumber TaxReference LEI EORI SEED SIC D-2012-17-EUIdentifier");
+        formParams.put(COUNTRY, "EE");
+        formParams.put(RELAY_STATE, "1234abcd");
+
+        String req = getAuthenticationReqForm(formParams).getBody().asString();
+
+        String base64Response = getBase64SamlResponseLegalMaximalAttributes(req);
+        JsonPath loginResponse = sendSamlResponse("", base64Response);
+        assertEquals("Correct loa is returned", LOA_HIGH, loginResponse.getString(STATUS_LOA));
+        assertEquals("Correct person idendifier is returned", DEFATTR_PNO, loginResponse.getString(STATUS_PNO));
+        assertEquals("Correct date is returned", DEFATTR_DATE, loginResponse.getString(STATUS_DATE));
+        assertEquals("Correct family name is returned", DEFATTR_FAMILY, loginResponse.getString(STATUS_FAMILY));
+        assertEquals("Correct first name is returned", DEFATTR_FIRST, loginResponse.getString(STATUS_FIRST));
+        assertEquals("Correct legal name is returned", DEFATTR_LEGAL_NAME, loginResponse.getString(STATUS_LEGAL_NAME));
+        assertEquals("Correct legal pno is returned", DEFATTR_LEGAL_PNO, loginResponse.getString(STATUS_LEGAL_PNO));
+        assertEquals("Correct legal address is returned", DEFATTR_LEGAL_ADDRESS, loginResponse.getString(STATUS_LEGAL_ADDRESS));
+        assertEquals("Correct legal vat is returned", DEFATTR_LEGAL_VATREGISTRATION, loginResponse.getString(STATUS_LEGAL_VAT));
+        assertEquals("Correct legal tax is returned", DEFATTR_LEGAL_TAXREFERENCE, loginResponse.getString(STATUS_LEGAL_TAX));
+        assertEquals("Correct legal lei is returned", DEFATTR_LEGAL_LEI, loginResponse.getString(STATUS_LEGAL_LEI));
+        assertEquals("Correct legal eori is returned", DEFATTR_LEGAL_EORI, loginResponse.getString(STATUS_LEGAL_EORI));
+        assertEquals("Correct legal seed is returned", DEFATTR_LEGAL_SEED, loginResponse.getString(STATUS_LEGAL_SEED));
+        assertEquals("Correct legal sic is returned", DEFATTR_LEGAL_SIC, loginResponse.getString(STATUS_LEGAL_SIC));
+        assertEquals("Correct legal pno D-2012-EUIdendtifier returned", DEFATTR_LEGAL_D201217EUIDENTIFIER, loginResponse.getString(STATUS_LEGAL_D2012));
     }
 
     @Test
