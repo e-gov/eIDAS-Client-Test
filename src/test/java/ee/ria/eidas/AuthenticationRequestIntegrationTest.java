@@ -141,7 +141,7 @@ public class AuthenticationRequestIntegrationTest extends TestsBase {
     public void auth2_optionalAttributessArePresentAndSetFalseForLegalPersons() {
         Map<String,String> formParams = new HashMap<String,String>();
         formParams.put(LOA, "HIGH");
-        formParams.put(ADDITIONAL_ATTRIBUTES, "LegalAddress VATRegistrationNumber TaxReference LEI EORI SEED SIC D-2012-17-EUIdentifier LegalPersonIdentifier LegalName");
+        formParams.put(ADDITIONAL_ATTRIBUTES, "LegalAddress VATRegistration TaxReference LEI EORI SEED SIC D-2012-17-EUIdentifier LegalPersonIdentifier LegalName");
         formParams.put(COUNTRY, "EE");
         formParams.put(RELAY_STATE, "1234abcd");
 
@@ -179,7 +179,7 @@ public class AuthenticationRequestIntegrationTest extends TestsBase {
     public void auth2_allAttributessArePresentAndSetCorrectlyForNaturalAndLegalPersons() {
         Map<String,String> formParams = new HashMap<String,String>();
         formParams.put(LOA, "HIGH");
-        formParams.put(ADDITIONAL_ATTRIBUTES, "LegalAddress VATRegistrationNumber TaxReference LEI EORI SEED SIC D-2012-17-EUIdentifier LegalPersonIdentifier LegalName BirthName PlaceOfBirth CurrentAddress Gender");
+        formParams.put(ADDITIONAL_ATTRIBUTES, "LegalAddress VATRegistration TaxReference LEI EORI SEED SIC D-2012-17-EUIdentifier LegalPersonIdentifier LegalName BirthName PlaceOfBirth CurrentAddress Gender");
         formParams.put(COUNTRY, "EE");
         formParams.put(RELAY_STATE, "1234abcd");
 

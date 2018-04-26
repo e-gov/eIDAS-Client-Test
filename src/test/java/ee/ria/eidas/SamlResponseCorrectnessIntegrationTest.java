@@ -559,7 +559,7 @@ public class SamlResponseCorrectnessIntegrationTest extends TestsBase {
 
         Map<String,String> formParams = new HashMap<String,String>();
         formParams.put(LOA, "HIGH");
-        formParams.put(ADDITIONAL_ATTRIBUTES, "LegalPersonIdentifier LegalName LegalAddress VATRegistrationNumber TaxReference LEI EORI SEED SIC D-2012-17-EUIdentifier");
+        formParams.put(ADDITIONAL_ATTRIBUTES, "LegalPersonIdentifier LegalName LegalAddress VATRegistration TaxReference LEI EORI SEED SIC D-2012-17-EUIdentifier");
         formParams.put(COUNTRY, "EE");
         formParams.put(RELAY_STATE, "1234abcd");
 
@@ -582,6 +582,8 @@ public class SamlResponseCorrectnessIntegrationTest extends TestsBase {
         assertEquals("Correct legal seed is returned", DEFATTR_LEGAL_SEED, loginResponse.getString(STATUS_LEGAL_SEED));
         assertEquals("Correct legal sic is returned", DEFATTR_LEGAL_SIC, loginResponse.getString(STATUS_LEGAL_SIC));
         assertEquals("Correct legal pno D-2012-EUIdendtifier returned", DEFATTR_LEGAL_D201217EUIDENTIFIER, loginResponse.getString(STATUS_LEGAL_D2012));
+        //Custom attribute check
+        assertEquals("Correct legal pno D-2012-EUIdendtifier returned", DEFATTR_LEGAL_BUSINESSCODES, loginResponse.getString("attributes.BusinessCodes"));
     }
 
     @Test
