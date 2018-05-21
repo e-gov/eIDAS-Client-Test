@@ -108,7 +108,7 @@ public class ResponseBuilderUtils extends ResponseAssertionBuilderUtils {
             DateTime timeNow = new DateTime();
             Response authnResponse = buildResponseForSigningWithoutAssertion(inResponseId, recipient, timeNow, issuerValue);
             authnResponse.getAssertions().add(buildAssertionWithoutEncryption(signCredential, inResponseId, recipient, timeNow, acceptableTimeMin, loa, givenName, familyName, personIdentifier, dateOfBirth, issuerValue, audienceUri));
-            authnResponse.getEncryptedAssertions().add(buildEncrAssertion(signCredential, encCredential,inResponseId, recipient, timeNow, acceptableTimeMin, loa, givenName, familyName, personIdentifier, dateOfBirth, issuerValue, audienceUri));
+            authnResponse.getEncryptedAssertions().add(buildEncrAssertion(signCredential, encCredential, inResponseId, recipient, timeNow, acceptableTimeMin, loa, givenName, familyName, personIdentifier, dateOfBirth, issuerValue, audienceUri));
             authnResponse.setSignature(signature);
             XMLObjectProviderRegistrySupport.getMarshallerFactory().getMarshaller(authnResponse).marshall(authnResponse);
             Signer.signObject(signature);
@@ -195,7 +195,7 @@ public class ResponseBuilderUtils extends ResponseAssertionBuilderUtils {
             authnResponse.setSignature(signature);
             authnResponse.setStatus(buildErrorStatus(error));
             authnResponse.setIssuer(buildIssuer(issuerValue));
-            authnResponse.getAssertions().add(buildAssertion(inResponseId,recipient, timeNow, acceptableTimeMin, null, "EE/EE/33232", issuerValue, audienceUri));
+            authnResponse.getAssertions().add(buildAssertion(inResponseId, recipient, timeNow, acceptableTimeMin, null, "EE/EE/33232", issuerValue, audienceUri));
 
             XMLObjectProviderRegistrySupport.getMarshallerFactory().getMarshaller(authnResponse).marshall(authnResponse);
             Signer.signObject(signature);
@@ -206,7 +206,7 @@ public class ResponseBuilderUtils extends ResponseAssertionBuilderUtils {
         }
     }
 
-    protected Response buildResponseForSigningWithoutAssertion (String inResponseId, String recipient, DateTime timeNow, String issuerValue) {
+    protected Response buildResponseForSigningWithoutAssertion(String inResponseId, String recipient, DateTime timeNow, String issuerValue) {
         Response authnResponse = new ResponseBuilder().buildObject();
         authnResponse.setIssueInstant(timeNow);
         authnResponse.setDestination(recipient);
@@ -365,7 +365,7 @@ public class ResponseBuilderUtils extends ResponseAssertionBuilderUtils {
         }
     }
 
-    public Response buildAuthnResponseNameIdCnt(Integer nameIdCnt, String nameIdFormat , Credential signCredential, Credential encCredential, String inResponseId, String recipient, String loa, String givenName, String familyName, String personIdentifier, String dateOfBirth, String issuerValue, Integer acceptableTimeMin, String audienceUri) {
+    public Response buildAuthnResponseNameIdCnt(Integer nameIdCnt, String nameIdFormat, Credential signCredential, Credential encCredential, String inResponseId, String recipient, String loa, String givenName, String familyName, String personIdentifier, String dateOfBirth, String issuerValue, Integer acceptableTimeMin, String audienceUri) {
         try {
             Signature signature = prepareSignature(signCredential);
             DateTime timeNow = new DateTime();

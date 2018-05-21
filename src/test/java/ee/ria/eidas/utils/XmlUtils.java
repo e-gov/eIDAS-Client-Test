@@ -2,9 +2,7 @@ package ee.ria.eidas.utils;
 
 import net.shibboleth.utilities.java.support.xml.QNameSupport;
 import net.shibboleth.utilities.java.support.xml.XMLParserException;
-import org.bouncycastle.jce.provider.BouncyCastleProvider;
 import org.junit.Assert;
-import org.opensaml.core.config.InitializationService;
 import org.opensaml.core.xml.config.XMLObjectProviderRegistrySupport;
 import org.opensaml.core.xml.io.Unmarshaller;
 import org.opensaml.core.xml.io.UnmarshallingException;
@@ -14,7 +12,6 @@ import org.w3c.dom.Element;
 import java.io.ByteArrayInputStream;
 import java.io.InputStream;
 import java.nio.charset.StandardCharsets;
-import java.security.Security;
 
 public class XmlUtils {
 

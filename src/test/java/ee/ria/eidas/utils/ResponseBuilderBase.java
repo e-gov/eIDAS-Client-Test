@@ -109,7 +109,7 @@ public class ResponseBuilderBase {
         assertion.setIssueInstant(issuInstant);
         assertion.setVersion(VERSION_20);
         assertion.setIssuer(buildIssuer(issuerValue));
-        assertion.setSubject(buildSubject(inResponseId,recipient, issuInstant, acceptableTimeMin, personIdentifier));
+        assertion.setSubject(buildSubject(inResponseId, recipient, issuInstant, acceptableTimeMin, personIdentifier));
         assertion.setConditions(buildConditions(audienceUri, issuInstant, acceptableTimeMin));
         assertion.getAuthnStatements().add(buildAuthnStatement(issuInstant, loa));
         return assertion;
@@ -155,26 +155,26 @@ public class ResponseBuilderBase {
         authnCont.setAuthnContextClassRef(authnContextClassRef);
         authnCont.setAuthnContextDecl(null);
         authnStatement.setAuthnContext(authnCont);
-        return  authnStatement;
+        return authnStatement;
     }
 
     protected AttributeStatement buildMinimalAttributeStatement(String givenName, String familyName, String personIdentifier, String dateOfBirth) {
         AttributeStatement attributeStatement = new AttributeStatementBuilder().buildObject();
         if(givenName != null) {
-            attributeStatement.getAttributes().add(buildAttribute("FirstName", "http://eidas.europa.eu/attributes/naturalperson/CurrentGivenName", "urn:oasis:names:tc:SAML:2.0:attrname-format:uri", "eidas-natural:CurrentGivenNameType", givenName));
+            attributeStatement.getAttributes().add(buildAttribute("FirstName", "http://eidas.europa.eu/attributes/naturalperson/CurrentGivenName", "urn:oasis:names:tc:SAML:2.0:attrname-format:uri", "eidas:CurrentGivenNameType", givenName));
         }
-        attributeStatement.getAttributes().add(buildAttribute("FamilyName", "http://eidas.europa.eu/attributes/naturalperson/CurrentFamilyName", "urn:oasis:names:tc:SAML:2.0:attrname-format:uri", "eidas-natural:CurrentFamilyNameType", familyName));
-        attributeStatement.getAttributes().add(buildAttribute("PersonIdentifier", "http://eidas.europa.eu/attributes/naturalperson/PersonIdentifier", "urn:oasis:names:tc:SAML:2.0:attrname-format:uri", "eidas-natural:PersonIdentifierType", personIdentifier));
-        attributeStatement.getAttributes().add(buildAttribute("DateOfBirth", "http://eidas.europa.eu/attributes/naturalperson/DateOfBirth", "urn:oasis:names:tc:SAML:2.0:attrname-format:uri", "eidas-natural:DateOfBirthType", dateOfBirth));
+        attributeStatement.getAttributes().add(buildAttribute("FamilyName", "http://eidas.europa.eu/attributes/naturalperson/CurrentFamilyName", "urn:oasis:names:tc:SAML:2.0:attrname-format:uri", "eidas:CurrentFamilyNameType", familyName));
+        attributeStatement.getAttributes().add(buildAttribute("PersonIdentifier", "http://eidas.europa.eu/attributes/naturalperson/PersonIdentifier", "urn:oasis:names:tc:SAML:2.0:attrname-format:uri", "eidas:PersonIdentifierType", personIdentifier));
+        attributeStatement.getAttributes().add(buildAttribute("DateOfBirth", "http://eidas.europa.eu/attributes/naturalperson/DateOfBirth", "urn:oasis:names:tc:SAML:2.0:attrname-format:uri", "eidas:DateOfBirthType", dateOfBirth));
         return attributeStatement;
     }
 
     protected AttributeStatement buildMinimalAttributeStatementWithLegalPerson(String givenName, String familyName, String personIdentifier, String dateOfBirth, String legalName, String legalPno) {
         AttributeStatement attributeStatement = new AttributeStatementBuilder().buildObject();
-        attributeStatement.getAttributes().add(buildAttribute("FirstName", "http://eidas.europa.eu/attributes/naturalperson/CurrentGivenName", "urn:oasis:names:tc:SAML:2.0:attrname-format:uri", "eidas-natural:CurrentGivenNameType", givenName));
-        attributeStatement.getAttributes().add(buildAttribute("FamilyName", "http://eidas.europa.eu/attributes/naturalperson/CurrentFamilyName", "urn:oasis:names:tc:SAML:2.0:attrname-format:uri", "eidas-natural:CurrentFamilyNameType", familyName));
-        attributeStatement.getAttributes().add(buildAttribute("PersonIdentifier", "http://eidas.europa.eu/attributes/naturalperson/PersonIdentifier", "urn:oasis:names:tc:SAML:2.0:attrname-format:uri", "eidas-natural:PersonIdentifierType", personIdentifier));
-        attributeStatement.getAttributes().add(buildAttribute("DateOfBirth", "http://eidas.europa.eu/attributes/naturalperson/DateOfBirth", "urn:oasis:names:tc:SAML:2.0:attrname-format:uri", "eidas-natural:DateOfBirthType", dateOfBirth));
+        attributeStatement.getAttributes().add(buildAttribute("FirstName", "http://eidas.europa.eu/attributes/naturalperson/CurrentGivenName", "urn:oasis:names:tc:SAML:2.0:attrname-format:uri", "eidas:CurrentGivenNameType", givenName));
+        attributeStatement.getAttributes().add(buildAttribute("FamilyName", "http://eidas.europa.eu/attributes/naturalperson/CurrentFamilyName", "urn:oasis:names:tc:SAML:2.0:attrname-format:uri", "eidas:CurrentFamilyNameType", familyName));
+        attributeStatement.getAttributes().add(buildAttribute("PersonIdentifier", "http://eidas.europa.eu/attributes/naturalperson/PersonIdentifier", "urn:oasis:names:tc:SAML:2.0:attrname-format:uri", "eidas:PersonIdentifierType", personIdentifier));
+        attributeStatement.getAttributes().add(buildAttribute("DateOfBirth", "http://eidas.europa.eu/attributes/naturalperson/DateOfBirth", "urn:oasis:names:tc:SAML:2.0:attrname-format:uri", "eidas:DateOfBirthType", dateOfBirth));
         if(legalName != null) {
             attributeStatement.getAttributes().add(buildAttribute("LegalName", "http://eidas.europa.eu/attributes/legalperson/LegalName", "urn:oasis:names:tc:SAML:2.0:attrname-format:uri", "eidas-legal:LegalNameType", legalName));
         }
@@ -213,25 +213,25 @@ public class ResponseBuilderBase {
 
     protected AttributeStatement buildMaximalAttributeStatement(String givenName, String familyName, String personIdentifier, String dateOfBirth, String birthName, String birthPlace, String address, String gender) {
         AttributeStatement attributeStatement = new AttributeStatementBuilder().buildObject();
-        attributeStatement.getAttributes().add(buildAttribute("FirstName", "http://eidas.europa.eu/attributes/naturalperson/CurrentGivenName", "urn:oasis:names:tc:SAML:2.0:attrname-format:uri", "eidas-natural:CurrentGivenNameType", givenName));
-        attributeStatement.getAttributes().add(buildAttribute("FamilyName", "http://eidas.europa.eu/attributes/naturalperson/CurrentFamilyName", "urn:oasis:names:tc:SAML:2.0:attrname-format:uri", "eidas-natural:CurrentFamilyNameType", familyName));
-        attributeStatement.getAttributes().add(buildAttribute("PersonIdentifier", "http://eidas.europa.eu/attributes/naturalperson/PersonIdentifier", "urn:oasis:names:tc:SAML:2.0:attrname-format:uri", "eidas-natural:PersonIdentifierType", personIdentifier));
-        attributeStatement.getAttributes().add(buildAttribute("DateOfBirth", "http://eidas.europa.eu/attributes/naturalperson/DateOfBirth", "urn:oasis:names:tc:SAML:2.0:attrname-format:uri", "eidas-natural:DateOfBirthType", dateOfBirth));
-        attributeStatement.getAttributes().add(buildAttribute("BirthName", "http://eidas.europa.eu/attributes/naturalperson/BirthName", "urn:oasis:names:tc:SAML:2.0:attrname-format:uri", "eidas-natural:BirthNameType", birthName));
-        attributeStatement.getAttributes().add(buildAttribute("PlaceOfBirth", "http://eidas.europa.eu/attributes/naturalperson/BirthPlaceCvlocation", "urn:oasis:names:tc:SAML:2.0:attrname-format:uri", "eidas-natural:BirthPlaceCvlocationType", birthPlace));
-        attributeStatement.getAttributes().add(buildAttribute("CurrentAddress", "http://eidas.europa.eu/attributes/naturalperson/Cvaddress", "urn:oasis:names:tc:SAML:2.0:attrname-format:uri", "eidas-natural:CvaddressType", address));
-        attributeStatement.getAttributes().add(buildAttribute("Gender", "http://eidas.europa.eu/attributes/naturalperson/GenderCode", "urn:oasis:names:tc:SAML:2.0:attrname-format:uri", "eidas-natural:GenderCodeType", gender));
+        attributeStatement.getAttributes().add(buildAttribute("FirstName", "http://eidas.europa.eu/attributes/naturalperson/CurrentGivenName", "urn:oasis:names:tc:SAML:2.0:attrname-format:uri", "eidas:CurrentGivenNameType", givenName));
+        attributeStatement.getAttributes().add(buildAttribute("FamilyName", "http://eidas.europa.eu/attributes/naturalperson/CurrentFamilyName", "urn:oasis:names:tc:SAML:2.0:attrname-format:uri", "eidas:CurrentFamilyNameType", familyName));
+        attributeStatement.getAttributes().add(buildAttribute("PersonIdentifier", "http://eidas.europa.eu/attributes/naturalperson/PersonIdentifier", "urn:oasis:names:tc:SAML:2.0:attrname-format:uri", "eidas:PersonIdentifierType", personIdentifier));
+        attributeStatement.getAttributes().add(buildAttribute("DateOfBirth", "http://eidas.europa.eu/attributes/naturalperson/DateOfBirth", "urn:oasis:names:tc:SAML:2.0:attrname-format:uri", "eidas:DateOfBirthType", dateOfBirth));
+        attributeStatement.getAttributes().add(buildAttribute("BirthName", "http://eidas.europa.eu/attributes/naturalperson/BirthName", "urn:oasis:names:tc:SAML:2.0:attrname-format:uri", "eidas:BirthNameType", birthName));
+        attributeStatement.getAttributes().add(buildAttribute("PlaceOfBirth", "http://eidas.europa.eu/attributes/naturalperson/PlaceOfBirth", "urn:oasis:names:tc:SAML:2.0:attrname-format:uri", "eidas:PlaceOfBirthType", birthPlace));
+        attributeStatement.getAttributes().add(buildAttribute("CurrentAddress", "http://eidas.europa.eu/attributes/naturalperson/CurrentAddress", "urn:oasis:names:tc:SAML:2.0:attrname-format:uri", "eidas:CurrentAddressType", address));
+        attributeStatement.getAttributes().add(buildAttribute("Gender", "http://eidas.europa.eu/attributes/naturalperson/Gender", "urn:oasis:names:tc:SAML:2.0:attrname-format:uri", "eidas:GenderType", gender));
         return attributeStatement;
     }
 
     protected AttributeStatement buildMinimalAttributeStatementWithFaultyNameFormat(String givenName, String familyName, String personIdentifier, String dateOfBirth) {
         AttributeStatement attributeStatement = new AttributeStatementBuilder().buildObject();
         if(givenName != null) {
-            attributeStatement.getAttributes().add(buildAttribute("FirstName", "http://eidas.europa.eu/attributes/naturalperson/CurrentGivenName", "urn:oasis:names:tc:SAML:2.0:attrname:uri", "eidas-natural:CurrentGivenNameType", givenName));
+            attributeStatement.getAttributes().add(buildAttribute("FirstName", "http://eidas.europa.eu/attributes/naturalperson/CurrentGivenName", "urn:oasis:names:tc:SAML:2.0:attrname:uri", "eidas:CurrentGivenNameType", givenName));
         }
-        attributeStatement.getAttributes().add(buildAttribute("FamilyName", "http://eidas.europa.eu/attributes/naturalperson/CurrentFamilyName", "urn:oasis:names:tc:SAML:2.0:format:uri", "eidas-natural:CurrentFamilyNameType", familyName));
-        attributeStatement.getAttributes().add(buildAttribute("PersonIdentifier", "http://eidas.europa.eu/attributes/naturalperson/PersonIdentifier", "urn:oasis:names:tc:SAML:7.0:attrname-format:uri", "eidas-natural:PersonIdentifierType", personIdentifier));
-        attributeStatement.getAttributes().add(buildAttribute("DateOfBirth", "http://eidas.europa.eu/attributes/naturalperson/DateOfBirth", "SAML:2.0:attrname-format:uri", "eidas-natural:DateOfBirthType", dateOfBirth));
+        attributeStatement.getAttributes().add(buildAttribute("FamilyName", "http://eidas.europa.eu/attributes/naturalperson/CurrentFamilyName", "urn:oasis:names:tc:SAML:2.0:format:uri", "eidas:CurrentFamilyNameType", familyName));
+        attributeStatement.getAttributes().add(buildAttribute("PersonIdentifier", "http://eidas.europa.eu/attributes/naturalperson/PersonIdentifier", "urn:oasis:names:tc:SAML:7.0:attrname-format:uri", "eidas:PersonIdentifierType", personIdentifier));
+        attributeStatement.getAttributes().add(buildAttribute("DateOfBirth", "http://eidas.europa.eu/attributes/naturalperson/DateOfBirth", "SAML:2.0:attrname-format:uri", "eidas:DateOfBirthType", dateOfBirth));
         return attributeStatement;
     }
 

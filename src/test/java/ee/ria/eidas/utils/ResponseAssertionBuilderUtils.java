@@ -25,7 +25,7 @@ public class ResponseAssertionBuilderUtils extends ResponseBuilderBase {
 
     protected EncryptedAssertion buildEncrAssertion(Credential signCredential, Credential encCredential, String inResponseId, String recipient, DateTime issueInstant, Integer acceptableTimeMin, String loa, String givenName, String familyName, String personIdentifier, String dateOfBirth, String issuerValue, String audienceUri) throws SecurityException, SignatureException, MarshallingException, EncryptionException {
         Signature signature = prepareSignature(signCredential);
-        Assertion assertion = buildAssertionForSigning(inResponseId, recipient ,issueInstant, acceptableTimeMin, loa, givenName, familyName, personIdentifier, dateOfBirth, issuerValue, audienceUri);
+        Assertion assertion = buildAssertionForSigning(inResponseId, recipient, issueInstant, acceptableTimeMin, loa, givenName, familyName, personIdentifier, dateOfBirth, issuerValue, audienceUri);
         assertion.setSignature(signature);
         XMLObjectProviderRegistrySupport.getMarshallerFactory().getMarshaller(assertion).marshall(assertion);
         Signer.signObject(signature);
@@ -35,7 +35,7 @@ public class ResponseAssertionBuilderUtils extends ResponseBuilderBase {
 
     protected EncryptedAssertion buildEncrAssertionWithMinLegal(Credential signCredential, Credential encCredential, String inResponseId, String recipient, DateTime issueInstant, Integer acceptableTimeMin, String loa, String givenName, String familyName, String personIdentifier, String dateOfBirth, String legalName, String legalPno, String issuerValue, String audienceUri) throws SecurityException, SignatureException, MarshallingException, EncryptionException {
         Signature signature = prepareSignature(signCredential);
-        Assertion assertion = buildLegalAssertionForSigning(inResponseId, recipient ,issueInstant, acceptableTimeMin, loa, givenName, familyName, personIdentifier, dateOfBirth, legalName, legalPno, issuerValue, audienceUri);
+        Assertion assertion = buildLegalAssertionForSigning(inResponseId, recipient, issueInstant, acceptableTimeMin, loa, givenName, familyName, personIdentifier, dateOfBirth, legalName, legalPno, issuerValue, audienceUri);
         assertion.setSignature(signature);
         XMLObjectProviderRegistrySupport.getMarshallerFactory().getMarshaller(assertion).marshall(assertion);
         Signer.signObject(signature);
@@ -71,7 +71,7 @@ public class ResponseAssertionBuilderUtils extends ResponseBuilderBase {
         assertion.setIssuer(buildIssuer(issuerValue));
         assertion.setSubject(buildSubject(inResponseId, recipient, issueInstant, acceptableTimeMin, personIdentifier));
         assertion.setConditions(buildConditions(audienceUri, issueInstant, acceptableTimeMin));
-        assertion.getAuthnStatements().add(buildAuthnStatement(issueInstant,loa));
+        assertion.getAuthnStatements().add(buildAuthnStatement(issueInstant, loa));
         assertion.getAttributeStatements().add(buildMinimalAttributeStatement(givenName, familyName, personIdentifier, dateOfBirth));
         return assertion;
     }
@@ -84,7 +84,7 @@ public class ResponseAssertionBuilderUtils extends ResponseBuilderBase {
         assertion.setIssuer(buildIssuer(issuerValue));
         assertion.setSubject(buildSubject(inResponseId, recipient, issueInstant, acceptableTimeMin, personIdentifier));
         assertion.setConditions(buildConditions(audienceUri, issueInstant, acceptableTimeMin));
-        assertion.getAuthnStatements().add(buildAuthnStatement(issueInstant,loa));
+        assertion.getAuthnStatements().add(buildAuthnStatement(issueInstant, loa));
         assertion.getAttributeStatements().add(buildMinimalAttributeStatementWithLegalPerson(givenName, familyName, personIdentifier, dateOfBirth, legalName, legalPno));
         return assertion;
     }
@@ -110,7 +110,7 @@ public class ResponseAssertionBuilderUtils extends ResponseBuilderBase {
         assertion.setIssuer(buildIssuer(issuerValue));
         assertion.setSubject(buildSubject(inResponseId, recipient, issueInstant, acceptableTimeMin, personIdentifier));
         assertion.setConditions(buildConditions(audienceUri, issueInstant, acceptableTimeMin));
-        assertion.getAuthnStatements().add(buildAuthnStatement(issueInstant,loa));
+        assertion.getAuthnStatements().add(buildAuthnStatement(issueInstant, loa));
         assertion.getAttributeStatements().add(buildMaximalAttributeStatement(givenName, familyName, personIdentifier, dateOfBirth, birthName, birthPlace, address, gender));
         return assertion;
     }
@@ -129,7 +129,7 @@ public class ResponseAssertionBuilderUtils extends ResponseBuilderBase {
         return signature;
     }
 
-    protected EncryptedAssertion encryptAssertion (Assertion assertion,Credential encCredential) throws EncryptionException {
+    protected EncryptedAssertion encryptAssertion(Assertion assertion, Credential encCredential) throws EncryptionException {
         KeyEncryptionParameters keyParams = new KeyEncryptionParameters();
         keyParams.setEncryptionCredential(encCredential);
         keyParams.setAlgorithm(EncryptionConstants.ALGO_ID_KEYTRANSPORT_RSAOAEP);
@@ -139,22 +139,22 @@ public class ResponseAssertionBuilderUtils extends ResponseBuilderBase {
         keyParams.setKeyInfoGenerator(keyInfoGenerator);
 
         DataEncryptionParameters encryptParams = new DataEncryptionParameters();
-        encryptParams.setAlgorithm(EncryptionConstants.ALGO_ID_BLOCKCIPHER_AES128);
+        encryptParams.setAlgorithm(EncryptionConstants.ALGO_ID_BLOCKCIPHER_AES256_GCM);
 
         Encrypter samlEncrypter = new Encrypter(encryptParams, keyParams);
         samlEncrypter.setKeyPlacement(Encrypter.KeyPlacement.INLINE);
         EncryptedAssertion encryptedAssertion = samlEncrypter.encrypt(assertion);
-        return  encryptedAssertion;
+        return encryptedAssertion;
     }
 
     protected EncryptedAssertion buildEncrAssertionWithoutAssertionSignature(Credential encCredential, String inResponseId, String recipient, DateTime issueInstant, Integer acceptableTimeMin, String loa, String givenName, String familyName, String personIdentifier, String dateOfBirth, String issuerValue, String audienceUri) throws EncryptionException {
-        Assertion assertion = buildAssertionForSigning(inResponseId, recipient ,issueInstant, acceptableTimeMin, loa, givenName, familyName, personIdentifier, dateOfBirth, issuerValue, audienceUri);
+        Assertion assertion = buildAssertionForSigning(inResponseId, recipient, issueInstant, acceptableTimeMin, loa, givenName, familyName, personIdentifier, dateOfBirth, issuerValue, audienceUri);
         return encryptAssertion(assertion, encCredential);
     }
 
     protected Assertion buildAssertionWithoutEncryption(Credential signCredential, String inResponseId, String recipient, DateTime issueInstant, Integer acceptableTimeMin, String loa, String givenName, String familyName, String personIdentifier, String dateOfBirth, String issuerValue, String audienceUri) throws SecurityException, SignatureException, MarshallingException {
         Signature signature = prepareSignature(signCredential);
-        Assertion assertion = buildAssertionForSigning(inResponseId, recipient ,issueInstant, acceptableTimeMin, loa, givenName, familyName, personIdentifier, dateOfBirth, issuerValue, audienceUri);
+        Assertion assertion = buildAssertionForSigning(inResponseId, recipient, issueInstant, acceptableTimeMin, loa, givenName, familyName, personIdentifier, dateOfBirth, issuerValue, audienceUri);
         assertion.setSignature(signature);
         XMLObjectProviderRegistrySupport.getMarshallerFactory().getMarshaller(assertion).marshall(assertion);
         Signer.signObject(signature);
@@ -171,7 +171,7 @@ public class ResponseAssertionBuilderUtils extends ResponseBuilderBase {
         assertion.setIssuer(buildIssuer(issuerValue));
         assertion.setSubject(buildSubject(inResponseId, recipient, issueInstant, acceptableTimeMin, personIdentifier));
         assertion.setConditions(buildConditions(audienceUri, issueInstant, acceptableTimeMin));
-        assertion.getAuthnStatements().add(buildAuthnStatement(issueInstant,loa));
+        assertion.getAuthnStatements().add(buildAuthnStatement(issueInstant, loa));
         assertion.getAttributeStatements().add(buildMinimalAttributeStatementWithFaultyNameFormat(givenName, familyName, personIdentifier, dateOfBirth));
         assertion.setSignature(signature);
         XMLObjectProviderRegistrySupport.getMarshallerFactory().getMarshaller(assertion).marshall(assertion);
@@ -190,16 +190,14 @@ public class ResponseAssertionBuilderUtils extends ResponseBuilderBase {
         assertion.setSubject(buildSubject(inResponseId, recipient, issueInstant, acceptableTimeMin, personIdentifier));
         assertion.setConditions(buildConditions(audienceUri, issueInstant, acceptableTimeMin));
         if (cnt == 1) {
-            assertion.getAuthnStatements().add(buildAuthnStatement(issueInstant,loa));
-        }
-        else if (cnt == 2) {
-            assertion.getAuthnStatements().add(buildAuthnStatement(issueInstant,loa));
-            assertion.getAuthnStatements().add(buildAuthnStatement(issueInstant,"http://eidas.europa.eu/LoA/low"));
-        }
-        else if (cnt == 3) {
-            assertion.getAuthnStatements().add(buildAuthnStatement(issueInstant,loa));
-            assertion.getAuthnStatements().add(buildAuthnStatement(issueInstant,"http://eidas.europa.eu/LoA/low"));
-            assertion.getAuthnStatements().add(buildAuthnStatement(issueInstant,"http://eidas.europa.eu/LoA/high"));
+            assertion.getAuthnStatements().add(buildAuthnStatement(issueInstant, loa));
+        } else if (cnt == 2) {
+            assertion.getAuthnStatements().add(buildAuthnStatement(issueInstant, loa));
+            assertion.getAuthnStatements().add(buildAuthnStatement(issueInstant, "http://eidas.europa.eu/LoA/low"));
+        } else if (cnt == 3) {
+            assertion.getAuthnStatements().add(buildAuthnStatement(issueInstant, loa));
+            assertion.getAuthnStatements().add(buildAuthnStatement(issueInstant, "http://eidas.europa.eu/LoA/low"));
+            assertion.getAuthnStatements().add(buildAuthnStatement(issueInstant, "http://eidas.europa.eu/LoA/high"));
         }
         assertion.getAttributeStatements().add(buildMinimalAttributeStatement(givenName, familyName, personIdentifier, dateOfBirth));
         assertion.setSignature(signature);
@@ -209,7 +207,7 @@ public class ResponseAssertionBuilderUtils extends ResponseBuilderBase {
         return encryptAssertion(assertion, encCredential);
     }
 
-    protected EncryptedAssertion buildEncrAssertionForTimeManipulation(DateTime assertionTime, DateTime subjectTime, DateTime conditionsTime,  DateTime authnTime, Credential signCredential, Credential encCredential, String inResponseId, String recipient, Integer acceptableTimeMin, String loa, String givenName, String familyName, String personIdentifier, String dateOfBirth, String issuerValue, String audienceUri) throws SecurityException, SignatureException, MarshallingException, EncryptionException {
+    protected EncryptedAssertion buildEncrAssertionForTimeManipulation(DateTime assertionTime, DateTime subjectTime, DateTime conditionsTime, DateTime authnTime, Credential signCredential, Credential encCredential, String inResponseId, String recipient, Integer acceptableTimeMin, String loa, String givenName, String familyName, String personIdentifier, String dateOfBirth, String issuerValue, String audienceUri) throws SecurityException, SignatureException, MarshallingException, EncryptionException {
         Signature signature = prepareSignature(signCredential);
         Assertion assertion = new AssertionBuilder().buildObject();
         assertion.setIssueInstant(assertionTime);
@@ -218,8 +216,9 @@ public class ResponseAssertionBuilderUtils extends ResponseBuilderBase {
         assertion.setIssuer(buildIssuer(issuerValue));
         assertion.setSubject(buildSubject(inResponseId, recipient, subjectTime, acceptableTimeMin, personIdentifier));
         assertion.setConditions(buildConditions(audienceUri, conditionsTime, acceptableTimeMin));
-        assertion.getAuthnStatements().add(buildAuthnStatement(authnTime,loa));
-        assertion.getAttributeStatements().add(buildMinimalAttributeStatement(givenName, familyName, personIdentifier, dateOfBirth));        assertion.setSignature(signature);
+        assertion.getAuthnStatements().add(buildAuthnStatement(authnTime, loa));
+        assertion.getAttributeStatements().add(buildMinimalAttributeStatement(givenName, familyName, personIdentifier, dateOfBirth));
+        assertion.setSignature(signature);
         XMLObjectProviderRegistrySupport.getMarshallerFactory().getMarshaller(assertion).marshall(assertion);
         Signer.signObject(signature);
 
@@ -235,7 +234,7 @@ public class ResponseAssertionBuilderUtils extends ResponseBuilderBase {
         assertion.setIssuer(buildIssuer(issuerValue));
         assertion.setSubject(buildSubject(inResponseId, recipient, issueInstant, acceptableTimeMin, personIdentifier));
         assertion.setConditions(buildConditions(audienceUri, issueInstant, acceptableTimeMin));
-        assertion.getAuthnStatements().add(buildAuthnStatement(issueInstant,loa));
+        assertion.getAuthnStatements().add(buildAuthnStatement(issueInstant, loa));
         if (attributeCnt == 1) {
             assertion.getAttributeStatements().add(buildMinimalAttributeStatement(givenName, familyName, personIdentifier, dateOfBirth));
         } else if (attributeCnt == 2) {
@@ -252,7 +251,7 @@ public class ResponseAssertionBuilderUtils extends ResponseBuilderBase {
 
     protected EncryptedAssertion buildEncrAssertionWithoutSubject(Credential signCredential, Credential encCredential, String inResponseId, String recipient, DateTime issueInstant, Integer acceptableTimeMin, String loa, String givenName, String familyName, String personIdentifier, String dateOfBirth, String issuerValue, String audienceUri) throws SecurityException, SignatureException, MarshallingException, EncryptionException {
         Signature signature = prepareSignature(signCredential);
-        Assertion assertion = buildAssertionForSigning(inResponseId, recipient ,issueInstant, acceptableTimeMin, loa, givenName, familyName, personIdentifier, dateOfBirth, issuerValue, audienceUri);
+        Assertion assertion = buildAssertionForSigning(inResponseId, recipient, issueInstant, acceptableTimeMin, loa, givenName, familyName, personIdentifier, dateOfBirth, issuerValue, audienceUri);
         assertion.setSubject(null);
         assertion.setSignature(signature);
         XMLObjectProviderRegistrySupport.getMarshallerFactory().getMarshaller(assertion).marshall(assertion);
@@ -272,8 +271,7 @@ public class ResponseAssertionBuilderUtils extends ResponseBuilderBase {
         assertion.setConditions(buildConditions(audienceUri, issueInstant, acceptableTimeMin));
         if (cnt == 1) {
             assertion.getAuthnStatements().add(buildAuthnStatement(issueInstant, loa));
-        }
-        else if (cnt == 2) {
+        } else if (cnt == 2) {
             assertion.getAuthnStatements().add(buildAuthnStatement(issueInstant, loa));
             assertion.getAuthnStatements().add(buildAuthnStatement(issueInstant, "http://eidas.europa.eu/LoA/low"));
         }
@@ -301,11 +299,9 @@ public class ResponseAssertionBuilderUtils extends ResponseBuilderBase {
             AudienceRestriction audienceRestriction = new AudienceRestrictionBuilder().buildObject();
             conditions.getAudienceRestrictions().add(audienceRestriction);
             assertion.setConditions(conditions);
-        }
-        else if (audienceCnt == 1) {
+        } else if (audienceCnt == 1) {
             assertion.setConditions(buildConditions(audienceUri, issueInstant, acceptableTimeMin));
-        }
-        else if (audienceCnt == 2) {
+        } else if (audienceCnt == 2) {
             Conditions conditions = new ConditionsBuilder().buildObject();
             conditions.setNotBefore(issueInstant);
             conditions.setNotOnOrAfter(issueInstant.plusMinutes(acceptableTimeMin));
@@ -345,13 +341,11 @@ public class ResponseAssertionBuilderUtils extends ResponseBuilderBase {
             nameID.setNameQualifier("http://C-PEPS.gov.xx");
             subject.setNameID(nameID);
             assertion.setSubject(subject);
-        }
-        else if (subjectConfirmationCnt == 1) {
+        } else if (subjectConfirmationCnt == 1) {
             Subject subject = buildSubject(inResponseId, recipient, issueInstant, acceptableTimeMin, personIdentifier);
             subject.getSubjectConfirmations().get(0).setMethod(subjectConfMethod);
             assertion.setSubject(subject);
-        }
-        else if (subjectConfirmationCnt == 2) {
+        } else if (subjectConfirmationCnt == 2) {
             Subject subject = new SubjectBuilder().buildObject();
             NameID nameID = new NameIDBuilder().buildObject();
             nameID.setValue(personIdentifier);
@@ -387,17 +381,15 @@ public class ResponseAssertionBuilderUtils extends ResponseBuilderBase {
         return encryptAssertion(assertion, encCredential);
     }
 
-    protected EncryptedAssertion buildEncrAssertionNameIdCnt(Integer nameIdCnt, String nameIdFormat,Credential signCredential, Credential encCredential, String inResponseId, String recipient, DateTime issueInstant, Integer acceptableTimeMin, String loa, String givenName, String familyName, String personIdentifier, String dateOfBirth, String issuerValue, String audienceUri) throws SecurityException, SignatureException, MarshallingException, EncryptionException {
+    protected EncryptedAssertion buildEncrAssertionNameIdCnt(Integer nameIdCnt, String nameIdFormat, Credential signCredential, Credential encCredential, String inResponseId, String recipient, DateTime issueInstant, Integer acceptableTimeMin, String loa, String givenName, String familyName, String personIdentifier, String dateOfBirth, String issuerValue, String audienceUri) throws SecurityException, SignatureException, MarshallingException, EncryptionException {
         Signature signature = prepareSignature(signCredential);
-        Assertion assertion = buildAssertionForSigning(inResponseId, recipient ,issueInstant, acceptableTimeMin, loa, givenName, familyName, personIdentifier, dateOfBirth, issuerValue, audienceUri);
+        Assertion assertion = buildAssertionForSigning(inResponseId, recipient, issueInstant, acceptableTimeMin, loa, givenName, familyName, personIdentifier, dateOfBirth, issuerValue, audienceUri);
 
         if (nameIdCnt == 0) {
             assertion.getSubject().setNameID(null);
-        }
-        else if (nameIdCnt == 1) {
+        } else if (nameIdCnt == 1) {
             assertion.getSubject().getNameID().setFormat(nameIdFormat);
-        }
-        else if (nameIdCnt == 2) {
+        } else if (nameIdCnt == 2) {
             //TODO: Have to find a way for that
         }
 
