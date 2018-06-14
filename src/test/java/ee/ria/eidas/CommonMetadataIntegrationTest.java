@@ -108,6 +108,6 @@ public class CommonMetadataIntegrationTest extends TestsBase {
         assertEquals("The binding must be: HTTP-POST", "urn:oasis:names:tc:SAML:2.0:bindings:HTTP-POST",
                 xmlPath.getString("EntityDescriptor.SPSSODescriptor.AssertionConsumerService.@Binding"));
         assertThat("The Location should indicate correct return url",
-                xmlPath.getString("EntityDescriptor.SPSSODescriptor.AssertionConsumerService.@Location"), endsWith( testEidasClientProperties.getSpReturnUrl()));
+                xmlPath.getString("EntityDescriptor.SPSSODescriptor.AssertionConsumerService.@Location"), endsWith( testEidasClientProperties.getFullSpReturnUrl()));
     }
 }

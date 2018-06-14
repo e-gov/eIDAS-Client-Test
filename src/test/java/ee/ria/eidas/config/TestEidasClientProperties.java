@@ -21,6 +21,7 @@ public class TestEidasClientProperties {
     private String idpUrl;
     private String idpMetadataUrl;
     private String idpStartUrl;
+    private String advertizedSpReturnUrl;
 
     public void setTargetUrl(String targetUrl) {
         this.targetUrl = targetUrl;
@@ -32,6 +33,14 @@ public class TestEidasClientProperties {
 
     public void setSpMetadataUrl(String spMetadataUrl) {
         this.spMetadataUrl = spMetadataUrl;
+    }
+
+    public String getAdvertizedSpReturnUrl() {
+        return advertizedSpReturnUrl;
+    }
+
+    public void setAdvertizedSpReturnUrl(String advertizedSpReturnUrl) {
+        this.advertizedSpReturnUrl = advertizedSpReturnUrl;
     }
 
     public void setSpStartUrl(String spStartUrl) {
@@ -147,6 +156,6 @@ public class TestEidasClientProperties {
     }
 
     public String getFullSpReturnUrl () {
-        return targetSpUrl+spReturnUrl;
+        return advertizedSpReturnUrl;
     }
 }
