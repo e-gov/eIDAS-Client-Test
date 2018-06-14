@@ -63,7 +63,7 @@ public class EidasClientAuthApiIntegrationTest extends TestsBase {
 
     @Test
     public void authApi2_invalidLoaLevelsAreNotAccepted() {
-        Response response =  getAuthenticationReqResponse("EE", "SUPER", "");
+        Response response =  getAuthenticationReqResponse(DEF_COUNTRY, "SUPER", "");
 
         assertEquals("Status code should be: 400", 400, response.statusCode());
         assertEquals("Bad request error should be returned", BAD_REQUEST, getValueFromJsonResponse(response, STATUS_ERROR));
@@ -72,7 +72,7 @@ public class EidasClientAuthApiIntegrationTest extends TestsBase {
 
     @Test
     public void authApi2_loaMissingValueShouldReturnDefault() {
-        XmlPath samlRequest = getDecodedSamlRequestBodyXml(getAuthenticationReq("CA", "", ""));
+        XmlPath samlRequest = getDecodedSamlRequestBodyXml(getAuthenticationReq(DEF_COUNTRY, "", ""));
 
         assertEquals("Correct LOA is returned", LOA_SUBSTANTIAL, samlRequest.getString(XML_LOA));
     }
@@ -80,7 +80,7 @@ public class EidasClientAuthApiIntegrationTest extends TestsBase {
     @Test
     public void authApi2_loaParameterMissingShouldReturnDefault() {
         Map<String,String> formParams = new HashMap<String,String>();
-        formParams.put(COUNTRY, "EE");
+        formParams.put(COUNTRY, DEF_COUNTRY);
         formParams.put(RELAY_STATE, "1234abcd");
 
         XmlPath samlRequest = getDecodedSamlRequestBodyXml(getAuthenticationReqForm(formParams).getBody().asString());
@@ -92,7 +92,7 @@ public class EidasClientAuthApiIntegrationTest extends TestsBase {
     public void authApi3_errorIsReturnedOnTooLongRelayState() {
         String relayState = RandomStringUtils.randomAlphanumeric(81);
 
-        Response response = getAuthenticationReqResponse("EE", "", relayState);
+        Response response = getAuthenticationReqResponse(DEF_COUNTRY, "", relayState);
 
         assertEquals("Status code should be: 400", 400, response.statusCode());
         assertEquals("Bad request error should be returned", BAD_REQUEST, getValueFromJsonResponse(response, STATUS_ERROR));
@@ -103,7 +103,7 @@ public class EidasClientAuthApiIntegrationTest extends TestsBase {
     public void authApi3_errorIsReturnedOnWrongCharactersInRelayState() {
         String relayState = "<>$";
 
-        Response response = getAuthenticationReqResponse("EE", "", relayState);
+        Response response = getAuthenticationReqResponse(DEF_COUNTRY, "", relayState);
 
         assertEquals("Status code should be: 400", 400, response.statusCode());
         assertEquals("Bad request error should be returned", BAD_REQUEST, getValueFromJsonResponse(response, STATUS_ERROR));
@@ -114,7 +114,7 @@ public class EidasClientAuthApiIntegrationTest extends TestsBase {
     public void authApi3_relayStateValueShouldBeReturned() {
         String relayState = RandomStringUtils.randomAlphanumeric(80);
 
-        Response response = getAuthenticationReqResponse("CA", "", relayState);
+        Response response = getAuthenticationReqResponse(DEF_COUNTRY, "", relayState);
 
         assertEquals("Status code should be: 200", 200, response.statusCode());
         assertEquals("Correct RelayState is returned", relayState, response.getBody().xmlPath(XmlPath.CompatibilityMode.HTML).getString("**.findAll { it.@name == 'RelayState' }.@value"));
@@ -122,7 +122,7 @@ public class EidasClientAuthApiIntegrationTest extends TestsBase {
 
     @Test
     public void authApi3_relayStateMissingValueShouldReturnOkStatus() {
-        Response response = getAuthenticationReqResponse("CA", "", "");
+        Response response = getAuthenticationReqResponse(DEF_COUNTRY, "", "");
 
         assertEquals("Status code should be: 200", 200, response.statusCode());
     }
@@ -130,7 +130,7 @@ public class EidasClientAuthApiIntegrationTest extends TestsBase {
     @Test
     public void authApi3_relayStateMissingShouldReturnOkStatus() {
         Map<String,String> formParams = new HashMap<String,String>();
-        formParams.put(COUNTRY, "EE");
+        formParams.put(COUNTRY, DEF_COUNTRY);
 
         Response response = getAuthenticationReqForm(formParams);
 
@@ -142,7 +142,7 @@ public class EidasClientAuthApiIntegrationTest extends TestsBase {
         Map<String,String> formParams = new HashMap<String,String>();
         formParams.put(LOA, "HIGH");
         formParams.put(ADDITIONAL_ATTRIBUTES, "NotExistingAttribute");
-        formParams.put(COUNTRY, "EE");
+        formParams.put(COUNTRY, DEF_COUNTRY);
         formParams.put(RELAY_STATE, "1234abcd");
 
         Response response = getAuthenticationReqFormFail(formParams);
@@ -157,7 +157,7 @@ public class EidasClientAuthApiIntegrationTest extends TestsBase {
         Map<String,String> formParams = new HashMap<String,String>();
         formParams.put(LOA, "HIGH");
         formParams.put(ADDITIONAL_ATTRIBUTES, "LegalPersonIdentifierCurrentAddressGender");
-        formParams.put(COUNTRY, "EE");
+        formParams.put(COUNTRY, DEF_COUNTRY);
         formParams.put(RELAY_STATE, "1234abcd");
 
         Response response = getAuthenticationReqFormFail(formParams);
@@ -172,7 +172,7 @@ public class EidasClientAuthApiIntegrationTest extends TestsBase {
         Map<String,String> formParams = new HashMap<String,String>();
         formParams.put(LOA, "HIGH");
         formParams.put(ADDITIONAL_ATTRIBUTES, "LegalPersonIdentifier&CurrentAddress&Gender");
-        formParams.put(COUNTRY, "EE");
+        formParams.put(COUNTRY, DEF_COUNTRY);
         formParams.put(RELAY_STATE, "1234abcd");
 
         Response response = getAuthenticationReqFormFail(formParams);
@@ -188,7 +188,7 @@ public class EidasClientAuthApiIntegrationTest extends TestsBase {
         Map<String,String> formParams = new HashMap<String,String>();
         formParams.put(LOA, "HIGH");
         formParams.put(ADDITIONAL_ATTRIBUTES, "LegalPersonIdentifier CurrentAddress Gender");
-        formParams.put(COUNTRY, "EE");
+        formParams.put(COUNTRY, DEF_COUNTRY);
         formParams.put(RELAY_STATE, "1234abcd");
 
         Response response = given()
@@ -210,14 +210,14 @@ public class EidasClientAuthApiIntegrationTest extends TestsBase {
 
     @Test
     public void authApi5_checkHtmlValues() {
-        String response = getAuthenticationReq("CA", "SUBSTANTIAL", "RelayState");
+        String response = getAuthenticationReq(DEF_COUNTRY, "SUBSTANTIAL", "RelayState");
 
         XmlPath html = new XmlPath(XmlPath.CompatibilityMode.HTML, response);
 
         assertEquals("Target url is present", testEidasClientProperties.getFullIdpStartUrl(), html.getString("html.body.form.@action"));
         assertEquals("Method is post", "post", html.getString("html.body.form.@method"));
         assertEquals("Relay state is present", "RelayState", html.getString("**.findAll { it.@name == 'RelayState' }.@value"));
-        assertEquals("Country is present", "CA", html.getString("**.findAll { it.@name == 'country' }.@value")); //TODO: Should be Country?
+        assertEquals("Country is present", DEF_COUNTRY, html.getString("**.findAll { it.@name == 'country' }.@value")); //TODO: Should be Country?
         assertEquals("SAML request is present because LoA is accessible", LOA_SUBSTANTIAL, getDecodedSamlRequestBodyXml(response).getString(XML_LOA));
     }
 
@@ -226,7 +226,7 @@ public class EidasClientAuthApiIntegrationTest extends TestsBase {
         Map<String,String> formParams = new HashMap<String,String>();
         formParams.put(LOA, "HIGH");
         formParams.put(LOA, "LOW");
-        formParams.put(COUNTRY, "EE");
+        formParams.put(COUNTRY, DEF_COUNTRY);
         formParams.put(RELAY_STATE, "1234abcd");
 
         XmlPath samlRequest = getDecodedSamlRequestBodyXml(getAuthenticationReqForm(formParams).getBody().asString());
@@ -239,7 +239,7 @@ public class EidasClientAuthApiIntegrationTest extends TestsBase {
         Map<String,String> formParams = new HashMap<String,String>();
         formParams.put("randomParam", "random");
         formParams.put(LOA, "LOW");
-        formParams.put(COUNTRY, "EE");
+        formParams.put(COUNTRY, DEF_COUNTRY);
         formParams.put(RELAY_STATE, "1234abcd");
 
         Response response = getAuthenticationReqForm(formParams);

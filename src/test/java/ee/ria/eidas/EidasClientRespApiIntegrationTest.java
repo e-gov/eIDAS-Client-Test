@@ -31,7 +31,7 @@ public class EidasClientRespApiIntegrationTest extends TestsBase {
     public void respApi2_errorIsReturnedOnTooLongRelayState() {
         String relayState = RandomStringUtils.randomAlphanumeric(81);
 
-        String base64Response = getBase64SamlResponseMinimalAttributes(getAuthenticationReq("CA","SUBSTANTIAL",""), "TestGiven","TestFamily","TestPNO", "TestDate", LOA_SUBSTANTIAL);
+        String base64Response = getBase64SamlResponseMinimalAttributes(getAuthenticationReq(DEF_COUNTRY,"SUBSTANTIAL",""), "TestGiven","TestFamily","TestPNO", "TestDate", LOA_SUBSTANTIAL);
         Response response = sendSamlResponseGetStatus(relayState, base64Response );
 
         assertEquals("Status code should be: 400", 400, response.statusCode());
@@ -44,7 +44,7 @@ public class EidasClientRespApiIntegrationTest extends TestsBase {
     public void respApi2_errorIsReturnedOnWrongCharactersInRelayState() {
         String relayState = "<>$";
 
-        String base64Response = getBase64SamlResponseMinimalAttributes(getAuthenticationReq("CA","SUBSTANTIAL",""), "TestGiven","TestFamily","TestPNO", "TestDate", LOA_SUBSTANTIAL);
+        String base64Response = getBase64SamlResponseMinimalAttributes(getAuthenticationReq(DEF_COUNTRY,"SUBSTANTIAL",""), "TestGiven","TestFamily","TestPNO", "TestDate", LOA_SUBSTANTIAL);
         Response response = sendSamlResponseGetStatus(relayState, base64Response );
 
         assertEquals("Status code should be: 400", 400, response.statusCode());
@@ -54,7 +54,7 @@ public class EidasClientRespApiIntegrationTest extends TestsBase {
 
     @Test
     public void respApi2_relayStateMissingValueShouldReturnOkStatus() {
-        String base64Response = getBase64SamlResponseMinimalAttributes(getAuthenticationReq("CA","SUBSTANTIAL",""), "TestGiven","TestFamily","TestPNO", "TestDate", LOA_SUBSTANTIAL);
+        String base64Response = getBase64SamlResponseMinimalAttributes(getAuthenticationReq(DEF_COUNTRY,"SUBSTANTIAL",""), "TestGiven","TestFamily","TestPNO", "TestDate", LOA_SUBSTANTIAL);
 
         Response response =  given()
                 .formParam(RELAY_STATE, "")
@@ -72,7 +72,7 @@ public class EidasClientRespApiIntegrationTest extends TestsBase {
     @Test
     public void respApi2_relayStateMissingShouldReturnOkStatus() {
         Map<String,String> formParams = new HashMap<String,String>();
-        formParams.put(COUNTRY, "EE");
+        formParams.put(COUNTRY, DEF_COUNTRY);
 
         String base64Response = getBase64SamlResponseMinimalAttributes(getAuthenticationReqForm(formParams).getBody().asString(), "TestGiven","TestFamily","TestPNO", "TestDate", LOA_SUBSTANTIAL);
 

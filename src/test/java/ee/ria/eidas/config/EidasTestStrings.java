@@ -9,6 +9,9 @@ public class EidasTestStrings {
     public static final String SAML_REQUEST = "SAMLRequest";
     public static final String SAML_RESPONSE = "SAMLResponse";
 
+    //Default test params
+    public static final String DEF_COUNTRY = "EE";
+
     //SAML response strings
     public static final String LOA_LOW = "http://eidas.europa.eu/LoA/low";
     public static final String LOA_SUBSTANTIAL = "http://eidas.europa.eu/LoA/substantial";
@@ -62,7 +65,7 @@ public class EidasTestStrings {
     public static final String DEFATTR_DATE = "1900-11-09";
     public static final String DEFATTR_BIRTH_NAME = "Test-Birth-First-Last-Name";
     public static final String DEFATTR_BIRTH_PLACE = "Country";
-    public static final String DEFATTR_ADDR = "Street 1, Flat 3, Village 2, Country7";
+    public static final String DEFATTR_ADDR = "PGVpZGFzOkxvY2F0b3JEZXNpZ25hdG9yPjEyNTwvZWlkYXM6TG9jYXRvckRlc2lnbmF0b3I+DQo8ZWlkYXM6VGhvcm91Z2hmYXJlPktpbmdzd2F5PC9laWRhczpUaG9yb3VnaGZhcmU+DQo8ZWlkYXM6UG9zdE5hbWU+TG9uZG9uPC9laWRhczpQb3N0TmFtZT4gDQo8ZWlkYXM6UG9zdENvZGU+V0MyQiA2Tkg8L2VpZGFzOlBvc3Rjb2RlPg==";
     public static final String DEFATTR_GENDER = "Male";
     public static final String DEFATTR_LEGAL_NAME = "Good Company a/s";
     public static final String DEFATTR_LEGAL_PNO = "292938483902";

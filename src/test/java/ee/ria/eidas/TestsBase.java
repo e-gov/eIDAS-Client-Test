@@ -149,7 +149,7 @@ public abstract class TestsBase {
     }
 
     protected String getAuthenticationReqWithDefault() {
-        return getAuthenticationReq("CA", "","");
+        return getAuthenticationReq(DEF_COUNTRY, "","");
     }
 
     protected String getAuthenticationReq(String country, String loa, String relayState) {
