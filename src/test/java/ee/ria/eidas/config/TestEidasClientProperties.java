@@ -8,7 +8,6 @@ import org.springframework.validation.annotation.Validated;
 public class TestEidasClientProperties {
 
     private String targetUrl;
-    private String targetSpUrl;
     private String spMetadataUrl;
     private String spStartUrl;
     private String spReturnUrl;
@@ -25,10 +24,6 @@ public class TestEidasClientProperties {
 
     public void setTargetUrl(String targetUrl) {
         this.targetUrl = targetUrl;
-    }
-
-    public void setTargetSpUrl(String targetSpUrl) {
-        this.targetSpUrl = targetSpUrl;
     }
 
     public void setSpMetadataUrl(String spMetadataUrl) {
@@ -91,16 +86,12 @@ public class TestEidasClientProperties {
         return targetUrl;
     }
 
-    public String getTargetSpUrl() {
-        return targetSpUrl;
-    }
-
     public String getSpMetadataUrl() {
         return spMetadataUrl;
     }
 
     public String getFullSpMetadataUrl() {
-        return targetSpUrl+spMetadataUrl;
+        return targetUrl+spMetadataUrl;
     }
 
     public String getSpStartUrl() {

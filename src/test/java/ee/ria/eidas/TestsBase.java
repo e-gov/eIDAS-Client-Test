@@ -82,12 +82,16 @@ public abstract class TestsBase {
         Security.addProvider(new BouncyCastleProvider());
         InitializationService.initialize();
 
+        XmlPath metadata = getMetadataBodyXML();
+
+        testEidasClientProperties.setAdvertizedSpReturnUrl(metadata.getString("EntityDescriptor.SPSSODescriptor.AssertionConsumerService.@Location"));
+
         try {
             KeyStore keystore = KeyStore.getInstance(KeyStore.getDefaultType());
             Resource resource = resourceLoader.getResource(testEidasClientProperties.getKeystore());
             keystore.load(resource.getInputStream(), testEidasClientProperties.getKeystorePass().toCharArray());
             signatureCredential = getCredential(keystore, testEidasClientProperties.getResponseSigningKeyId(), testEidasClientProperties.getResponseSigningKeyPass() );
-            encryptionCredential = getEncryptionCredentialFromMetaData(getMetadataBody());
+            encryptionCredential = getEncryptionCredentialFromMetaData(metadata);
         } catch (Exception e) {
             throw new RuntimeException("Something went wrong initializing credentials:", e);
         }
@@ -311,13 +315,12 @@ public abstract class TestsBase {
         }
     }
 
-    protected java.security.cert.X509Certificate getEncryptionCertificate(String body) throws CertificateException {
-        XmlPath metadataXml = new XmlPath(body);
-        java.security.cert.X509Certificate x509 = X509Support.decodeCertificate(metadataXml.getString("**.findAll {it.@use == 'encryption'}.KeyInfo.X509Data.X509Certificate"));
+    protected java.security.cert.X509Certificate getEncryptionCertificate(XmlPath body) throws CertificateException {
+        java.security.cert.X509Certificate x509 = X509Support.decodeCertificate(body.getString("**.findAll {it.@use == 'encryption'}.KeyInfo.X509Data.X509Certificate"));
         return x509;
     }
 
-    protected Credential getEncryptionCredentialFromMetaData (String body) throws CertificateException {
+    protected Credential getEncryptionCredentialFromMetaData (XmlPath body) throws CertificateException {
         java.security.cert.X509Certificate x509Certificate = getEncryptionCertificate(body);
         BasicX509Credential encryptionCredential = new BasicX509Credential(x509Certificate);
         return encryptionCredential;

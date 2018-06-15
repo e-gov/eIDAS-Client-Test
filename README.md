@@ -17,6 +17,8 @@ Vajalik on Java VM eelnev installatsioon. Arenduseks on kasutatud Oracle Java jd
 
 a) Võimalik on ette anda kahe erineva "profiili" properties faile "dev" ja "test" - vastavad properties failid [application-dev.properties](https://github.com/e-gov/eIDAS-Client-Test/blob/master/src/test/resources/application-dev.properties) ja [application-test.properties](https://github.com/e-gov/eIDAS-Client-Test/blob/master/src/test/resources/application-test.properties). Vaikeväärtusena on kasutusel profiil "dev", kuid seda on võimalik käivitamisel muuta parameetriga. Vaikeväärtused on seadistatud [application.properties](https://github.com/e-gov/eIDAS-Client-Test/blob/master/src/test/resources/application.properties) failis.
 
+`-Dspring.profiles.active=test`
+
 b) Andes vastavad parameetrid ette testide käivitamisel (kirjeldus testide käivitamise punktis)
 
 Parameetrite kirjeldus:
@@ -27,8 +29,7 @@ Parameetrite kirjeldus:
 
 | Parameeter | Vaikeväärtus | Vajalik korduvkasutatavatele testidele | Kirjeldus |
 |------------|--------------|----------------------------------------|-----------|
-| test.client.targetUrl | http://localhost:8889 | Jah | Testitava klientrakenduse Url ja port. |
-| test.client.targetSpUrl | http://localhost:8889 | Ei | Teenuse Url ja port. Sama url mis kajastub metateabe otspunktis. |
+| test.client.targetUrl | http://localhost:8889 | Jah | Testitava klientrakenduse Url ja port. SAML vastuses kasutatavad URLid loetakse metaandmetest. |
 | test.client.spMetadataUrl | /metadata | Jah | Teenuse metaandmete otspunkt. |
 | test.client.spStartUrl | /login | Ei | Teenuse autentimise alustamise otspunkt. |
 | test.client.spReturnUrl | /returnUrl | Ei | Teenuse autentimise vastuse otspunkt. |
