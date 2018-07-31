@@ -21,7 +21,7 @@ public class AuthenticationResponseIntegrationTest extends TestsBase {
     @Test
     public void resp1_validMinimalInputAuthentication() {
         String base64Response = getBase64SamlResponseDefaultMinimalAttributes(getAuthenticationReqWithDefault());
-        JsonPath loginResponseJson = sendSamlResponse("",base64Response );
+        JsonPath loginResponseJson = sendSamlResponse("", base64Response );
         assertEquals("Correct loa is returned", LOA_SUBSTANTIAL, loginResponseJson.getString(STATUS_LOA));
         assertEquals("Correct person identifier is returned", DEFATTR_PNO, loginResponseJson.getString(STATUS_PNO));
         assertEquals("Correct date is returned", DEFATTR_DATE, loginResponseJson.getString(STATUS_DATE));
@@ -32,7 +32,7 @@ public class AuthenticationResponseIntegrationTest extends TestsBase {
     @Test
     public void resp1_validMaximalInputAuthentication() {
         String base64Response = getBase64SamlResponseDefaultMaximalAttributes(getAuthenticationReqWithDefault());
-        JsonPath loginResponseJson = sendSamlResponse("",base64Response );
+        JsonPath loginResponseJson = sendSamlResponse("", base64Response );
         assertEquals("Correct loa is returned", LOA_SUBSTANTIAL, loginResponseJson.getString(STATUS_LOA));
         assertEquals("Correct person identifier is returned", DEFATTR_PNO, loginResponseJson.getString(STATUS_PNO));
         assertEquals("Correct date is returned", DEFATTR_DATE, loginResponseJson.getString(STATUS_DATE));
@@ -45,12 +45,33 @@ public class AuthenticationResponseIntegrationTest extends TestsBase {
     }
 
     @Test
+    public void resp2_unsignedResponseMustFailOnPostBinding() {
+        String base64Response = getBase64SamlResponseDefaultMinimalAttributesWithoutSignature(getAuthenticationReqWithDefault());
+        JsonPath loginResponse = sendSamlResponse("", base64Response );
+        assertEquals("Response must be signed on POST binding, error should be returned","Invalid SAMLResponse. Response not signed.", loginResponse.getString("message"));
+    }
+
+    @Test
+    public void resp2_notTrustedSignatureMustFailOnPostBinding() {
+        String base64Response = getBase64SamlResponseDefaultMinimalAttributesWithUntrustedSignature(getAuthenticationReqWithDefault());
+        JsonPath loginResponse = sendSamlResponse("", base64Response );
+        assertEquals("Response must be signed with trusted certificate","Invalid SAMLResponse. Invalid response signature.", loginResponse.getString("message"));
+    }
+
+    @Test
+    public void resp2_faultySignatureResponseMustFailOnPostBinding() {
+        String base64Response = getBase64SamlResponseDefaultMinimalAttributesWithFaultySignature(getAuthenticationReqWithDefault());
+        JsonPath loginResponse = sendSamlResponse("", base64Response );
+        assertEquals("Response has been modified, error should be returned","Invalid SAMLResponse. Invalid response signature.", loginResponse.getString("message"));
+    }
+
+    @Test
     public void resp4_responseWithLowLoaShouldNotBeAcceptedWhenSubstantialWasRequired() {
         String base64Response = getBase64SamlResponseMinimalAttributes(getAuthenticationReq(DEF_COUNTRY,"SUBSTANTIAL",""), "TestGiven","TestFamily","TestPNO", "TestDate", LOA_LOW);
         Response response = sendSamlResponseGetStatus("", base64Response );
         assertEquals("Status code should be: 400", 400, response.statusCode());
         assertEquals("Bad request error should be returned", BAD_REQUEST, getValueFromJsonResponse(response, STATUS_ERROR));
-        assertThat("Correct error message", getValueFromJsonResponse(response, STATUS_ERROR_MESSAGE), startsWith("AuthnContextClassRef is not greater or equal to the request level of assurance!"));
+        assertThat("Correct error message", getValueFromJsonResponse(response, STATUS_ERROR_MESSAGE), startsWith("Invalid SAMLResponse. AuthnContextClassRef is not greater or equal to the request level of assurance!"));
     }
 
     @Test
@@ -59,7 +80,7 @@ public class AuthenticationResponseIntegrationTest extends TestsBase {
         Response response = sendSamlResponseGetStatus("", base64Response );
         assertEquals("Status code should be: 400", 400, response.statusCode());
         assertEquals("Bad request error should be returned", BAD_REQUEST, getValueFromJsonResponse(response, STATUS_ERROR));
-        assertThat("Correct error message", getValueFromJsonResponse(response, STATUS_ERROR_MESSAGE), startsWith("AuthnContextClassRef is not greater or equal to the request level of assurance!"));
+        assertThat("Correct error message", getValueFromJsonResponse(response, STATUS_ERROR_MESSAGE), startsWith("Invalid SAMLResponse. AuthnContextClassRef is not greater or equal to the request level of assurance!"));
     }
 
     @Test
@@ -68,55 +89,55 @@ public class AuthenticationResponseIntegrationTest extends TestsBase {
         Response response = sendSamlResponseGetStatus("", base64Response );
         assertEquals("Status code should be: 400", 400, response.statusCode());
         assertEquals("Bad request error should be returned", BAD_REQUEST, getValueFromJsonResponse(response, STATUS_ERROR));
-        assertThat("Correct error message", getValueFromJsonResponse(response, STATUS_ERROR_MESSAGE), startsWith("AuthnContextClassRef is not greater or equal to the request level of assurance!"));
+        assertThat("Correct error message", getValueFromJsonResponse(response, STATUS_ERROR_MESSAGE), startsWith("Invalid SAMLResponse. AuthnContextClassRef is not greater or equal to the request level of assurance!"));
     }
 
     @Test
     public void resp4_responseWithSameLoaShouldBeAcceptedLow() {
         String base64Response = getBase64SamlResponseMinimalAttributes(getAuthenticationReq(DEF_COUNTRY,"LOW",""), "TestGiven","TestFamily","TestPNO", "TestDate", LOA_LOW);
-        JsonPath loginResponseJson = sendSamlResponse("",base64Response );
+        JsonPath loginResponseJson = sendSamlResponse("", base64Response );
         assertEquals("Correct loa is returned", LOA_LOW, loginResponseJson.getString(STATUS_LOA));
     }
 
     @Test
     public void resp4_responseWithSameLoaShouldBeAcceptedSubstantial() {
         String base64Response = getBase64SamlResponseMinimalAttributes(getAuthenticationReq(DEF_COUNTRY,"SUBSTANTIAL",""), "TestGiven","TestFamily","TestPNO", "TestDate", LOA_SUBSTANTIAL);
-        JsonPath loginResponseJson = sendSamlResponse("",base64Response );
+        JsonPath loginResponseJson = sendSamlResponse("", base64Response );
         assertEquals("Correct loa is returned", LOA_SUBSTANTIAL, loginResponseJson.getString(STATUS_LOA));
     }
 
     @Test
     public void resp4_responseWithSameLoaShouldBeAcceptedHigh() {
         String base64Response = getBase64SamlResponseMinimalAttributes(getAuthenticationReq(DEF_COUNTRY,"HIGH",""), "TestGiven","TestFamily","TestPNO", "TestDate", LOA_HIGH);
-        JsonPath loginResponseJson = sendSamlResponse("",base64Response );
+        JsonPath loginResponseJson = sendSamlResponse("", base64Response );
         assertEquals("Correct loa is returned", LOA_HIGH, loginResponseJson.getString(STATUS_LOA));
     }
 
     @Test
     public void resp4_responseWithHigherLoaLowShouldBeAcceptedSubstantial() {
         String base64Response = getBase64SamlResponseMinimalAttributes(getAuthenticationReq(DEF_COUNTRY,"LOW",""), "TestGiven","TestFamily","TestPNO", "TestDate", LOA_SUBSTANTIAL);
-        JsonPath loginResponseJson = sendSamlResponse("",base64Response );
+        JsonPath loginResponseJson = sendSamlResponse("", base64Response );
         assertEquals("Correct loa is returned", LOA_SUBSTANTIAL, loginResponseJson.getString(STATUS_LOA));
     }
 
     @Test
     public void resp4_responseWithHigherLoaLowShouldBeAcceptedHigh() {
         String base64Response = getBase64SamlResponseMinimalAttributes(getAuthenticationReq(DEF_COUNTRY,"LOW",""), "TestGiven","TestFamily","TestPNO", "TestDate", LOA_HIGH);
-        JsonPath loginResponseJson = sendSamlResponse("",base64Response );
+        JsonPath loginResponseJson = sendSamlResponse("", base64Response );
         assertEquals("Correct loa is returned", LOA_HIGH, loginResponseJson.getString(STATUS_LOA));
     }
 
     @Test
     public void resp4_responseWithHigherLoaSubstantialShouldBeAcceptedHigh() {
         String base64Response = getBase64SamlResponseMinimalAttributes(getAuthenticationReq(DEF_COUNTRY,"SUBSTANTIAL",""), "TestGiven","TestFamily","TestPNO", "TestDate", LOA_HIGH);
-        JsonPath loginResponseJson = sendSamlResponse("",base64Response );
+        JsonPath loginResponseJson = sendSamlResponse("", base64Response );
         assertEquals("Correct loa is returned", LOA_HIGH, loginResponseJson.getString(STATUS_LOA));
     }
 
     @Test
     public void resp8_unsignedAssertionMustFailOnPostBinding() {
         String base64Response = getBase64SamlResponseDefaultMinimalAttributesWithoutAssertionSignature(getAuthenticationReqWithDefault());
-        JsonPath loginResponse = sendSamlResponse("",base64Response );
-        assertEquals("Assertion must be signed on POST binding, error should be returned","The SAML Assertion was not signed", loginResponse.getString("message"));
+        JsonPath loginResponse = sendSamlResponse("", base64Response );
+        assertEquals("Assertion must be signed on POST binding, error should be returned","Invalid SAMLResponse. The SAML Assertion was not signed", loginResponse.getString("message"));
     }
 }
