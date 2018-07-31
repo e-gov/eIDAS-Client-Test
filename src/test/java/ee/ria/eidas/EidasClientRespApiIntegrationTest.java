@@ -103,7 +103,7 @@ public class EidasClientRespApiIntegrationTest extends TestsBase {
 
         assertEquals("Status code should be: 400", 400, response.statusCode());
         assertEquals("Bad request error should be returned", BAD_REQUEST, getValueFromJsonResponse(response, STATUS_ERROR));
-        assertThat("Correct error message", getValueFromJsonResponse(response, STATUS_ERROR_MESSAGE), startsWith("Failed to read SAMLResponse."));
+        assertThat("Correct error message", getValueFromJsonResponse(response, STATUS_ERROR_MESSAGE), startsWith("Required String parameter 'SAMLResponse' is not present"));
     }
 
     @Test
@@ -121,7 +121,7 @@ public class EidasClientRespApiIntegrationTest extends TestsBase {
 
         assertEquals("Status code should be: 400", 400, response.statusCode());
         assertEquals("Bad request error should be returned", BAD_REQUEST, getValueFromJsonResponse(response, STATUS_ERROR));
-        assertThat("Correct error message", getValueFromJsonResponse(response, STATUS_ERROR_MESSAGE), startsWith("Failed to read SAMLResponse."));
+        assertThat("Correct error message", getValueFromJsonResponse(response, STATUS_ERROR_MESSAGE), startsWith("Invalid SAMLResponse. Failed to read SAMLResponse."));
     }
 
     @Test

@@ -41,7 +41,7 @@ public class SamlResponseCorrectnessIntegrationTest extends TestsBase {
         Response loginResponse = sendSamlResponseExtractResponse("", base64Response);
         assertEquals(400, loginResponse.getStatusCode());
         assertEquals("Generic error should be returned", BAD_REQUEST, getValueFromJsonResponse(loginResponse, STATUS_ERROR));
-        assertEquals("Correct error message is returned", "Error handling message: Message is not schema-valid.", getValueFromJsonResponse(loginResponse, STATUS_ERROR_MESSAGE));
+        assertEquals("Correct error message is returned", "Invalid SAMLResponse. Error handling message: Message is not schema-valid.", getValueFromJsonResponse(loginResponse, STATUS_ERROR_MESSAGE));
     }
 
     @Ignore //TODO: Currently it is only checked that encrypted assertion is present.
@@ -59,7 +59,7 @@ public class SamlResponseCorrectnessIntegrationTest extends TestsBase {
         Response loginResponse = sendSamlResponseExtractResponse("", base64Response);
         assertEquals(400, loginResponse.getStatusCode());
         assertEquals("Generic error should be returned", BAD_REQUEST, getValueFromJsonResponse(loginResponse, STATUS_ERROR));
-        assertEquals("The response is not schema valid", "Error handling message: Message is not schema-valid.", getValueFromJsonResponse(loginResponse, STATUS_ERROR_MESSAGE));
+        assertEquals("The response is not schema valid", "Invalid SAMLResponse. Error handling message: Message is not schema-valid.", getValueFromJsonResponse(loginResponse, STATUS_ERROR_MESSAGE));
     }
 
     @Test
@@ -68,7 +68,7 @@ public class SamlResponseCorrectnessIntegrationTest extends TestsBase {
         Response loginResponse = sendSamlResponseExtractResponse("", base64Response);
         assertEquals(400, loginResponse.getStatusCode());
         assertEquals("Generic error should be returned", BAD_REQUEST, getValueFromJsonResponse(loginResponse, STATUS_ERROR));
-        assertEquals("The response is not schema valid", "Error handling message: Message is not schema-valid.", getValueFromJsonResponse(loginResponse, STATUS_ERROR_MESSAGE));
+        assertEquals("The response is not schema valid", "Invalid SAMLResponse. Error handling message: Message is not schema-valid.", getValueFromJsonResponse(loginResponse, STATUS_ERROR_MESSAGE));
     }
 
     @Ignore //TODO: Currently this passes, it is unclear what it should do...
@@ -86,7 +86,7 @@ public class SamlResponseCorrectnessIntegrationTest extends TestsBase {
         Response loginResponse = sendSamlResponseExtractResponse("", base64Response);
         assertEquals(400, loginResponse.getStatusCode());
         assertEquals("Generic error should be returned", BAD_REQUEST, getValueFromJsonResponse(loginResponse, STATUS_ERROR));
-        assertEquals("Loa values are defined and other values should not be accepted", "AuthnContextClassRef is not greater or equal to the request level of assurance!", getValueFromJsonResponse(loginResponse, STATUS_ERROR_MESSAGE));
+        assertEquals("Loa values are defined and other values should not be accepted", "Invalid SAMLResponse. AuthnContextClassRef is not greater or equal to the request level of assurance!", getValueFromJsonResponse(loginResponse, STATUS_ERROR_MESSAGE));
     }
 
     @Test
@@ -95,7 +95,7 @@ public class SamlResponseCorrectnessIntegrationTest extends TestsBase {
         Response loginResponse = sendSamlResponseExtractResponse("", base64Response);
         assertEquals(400, loginResponse.getStatusCode());
         assertEquals("Generic error should be returned", BAD_REQUEST, getValueFromJsonResponse(loginResponse, STATUS_ERROR));
-        assertEquals("Loa can not be empty", "AuthnContextClassRef is not greater or equal to the request level of assurance!", getValueFromJsonResponse(loginResponse, STATUS_ERROR_MESSAGE));
+        assertEquals("Loa can not be empty", "Invalid SAMLResponse. AuthnContextClassRef is not greater or equal to the request level of assurance!", getValueFromJsonResponse(loginResponse, STATUS_ERROR_MESSAGE));
     }
 
     @Test
@@ -104,7 +104,7 @@ public class SamlResponseCorrectnessIntegrationTest extends TestsBase {
         Response response = sendSamlResponseGetStatus("", base64Response );
         assertEquals("Status code should be: 400", 400, response.statusCode());
         assertEquals("Bad request error should be returned", BAD_REQUEST, getValueFromJsonResponse(response, STATUS_ERROR));
-        assertThat("Correct error message", getValueFromJsonResponse(response, STATUS_ERROR_MESSAGE), startsWith("Missing mandatory attributes in the response assertion:"));
+        assertThat("Correct error message", getValueFromJsonResponse(response, STATUS_ERROR_MESSAGE), startsWith("Invalid SAMLResponse. Missing mandatory attributes in the response assertion:"));
     }
 
     @Test
@@ -140,7 +140,7 @@ public class SamlResponseCorrectnessIntegrationTest extends TestsBase {
         Response loginResponse = sendSamlResponseExtractResponse("", base64Response);
         assertEquals(400, loginResponse.getStatusCode());
         assertEquals("Generic error should be returned", BAD_REQUEST, getValueFromJsonResponse(loginResponse, STATUS_ERROR));
-        assertEquals("Correct error message is returned", "Error handling message: Message was rejected due to issue instant expiration", getValueFromJsonResponse(loginResponse, STATUS_ERROR_MESSAGE));
+        assertEquals("Correct error message is returned", "Invalid SAMLResponse. Error handling message: Message was rejected due to issue instant expiration", getValueFromJsonResponse(loginResponse, STATUS_ERROR_MESSAGE));
     }
 
     @Test
@@ -149,7 +149,7 @@ public class SamlResponseCorrectnessIntegrationTest extends TestsBase {
         Response loginResponse = sendSamlResponseExtractResponse("", base64Response);
         assertEquals(400, loginResponse.getStatusCode());
         assertEquals("Generic error should be returned", BAD_REQUEST, getValueFromJsonResponse(loginResponse, STATUS_ERROR));
-        assertEquals("Correct error message is returned", "Error handling message: Message was rejected because it was issued in the future", getValueFromJsonResponse(loginResponse, STATUS_ERROR_MESSAGE));
+        assertEquals("Correct error message is returned", "Invalid SAMLResponse. Error handling message: Message was rejected because it was issued in the future", getValueFromJsonResponse(loginResponse, STATUS_ERROR_MESSAGE));
     }
 
     @Test
@@ -159,7 +159,7 @@ public class SamlResponseCorrectnessIntegrationTest extends TestsBase {
         Response loginResponse = sendSamlResponseExtractResponse("", base64Response);
         assertEquals(400, loginResponse.getStatusCode());
         assertEquals("Generic error should be returned", BAD_REQUEST, getValueFromJsonResponse(loginResponse, STATUS_ERROR));
-        assertEquals("Correct error message is returned", "No corresponding SAML request session found for the given response assertion!", getValueFromJsonResponse(loginResponse, STATUS_ERROR_MESSAGE));
+        assertEquals("Correct error message is returned", "Invalid SAMLResponse. No corresponding SAML request session found for the given response!", getValueFromJsonResponse(loginResponse, STATUS_ERROR_MESSAGE));
     }
 
     @Ignore //TODO: This needs investigation as it currently passes!
@@ -180,7 +180,7 @@ public class SamlResponseCorrectnessIntegrationTest extends TestsBase {
         Response loginResponse = sendSamlResponseExtractResponse("", base64Response);
         assertEquals(400, loginResponse.getStatusCode());
         assertEquals("Generic error should be returned", BAD_REQUEST, getValueFromJsonResponse(loginResponse, STATUS_ERROR));
-        assertEquals("Correct error message is returned", "No corresponding SAML request session found for the given response assertion!", getValueFromJsonResponse(loginResponse, STATUS_ERROR_MESSAGE));
+        assertEquals("Correct error message is returned", "Invalid SAMLResponse. No corresponding SAML request session found for the given response assertion!", getValueFromJsonResponse(loginResponse, STATUS_ERROR_MESSAGE));
     }
 
     @Test
@@ -189,7 +189,7 @@ public class SamlResponseCorrectnessIntegrationTest extends TestsBase {
         Response loginResponse = sendSamlResponseExtractResponse("", base64Response);
         assertEquals(400, loginResponse.getStatusCode());
         assertEquals("Generic error should be returned", BAD_REQUEST, getValueFromJsonResponse(loginResponse, STATUS_ERROR));
-        assertEquals("Correct error message is returned", "Assertion must contain exactly 1 AttributeStatement!", getValueFromJsonResponse(loginResponse, STATUS_ERROR_MESSAGE));
+        assertEquals("Correct error message is returned", "Invalid SAMLResponse. Assertion must contain exactly 1 AttributeStatement!", getValueFromJsonResponse(loginResponse, STATUS_ERROR_MESSAGE));
     }
 
     @Test
@@ -198,7 +198,7 @@ public class SamlResponseCorrectnessIntegrationTest extends TestsBase {
         Response loginResponse = sendSamlResponseExtractResponse("", base64Response);
         assertEquals(400, loginResponse.getStatusCode());
         assertEquals("Generic error should be returned", BAD_REQUEST, getValueFromJsonResponse(loginResponse, STATUS_ERROR));
-        assertEquals("Correct error message is returned", "Assertion must contain exactly 1 AttributeStatement!", getValueFromJsonResponse(loginResponse, STATUS_ERROR_MESSAGE));
+        assertEquals("Correct error message is returned", "Invalid SAMLResponse. Assertion must contain exactly 1 AttributeStatement!", getValueFromJsonResponse(loginResponse, STATUS_ERROR_MESSAGE));
     }
 
     @Ignore //TODO: Internal server error is returned
@@ -216,7 +216,7 @@ public class SamlResponseCorrectnessIntegrationTest extends TestsBase {
         Response loginResponse = sendSamlResponseExtractResponse("", base64Response);
         assertEquals(400, loginResponse.getStatusCode());
         assertEquals("Generic error should be returned", BAD_REQUEST, getValueFromJsonResponse(loginResponse, STATUS_ERROR));
-        assertEquals("Message about AuthnStatement should be returned", "Assertion must contain exactly 1 AuthnStatement!", getValueFromJsonResponse(loginResponse, STATUS_ERROR_MESSAGE));
+        assertEquals("Message about AuthnStatement should be returned", "Invalid SAMLResponse. Assertion must contain exactly 1 AuthnStatement!", getValueFromJsonResponse(loginResponse, STATUS_ERROR_MESSAGE));
     }
 
     @Test
@@ -225,7 +225,7 @@ public class SamlResponseCorrectnessIntegrationTest extends TestsBase {
         Response loginResponse = sendSamlResponseExtractResponse("", base64Response);
         assertEquals(400, loginResponse.getStatusCode());
         assertEquals("Generic error should be returned", BAD_REQUEST, getValueFromJsonResponse(loginResponse, STATUS_ERROR));
-        assertEquals("Message about AuthnStatement should be returned", "Assertion must contain exactly 1 AuthnStatement!", getValueFromJsonResponse(loginResponse, STATUS_ERROR_MESSAGE));
+        assertEquals("Message about AuthnStatement should be returned", "Invalid SAMLResponse. Assertion must contain exactly 1 AuthnStatement!", getValueFromJsonResponse(loginResponse, STATUS_ERROR_MESSAGE));
     }
 
     @Test
@@ -234,7 +234,7 @@ public class SamlResponseCorrectnessIntegrationTest extends TestsBase {
         Response loginResponse = sendSamlResponseExtractResponse("", base64Response);
         assertEquals(400, loginResponse.getStatusCode());
         assertEquals("Generic error should be returned", BAD_REQUEST, getValueFromJsonResponse(loginResponse, STATUS_ERROR));
-        assertEquals("Message about incorrect issue time should be returned", "Assertion issue instant is expired!", getValueFromJsonResponse(loginResponse, STATUS_ERROR_MESSAGE));
+        assertEquals("Message about incorrect issue time should be returned", "Invalid SAMLResponse. Assertion issue instant is expired!", getValueFromJsonResponse(loginResponse, STATUS_ERROR_MESSAGE));
     }
 
     @Test
@@ -243,7 +243,7 @@ public class SamlResponseCorrectnessIntegrationTest extends TestsBase {
         Response loginResponse = sendSamlResponseExtractResponse("", base64Response);
         assertEquals(400, loginResponse.getStatusCode());
         assertEquals("Generic error should be returned", BAD_REQUEST, getValueFromJsonResponse(loginResponse, STATUS_ERROR));
-        assertEquals("Message about incorrect issue time should be returned", "Assertion issue instant is in the future!", getValueFromJsonResponse(loginResponse, STATUS_ERROR_MESSAGE));
+        assertEquals("Message about incorrect issue time should be returned", "Invalid SAMLResponse. Assertion issue instant is in the future!", getValueFromJsonResponse(loginResponse, STATUS_ERROR_MESSAGE));
     }
 
     @Test
@@ -252,7 +252,7 @@ public class SamlResponseCorrectnessIntegrationTest extends TestsBase {
         Response loginResponse = sendSamlResponseExtractResponse("", base64Response);
         assertEquals(400, loginResponse.getStatusCode());
         assertEquals("Generic error should be returned", BAD_REQUEST, getValueFromJsonResponse(loginResponse, STATUS_ERROR));
-        assertEquals("Error must be returned on wrong format", "Assertion issuer's format must equal to: urn:oasis:names:tc:SAML:2.0:nameid-format:entity!", getValueFromJsonResponse(loginResponse, STATUS_ERROR_MESSAGE));
+        assertEquals("Error must be returned on wrong format", "Invalid SAMLResponse. Assertion issuer's format must equal to: urn:oasis:names:tc:SAML:2.0:nameid-format:entity!", getValueFromJsonResponse(loginResponse, STATUS_ERROR_MESSAGE));
     }
 
     @Test
@@ -261,7 +261,7 @@ public class SamlResponseCorrectnessIntegrationTest extends TestsBase {
         Response loginResponse = sendSamlResponseExtractResponse("", base64Response);
         assertEquals(400, loginResponse.getStatusCode());
         assertEquals("Generic error should be returned", BAD_REQUEST, getValueFromJsonResponse(loginResponse, STATUS_ERROR));
-        assertEquals("Issuer url must match with correct url", "Assertion issuer's value is not equal to the configured IDP metadata url!", getValueFromJsonResponse(loginResponse, STATUS_ERROR_MESSAGE));
+        assertEquals("Issuer url must match with correct url", "Invalid SAMLResponse. Assertion issuer's value is not equal to the configured IDP metadata url!", getValueFromJsonResponse(loginResponse, STATUS_ERROR_MESSAGE));
     }
 
     @Test
@@ -270,7 +270,7 @@ public class SamlResponseCorrectnessIntegrationTest extends TestsBase {
         Response loginResponse = sendSamlResponseExtractResponse("", base64Response);
         assertEquals(400, loginResponse.getStatusCode());
         assertEquals("Generic error should be returned", BAD_REQUEST, getValueFromJsonResponse(loginResponse, STATUS_ERROR));
-        assertEquals("NameID must be present", "Assertion subject is missing nameID!", getValueFromJsonResponse(loginResponse, STATUS_ERROR_MESSAGE));
+        assertEquals("NameID must be present", "Invalid SAMLResponse. Assertion subject is missing nameID!", getValueFromJsonResponse(loginResponse, STATUS_ERROR_MESSAGE));
     }
 
     @Ignore //TODO: Currently nameID presence is not checked
@@ -289,7 +289,7 @@ public class SamlResponseCorrectnessIntegrationTest extends TestsBase {
         Response loginResponse = sendSamlResponseExtractResponse("", base64Response);
         assertEquals(400, loginResponse.getStatusCode());
         assertEquals("Generic error should be returned", BAD_REQUEST, getValueFromJsonResponse(loginResponse, STATUS_ERROR));
-        assertEquals("NameID must have predefined acceptable value", "Assertion's subject name ID format is not equal to one of the following: [urn:oasis:names:tc:SAML:1.1:nameid-format:unspecified, urn:oasis:names:tc:SAML:2.0:nameid-format:transient, urn:oasis:names:tc:SAML:2.0:nameid-format:persistent]", getValueFromJsonResponse(loginResponse, STATUS_ERROR_MESSAGE));
+        assertEquals("NameID must have predefined acceptable value", "Invalid SAMLResponse. Assertion's subject name ID format is not equal to one of the following: [urn:oasis:names:tc:SAML:1.1:nameid-format:unspecified, urn:oasis:names:tc:SAML:2.0:nameid-format:transient, urn:oasis:names:tc:SAML:2.0:nameid-format:persistent]", getValueFromJsonResponse(loginResponse, STATUS_ERROR_MESSAGE));
     }
 
     @Test
@@ -341,7 +341,7 @@ public class SamlResponseCorrectnessIntegrationTest extends TestsBase {
         Response loginResponse = sendSamlResponseExtractResponse("", base64Response);
         assertEquals(400, loginResponse.getStatusCode());
         assertEquals("Generic error should be returned", BAD_REQUEST, getValueFromJsonResponse(loginResponse, STATUS_ERROR));
-        assertEquals("Only one subject confirmation value is accepted", "Assertion subject must contain exactly 1 SubjectConfirmation!", getValueFromJsonResponse(loginResponse, STATUS_ERROR_MESSAGE));
+        assertEquals("Only one subject confirmation value is accepted", "Invalid SAMLResponse. Assertion subject must contain exactly 1 SubjectConfirmation!", getValueFromJsonResponse(loginResponse, STATUS_ERROR_MESSAGE));
     }
 
     @Test
@@ -350,7 +350,7 @@ public class SamlResponseCorrectnessIntegrationTest extends TestsBase {
         Response loginResponse = sendSamlResponseExtractResponse("", base64Response);
         assertEquals(400, loginResponse.getStatusCode());
         assertEquals("Generic error should be returned", BAD_REQUEST, getValueFromJsonResponse(loginResponse, STATUS_ERROR));
-        assertEquals("SubjectConfirmation must have predefined acceptable value", "Assertion SubjectConfirmation must equal to: urn:oasis:names:tc:SAML:2.0:cm:bearer!", getValueFromJsonResponse(loginResponse, STATUS_ERROR_MESSAGE));
+        assertEquals("SubjectConfirmation must have predefined acceptable value", "Invalid SAMLResponse. Assertion SubjectConfirmation must equal to: urn:oasis:names:tc:SAML:2.0:cm:bearer!", getValueFromJsonResponse(loginResponse, STATUS_ERROR_MESSAGE));
     }
 
     @Test
@@ -359,7 +359,7 @@ public class SamlResponseCorrectnessIntegrationTest extends TestsBase {
         Response loginResponse = sendSamlResponseExtractResponse("", base64Response);
         assertEquals(400, loginResponse.getStatusCode());
         assertEquals("Generic error should be returned", BAD_REQUEST, getValueFromJsonResponse(loginResponse, STATUS_ERROR));
-        assertEquals("Current time must not be after SubjectConfirmationTime", "SubjectConfirmationData NotOnOrAfter is not valid!", getValueFromJsonResponse(loginResponse, STATUS_ERROR_MESSAGE));
+        assertEquals("Current time must not be after SubjectConfirmationTime", "Invalid SAMLResponse. SubjectConfirmationData NotOnOrAfter is not valid!", getValueFromJsonResponse(loginResponse, STATUS_ERROR_MESSAGE));
     }
 
     @Test
@@ -368,7 +368,7 @@ public class SamlResponseCorrectnessIntegrationTest extends TestsBase {
         Response loginResponse = sendSamlResponseExtractResponse("", base64Response);
         assertEquals(400, loginResponse.getStatusCode());
         assertEquals("Generic error should be returned", BAD_REQUEST, getValueFromJsonResponse(loginResponse, STATUS_ERROR));
-        assertEquals("Recipient url must be correct return url", "Error handling message: SAML message failed received endpoint check", getValueFromJsonResponse(loginResponse, STATUS_ERROR_MESSAGE));
+        assertEquals("Recipient url must be correct return url", "Invalid SAMLResponse. Error handling message: SAML message failed received endpoint check", getValueFromJsonResponse(loginResponse, STATUS_ERROR_MESSAGE));
     }
 
     @Test
@@ -377,7 +377,7 @@ public class SamlResponseCorrectnessIntegrationTest extends TestsBase {
         Response loginResponse = sendSamlResponseExtractResponse("", base64Response);
         assertEquals(400, loginResponse.getStatusCode());
         assertEquals("Generic error should be returned", BAD_REQUEST, getValueFromJsonResponse(loginResponse, STATUS_ERROR));
-        assertEquals("Over time message should return error", "SubjectConfirmationData NotOnOrAfter is not valid!", getValueFromJsonResponse(loginResponse, STATUS_ERROR_MESSAGE));
+        assertEquals("Over time message should return error", "Invalid SAMLResponse. Assertion condition NotOnOrAfter is not valid!", getValueFromJsonResponse(loginResponse, STATUS_ERROR_MESSAGE));
     }
 
     @Test
@@ -386,7 +386,7 @@ public class SamlResponseCorrectnessIntegrationTest extends TestsBase {
         Response loginResponse = sendSamlResponseExtractResponse("", base64Response);
         assertEquals(400, loginResponse.getStatusCode());
         assertEquals("Generic error should be returned", BAD_REQUEST, getValueFromJsonResponse(loginResponse, STATUS_ERROR));
-        assertEquals("Time in the future should return error", "Assertion condition NotBefore is not valid!", getValueFromJsonResponse(loginResponse, STATUS_ERROR_MESSAGE));
+        assertEquals("Time in the future should return error", "Invalid SAMLResponse. Assertion condition NotBefore is not valid!", getValueFromJsonResponse(loginResponse, STATUS_ERROR_MESSAGE));
     }
 
     @Test
@@ -395,7 +395,7 @@ public class SamlResponseCorrectnessIntegrationTest extends TestsBase {
         Response loginResponse = sendSamlResponseExtractResponse("", base64Response);
         assertEquals(400, loginResponse.getStatusCode());
         assertEquals("Generic error should be returned", BAD_REQUEST, getValueFromJsonResponse(loginResponse, STATUS_ERROR));
-        assertEquals("AudienceRestriction must be present", "Assertion condition's AudienceRestriction must contain at least 1 Audience!", getValueFromJsonResponse(loginResponse, STATUS_ERROR_MESSAGE));
+        assertEquals("AudienceRestriction must be present", "Invalid SAMLResponse. Assertion condition's AudienceRestriction must contain at least 1 Audience!", getValueFromJsonResponse(loginResponse, STATUS_ERROR_MESSAGE));
     }
 
     @Test
@@ -415,7 +415,7 @@ public class SamlResponseCorrectnessIntegrationTest extends TestsBase {
         Response loginResponse = sendSamlResponseExtractResponse("", base64Response);
         assertEquals(400, loginResponse.getStatusCode());
         assertEquals("Generic error should be returned", BAD_REQUEST, getValueFromJsonResponse(loginResponse, STATUS_ERROR));
-        assertEquals("Audience must match with configured url", "Audience does not match with configured SP entity ID!", getValueFromJsonResponse(loginResponse, STATUS_ERROR_MESSAGE));
+        assertEquals("Audience must match with configured url", "Invalid SAMLResponse. Audience does not match with configured SP entity ID!", getValueFromJsonResponse(loginResponse, STATUS_ERROR_MESSAGE));
     }
 
     @Test
@@ -424,7 +424,7 @@ public class SamlResponseCorrectnessIntegrationTest extends TestsBase {
         Response loginResponse = sendSamlResponseExtractResponse("", base64Response);
         assertEquals(400, loginResponse.getStatusCode());
         assertEquals("Generic error should be returned", BAD_REQUEST, getValueFromJsonResponse(loginResponse, STATUS_ERROR));
-        assertEquals("Error should be returned as only one AuthnStatement is allowed", "Assertion must contain exactly 1 AuthnStatement!", getValueFromJsonResponse(loginResponse, STATUS_ERROR_MESSAGE));
+        assertEquals("Error should be returned as only one AuthnStatement is allowed", "Invalid SAMLResponse. Assertion must contain exactly 1 AuthnStatement!", getValueFromJsonResponse(loginResponse, STATUS_ERROR_MESSAGE));
     }
 
     @Test
@@ -433,7 +433,7 @@ public class SamlResponseCorrectnessIntegrationTest extends TestsBase {
         Response loginResponse = sendSamlResponseExtractResponse("", base64Response);
         assertEquals(400, loginResponse.getStatusCode());
         assertEquals("Generic error should be returned", BAD_REQUEST, getValueFromJsonResponse(loginResponse, STATUS_ERROR));
-        assertEquals("Error should be returned as only one AuthnStatement is allowed", "Assertion must contain exactly 1 AuthnStatement!", getValueFromJsonResponse(loginResponse, STATUS_ERROR_MESSAGE));
+        assertEquals("Error should be returned as only one AuthnStatement is allowed", "Invalid SAMLResponse. Assertion must contain exactly 1 AuthnStatement!", getValueFromJsonResponse(loginResponse, STATUS_ERROR_MESSAGE));
     }
 
     @Test
@@ -442,7 +442,7 @@ public class SamlResponseCorrectnessIntegrationTest extends TestsBase {
         Response loginResponse = sendSamlResponseExtractResponse("", base64Response);
         assertEquals(400, loginResponse.getStatusCode());
         assertEquals("Generic error should be returned", BAD_REQUEST, getValueFromJsonResponse(loginResponse, STATUS_ERROR));
-        assertEquals("Error should be returned as time is past", "AuthnInstant is expired!", getValueFromJsonResponse(loginResponse, STATUS_ERROR_MESSAGE));
+        assertEquals("Error should be returned as time is past", "Invalid SAMLResponse. AuthnInstant is expired!", getValueFromJsonResponse(loginResponse, STATUS_ERROR_MESSAGE));
     }
 
     @Test
@@ -451,7 +451,7 @@ public class SamlResponseCorrectnessIntegrationTest extends TestsBase {
         Response loginResponse = sendSamlResponseExtractResponse("", base64Response);
         assertEquals(400, loginResponse.getStatusCode());
         assertEquals("Generic error should be returned", BAD_REQUEST, getValueFromJsonResponse(loginResponse, STATUS_ERROR));
-        assertEquals("Error should be returned as time is future", "AuthnInstant is in the future!", getValueFromJsonResponse(loginResponse, STATUS_ERROR_MESSAGE));
+        assertEquals("Error should be returned as time is future", "Invalid SAMLResponse. AuthnInstant is in the future!", getValueFromJsonResponse(loginResponse, STATUS_ERROR_MESSAGE));
     }
 
     @Test
@@ -487,7 +487,7 @@ public class SamlResponseCorrectnessIntegrationTest extends TestsBase {
         Response response = sendSamlResponseGetStatus("", base64Response );
         assertEquals("Status code should be: 400", 400, response.statusCode());
         assertEquals("Bad request error should be returned", BAD_REQUEST, getValueFromJsonResponse(response, STATUS_ERROR));
-        assertThat("Correct error message", getValueFromJsonResponse(response, STATUS_ERROR_MESSAGE), startsWith("Missing mandatory attributes in the response assertion: [LegalPersonIdentifier, LegalName]"));
+        assertThat("Correct error message", getValueFromJsonResponse(response, STATUS_ERROR_MESSAGE), startsWith("Invalid SAMLResponse. Missing mandatory attributes in the response assertion: [LegalPersonIdentifier, LegalName]"));
     }
 
     @Test
@@ -503,7 +503,7 @@ public class SamlResponseCorrectnessIntegrationTest extends TestsBase {
         Response response = sendSamlResponseGetStatus("", base64Response );
         assertEquals("Status code should be: 400", 400, response.statusCode());
         assertEquals("Bad request error should be returned", BAD_REQUEST, getValueFromJsonResponse(response, STATUS_ERROR));
-        assertThat("Correct error message", getValueFromJsonResponse(response, STATUS_ERROR_MESSAGE), startsWith("Missing mandatory attributes in the response assertion: [LegalName]"));
+        assertThat("Correct error message", getValueFromJsonResponse(response, STATUS_ERROR_MESSAGE), startsWith("Invalid SAMLResponse. Missing mandatory attributes in the response assertion: [LegalName]"));
     }
 
     @Test
@@ -519,7 +519,7 @@ public class SamlResponseCorrectnessIntegrationTest extends TestsBase {
         Response response = sendSamlResponseGetStatus("", base64Response );
         assertEquals("Status code should be: 400", 400, response.statusCode());
         assertEquals("Bad request error should be returned", BAD_REQUEST, getValueFromJsonResponse(response, STATUS_ERROR));
-        assertThat("Correct error message", getValueFromJsonResponse(response, STATUS_ERROR_MESSAGE), startsWith("Missing mandatory attributes in the response assertion: [LegalPersonIdentifier]"));
+        assertThat("Correct error message", getValueFromJsonResponse(response, STATUS_ERROR_MESSAGE), startsWith("Invalid SAMLResponse. Missing mandatory attributes in the response assertion: [LegalPersonIdentifier]"));
     }
 
     @Test
@@ -535,7 +535,7 @@ public class SamlResponseCorrectnessIntegrationTest extends TestsBase {
         Response response = sendSamlResponseGetStatus("", base64Response );
         assertEquals("Status code should be: 400", 400, response.statusCode());
         assertEquals("Bad request error should be returned", BAD_REQUEST, getValueFromJsonResponse(response, STATUS_ERROR));
-        assertThat("Correct error message", getValueFromJsonResponse(response, STATUS_ERROR_MESSAGE), startsWith("Missing mandatory attributes in the response assertion: [LegalName]"));
+        assertThat("Correct error message", getValueFromJsonResponse(response, STATUS_ERROR_MESSAGE), startsWith("Invalid SAMLResponse. Missing mandatory attributes in the response assertion: [LegalName]"));
     }
 
     @Test
@@ -551,7 +551,7 @@ public class SamlResponseCorrectnessIntegrationTest extends TestsBase {
         Response response = sendSamlResponseGetStatus("", base64Response );
         assertEquals("Status code should be: 400", 400, response.statusCode());
         assertEquals("Bad request error should be returned", BAD_REQUEST, getValueFromJsonResponse(response, STATUS_ERROR));
-        assertThat("Correct error message", getValueFromJsonResponse(response, STATUS_ERROR_MESSAGE), startsWith("Missing mandatory attributes in the response assertion: [LegalPersonIdentifier]"));
+        assertThat("Correct error message", getValueFromJsonResponse(response, STATUS_ERROR_MESSAGE), startsWith("Invalid SAMLResponse. Missing mandatory attributes in the response assertion: [LegalPersonIdentifier]"));
     }
 
     @Test
