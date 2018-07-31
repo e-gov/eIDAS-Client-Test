@@ -217,7 +217,7 @@ public class EidasClientAuthApiIntegrationTest extends TestsBase {
         assertEquals("Target url is present", testEidasClientProperties.getFullIdpStartUrl(), html.getString("html.body.form.@action"));
         assertEquals("Method is post", "post", html.getString("html.body.form.@method"));
         assertEquals("Relay state is present", "RelayState", html.getString("**.findAll { it.@name == 'RelayState' }.@value"));
-        assertEquals("Country is present", DEF_COUNTRY, html.getString("**.findAll { it.@name == 'country' }.@value")); //TODO: Should be Country?
+        assertEquals("Country is present", DEF_COUNTRY, html.getString("**.findAll { it.@name == 'country' }.@value"));
         assertEquals("SAML request is present because LoA is accessible", LOA_SUBSTANTIAL, getDecodedSamlRequestBodyXml(response).getString(XML_LOA));
     }
 
@@ -231,7 +231,7 @@ public class EidasClientAuthApiIntegrationTest extends TestsBase {
 
         XmlPath samlRequest = getDecodedSamlRequestBodyXml(getAuthenticationReqForm(formParams).getBody().asString());
 
-        assertEquals("Correct LOA is returned", LOA_LOW, samlRequest.getString(XML_LOA)); //TODO: Is it ok to take last?
+        assertEquals("Correct LOA is returned", LOA_LOW, samlRequest.getString(XML_LOA));
         }
 
     @Test

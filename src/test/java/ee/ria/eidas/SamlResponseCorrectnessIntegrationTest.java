@@ -275,16 +275,6 @@ public class SamlResponseCorrectnessIntegrationTest extends TestsBase {
         assertEquals("NameID must be present", "Invalid SAMLResponse. Assertion subject is missing nameID!", getValueFromJsonResponse(loginResponse, STATUS_ERROR_MESSAGE));
     }
 
-    @Ignore //TODO: Currently nameID presence is not checked
-    @Test
-    public void saml16_twoNameIdErrorShouldBeReturned() {
-        String base64Response = getBase64SamlResponseNameIdCnt(getAuthenticationReqWithDefault(), 2, NAME_ID_FORMAT_UNSPECIFIED);
-        Response loginResponse = sendSamlResponseExtractResponse("", base64Response);
-        assertEquals(400, loginResponse.getStatusCode());
-        assertEquals("Generic error should be returned", BAD_REQUEST, getValueFromJsonResponse(loginResponse, STATUS_ERROR));
-        assertEquals("Generic error should be returned", "Assertion subject has...", getValueFromJsonResponse(loginResponse, STATUS_ERROR_MESSAGE));
-    }
-
     @Test
     public void saml16_notSupportedNameIdMethodErrorShouldBeReturned() {
         String base64Response = getBase64SamlResponseNameIdCnt(getAuthenticationReqWithDefault(), 1, NAME_ID_FORMAT_ENCRYPTED);

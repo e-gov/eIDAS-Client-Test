@@ -389,8 +389,6 @@ public class ResponseAssertionBuilderUtils extends ResponseBuilderBase {
             assertion.getSubject().setNameID(null);
         } else if (nameIdCnt == 1) {
             assertion.getSubject().getNameID().setFormat(nameIdFormat);
-        } else if (nameIdCnt == 2) {
-            //TODO: Have to find a way for that
         }
 
         assertion.setSignature(signature);

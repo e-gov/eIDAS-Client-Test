@@ -62,12 +62,6 @@ public class AuthenticationRequestIntegrationTest extends TestsBase {
                         hasItem("http://www.w3.org/2007/05/xmldsig-more#sha512-rsa-MGF1"), hasItem("http://www.w3.org/2007/05/xmldsig-more#sha256-rsa-MGF1")));
     }
 
-    @Ignore
-    @Test //TODO: Does SAML request has also schema to validate against?
-    public void auth1_verifySamlAuthRequestSchema() {
-        //assertTrue("Metadata must be based on urn:oasis:names:tc:SAML:2.0:metadata schema", validateMetadataSchema());
-    }
-
     @Test
     public void auth2_mandatoryAttributessArePresentAndSetTrueForNaturalPersons() {
         XmlPath xmlPath = getDecodedSamlRequestBodyXml(getAuthenticationReqWithDefault());
