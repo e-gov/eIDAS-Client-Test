@@ -27,13 +27,14 @@ import static org.junit.Assert.assertEquals;
 @Category(IntegrationTest.class)
 public class SamlResponseCorrectnessIntegrationTest extends TestsBase {
 
-    @Ignore //TODO: we are getting internal server error
     @Test
     public void saml1_notEncryptedAssertionMustFail() {
         String base64Response = getBase64SamlResponseDefaultMinimalAttributesWithoutEncryption(getAuthenticationReqWithDefault());
-        JsonPath loginResponse = sendSamlResponse("", base64Response);
-        assertEquals("Assertion must be encrypted, error should be returned","Saml Response does not contain any encrypted assertions", loginResponse.getString("message"));
-    }
+        Response loginResponse = sendSamlResponseExtractResponse("", base64Response);
+        assertEquals(400, loginResponse.getStatusCode());
+        assertEquals("Generic error should be returned", BAD_REQUEST, getValueFromJsonResponse(loginResponse, STATUS_ERROR));
+        assertEquals("Correct error message is returned", "Invalid SAMLResponse. Error handling message: Message is not schema-valid.", getValueFromJsonResponse(loginResponse, STATUS_ERROR_MESSAGE));
+     }
 
     @Test
     public void saml1_notEncryptedAndEncryptedAssertionsMixedMustFail() {
@@ -44,13 +45,14 @@ public class SamlResponseCorrectnessIntegrationTest extends TestsBase {
         assertEquals("Correct error message is returned", "Invalid SAMLResponse. Error handling message: Message is not schema-valid.", getValueFromJsonResponse(loginResponse, STATUS_ERROR_MESSAGE));
     }
 
-    @Ignore //TODO: Currently it is only checked that encrypted assertion is present.
+    @Ignore //TODO: Currently internal server error is returned. Needs analysing.
     @Test
     public void saml1_multipleAssertionsInResponseMustFail() {
         String base64Response = getBase64SamlResponseMinimalAttributesWithMultipleAssertions(getAuthenticationReqWithDefault());
-        JsonPath loginResponse = sendSamlResponse("", base64Response);
-        assertEquals("500", loginResponse.getString("status"));
-        assertEquals("","Saml Response does not contain any encrypted assertions", loginResponse.getString("message"));
+        Response loginResponse = sendSamlResponseExtractResponse("", base64Response);
+        assertEquals(500, loginResponse.getStatusCode());
+        assertEquals("Generic error should be returned", BAD_REQUEST, getValueFromJsonResponse(loginResponse, STATUS_ERROR));
+        assertEquals("Correct error message is returned", "Invalid SAMLResponse. Error handling message: Message is not schema-valid.", getValueFromJsonResponse(loginResponse, STATUS_ERROR_MESSAGE));
     }
 
     @Test
@@ -71,13 +73,14 @@ public class SamlResponseCorrectnessIntegrationTest extends TestsBase {
         assertEquals("The response is not schema valid", "Invalid SAMLResponse. Error handling message: Message is not schema-valid.", getValueFromJsonResponse(loginResponse, STATUS_ERROR_MESSAGE));
     }
 
-    @Ignore //TODO: Currently this passes, it is unclear what it should do...
+    @Ignore //TODO: Currently internal server error is returned. Needs analysing.
     @Test
     public void saml2_multipleStatusCodesInResponseMustFail() {
         String base64Response = getBase64SamlResponseMinimalAttributesWithStatusCodes(getAuthenticationReqWithDefault(), 2);
-        JsonPath loginResponse = sendSamlResponse("", base64Response);
-        assertEquals("500", loginResponse.getString("status"));
-        assertEquals("","", loginResponse.getString("message"));
+        Response loginResponse = sendSamlResponseExtractResponse("", base64Response);
+        assertEquals(500, loginResponse.getStatusCode());
+        assertEquals("Generic error should be returned", BAD_REQUEST, getValueFromJsonResponse(loginResponse, STATUS_ERROR));
+        assertEquals("The response is not schema valid", "Invalid SAMLResponse. Error handling message: Message is not schema-valid.", getValueFromJsonResponse(loginResponse, STATUS_ERROR_MESSAGE));
     }
 
     @Test
@@ -162,7 +165,6 @@ public class SamlResponseCorrectnessIntegrationTest extends TestsBase {
         assertEquals("Correct error message is returned", "Invalid SAMLResponse. No corresponding SAML request session found for the given response!", getValueFromJsonResponse(loginResponse, STATUS_ERROR_MESSAGE));
     }
 
-    @Ignore //TODO: This needs investigation as it currently passes!
     @Test
     public void saml10_wrongInResponseToInResponse() {
         XmlPath xmlPath = getDecodedSamlRequestBodyXml(getAuthenticationReqWithDefault());
@@ -170,7 +172,7 @@ public class SamlResponseCorrectnessIntegrationTest extends TestsBase {
         Response loginResponse = sendSamlResponseExtractResponse("", base64Response);
         assertEquals(400, loginResponse.getStatusCode());
         assertEquals("Generic error should be returned", BAD_REQUEST, getValueFromJsonResponse(loginResponse, STATUS_ERROR));
-        assertEquals("Correct error message is returned", "No corresponding SAML request session found for the given response assertion!", getValueFromJsonResponse(loginResponse, STATUS_ERROR_MESSAGE));
+        assertEquals("Correct error message is returned", "Invalid SAMLResponse. No corresponding SAML request session found for the given response!", getValueFromJsonResponse(loginResponse, STATUS_ERROR_MESSAGE));
     }
 
     @Test
@@ -201,13 +203,13 @@ public class SamlResponseCorrectnessIntegrationTest extends TestsBase {
         assertEquals("Correct error message is returned", "Invalid SAMLResponse. Assertion must contain exactly 1 AttributeStatement!", getValueFromJsonResponse(loginResponse, STATUS_ERROR_MESSAGE));
     }
 
-    @Ignore //TODO: Internal server error is returned
     @Test
     public void saml11_noSubjectInResponseShouldReturnError() {
         String base64Response = getBase64SamlResponseWithoutSubject(getAuthenticationReqWithDefault());
-        JsonPath loginResponse = sendSamlResponse("", base64Response);
-        assertEquals("400", loginResponse.getString("status"));
-        assertEquals("Generic error should be returned", BAD_SAML, loginResponse.getString(STATUS_ERROR_MESSAGE));
+        Response loginResponse = sendSamlResponseExtractResponse("", base64Response);
+        assertEquals(400, loginResponse.getStatusCode());
+        assertEquals("Generic error should be returned", BAD_REQUEST, getValueFromJsonResponse(loginResponse, STATUS_ERROR));
+        assertEquals("Correct error message is returned", "Invalid SAMLResponse. Assertion is missing subject!", getValueFromJsonResponse(loginResponse, STATUS_ERROR_MESSAGE));
     }
 
     @Test
@@ -274,7 +276,7 @@ public class SamlResponseCorrectnessIntegrationTest extends TestsBase {
     }
 
     @Ignore //TODO: Currently nameID presence is not checked
-    @Test //TODO: two nameId-s is currently not supported by base class
+    @Test
     public void saml16_twoNameIdErrorShouldBeReturned() {
         String base64Response = getBase64SamlResponseNameIdCnt(getAuthenticationReqWithDefault(), 2, NAME_ID_FORMAT_UNSPECIFIED);
         Response loginResponse = sendSamlResponseExtractResponse("", base64Response);
@@ -325,14 +327,13 @@ public class SamlResponseCorrectnessIntegrationTest extends TestsBase {
         assertEquals("Correct first name is returned", DEFATTR_FIRST, loginResponse.getString(STATUS_FIRST));
     }
 
-    @Ignore //TODO: We get Internal Server Error
     @Test
     public void saml17_noSubjectConfirmationErrorShouldBeReturned() {
         String base64Response = getBase64SamlResponseSubjectConfirmationCnt(getAuthenticationReqWithDefault(), 0, SUBJECT_CONFIRMATION_METHOD_BEARER);
         Response loginResponse = sendSamlResponseExtractResponse("", base64Response);
         assertEquals(400, loginResponse.getStatusCode());
         assertEquals("Generic error should be returned", BAD_REQUEST, getValueFromJsonResponse(loginResponse, STATUS_ERROR));
-        assertEquals("Only one subject confirmation value is accepted", "", getValueFromJsonResponse(loginResponse, STATUS_ERROR_MESSAGE));
+        assertEquals("Only one subject confirmation value is accepted", "Invalid SAMLResponse. Assertion subject must contain exactly 1 SubjectConfirmation!", getValueFromJsonResponse(loginResponse, STATUS_ERROR_MESSAGE));
     }
 
     @Test
