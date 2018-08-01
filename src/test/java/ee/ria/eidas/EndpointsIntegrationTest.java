@@ -29,15 +29,14 @@ public class EndpointsIntegrationTest extends TestsBase {
                 .body("error",equalTo("Not Found"));
     }
 
-    @Ignore //TODO: TARAEI-102
     @Test
     public void metEnd1_notSupportedHttpOptionsMethodShouldReturnError() {
         given()
                 .config(RestAssured.config().encoderConfig(encoderConfig().defaultContentCharset("UTF-8")))
-                .when().head(testEidasClientProperties.getSpMetadataUrl())
+                .when().options(testEidasClientProperties.getSpMetadataUrl())
                 .then().log().ifValidationFails()
-                .statusCode(403)
-                .header("Allow", "");
+                .statusCode(200)
+                .header("Allow", "GET,HEAD");
     }
 
     @Test
@@ -66,7 +65,7 @@ public class EndpointsIntegrationTest extends TestsBase {
                 .config(RestAssured.config().encoderConfig(encoderConfig().defaultContentCharset("UTF-8")))
                 .when().head(testEidasClientProperties.getSpMetadataUrl())
                 .then().log().ifValidationFails()
-                .statusCode(403);
+                .statusCode(200);
     }
 
     @Test
@@ -89,7 +88,6 @@ public class EndpointsIntegrationTest extends TestsBase {
                 .body("error",equalTo("Not Found"));
     }
 
-    @Ignore //TODO: TARAEI-102
     @Test
     public void autEnd1_notSupportedHttpOptionsMethodShouldReturnError() {
         given()
@@ -100,8 +98,8 @@ public class EndpointsIntegrationTest extends TestsBase {
                 .config(RestAssured.config().encoderConfig(encoderConfig().defaultContentCharset("UTF-8")))
                 .when().options(testEidasClientProperties.getSpStartUrl())
                 .then().log().ifValidationFails()
-                .statusCode(403)
-                .header("Allow", "");
+                .statusCode(200)
+                .header("Allow", "GET,HEAD");
     }
 
     @Test
@@ -114,7 +112,7 @@ public class EndpointsIntegrationTest extends TestsBase {
                 .config(RestAssured.config().encoderConfig(encoderConfig().defaultContentCharset("UTF-8")))
                 .when().head(testEidasClientProperties.getSpStartUrl())
                 .then().log().ifValidationFails()
-                .statusCode(403);
+                .statusCode(400);
     }
 
     @Test
@@ -172,7 +170,6 @@ public class EndpointsIntegrationTest extends TestsBase {
                 .body("error",equalTo("Not Found"));
     }
 
-    @Ignore //TODO: TARAEI-102
     @Test
     public void resEnd1_notSupportedHttpOptionsMethodShouldReturnError() {
         given()
@@ -182,8 +179,8 @@ public class EndpointsIntegrationTest extends TestsBase {
                 .config(RestAssured.config().encoderConfig(encoderConfig().defaultContentCharset("UTF-8")))
                 .when().options(testEidasClientProperties.getSpReturnUrl())
                 .then().log().ifValidationFails()
-                .statusCode(403)
-                .header("Allow", "");
+                .statusCode(200)
+                .header("Allow", "POST");
     }
 
     @Test
@@ -194,8 +191,8 @@ public class EndpointsIntegrationTest extends TestsBase {
                 .contentType("application/x-www-form-urlencoded")
                 .config(RestAssured.config().encoderConfig(encoderConfig().defaultContentCharset("UTF-8")))
                 .when().head(testEidasClientProperties.getSpReturnUrl())
-                .then().log().ifValidationFails()
-                .statusCode(403);
+                .then().log().all()
+                .statusCode(405);
     }
 
     @Test
