@@ -21,6 +21,15 @@ public class TestEidasClientProperties {
     private String idpMetadataUrl;
     private String idpStartUrl;
     private String advertizedSpReturnUrl;
+    private String httpsKeystore;
+    private String httpsKeystorePassword;
+    private String httpsTruststorePassword;
+    private String httpsTruststore;
+    private String metadataUrl;
+
+
+    public TestEidasClientProperties() {
+    }
 
     public void setTargetUrl(String targetUrl) {
         this.targetUrl = targetUrl;
@@ -91,7 +100,7 @@ public class TestEidasClientProperties {
     }
 
     public String getFullSpMetadataUrl() {
-        return targetUrl+spMetadataUrl;
+        return getMetadataUrl() + spMetadataUrl;
     }
 
     public String getSpStartUrl() {
@@ -138,15 +147,56 @@ public class TestEidasClientProperties {
         return idpStartUrl;
     }
 
-    public String getFullIdpMetadataUrl () {
+    public String getFullIdpMetadataUrl() {
         return idpUrl + idpMetadataUrl;
     }
 
-    public String getFullIdpStartUrl () {
+    public String getFullIdpStartUrl() {
         return idpUrl + idpStartUrl;
     }
 
-    public String getFullSpReturnUrl () {
+    public String getFullSpReturnUrl() {
         return advertizedSpReturnUrl;
+    }
+
+    public String getHttpsKeystore() {
+        return httpsKeystore;
+    }
+
+    public void setHttpsKeystore(String httpsKeystore) {
+        this.httpsKeystore = httpsKeystore;
+    }
+
+    public String getHttpsKeystorePassword() {
+        return httpsKeystorePassword;
+    }
+
+    public void setHttpsKeystorePassword(String httpsKeystorePassword) {
+        this.httpsKeystorePassword = httpsKeystorePassword;
+    }
+
+    public String getHttpsTruststorePassword() {
+        return httpsTruststorePassword;
+    }
+
+    public void setHttpsTruststorePassword(String httpsTruststorePassword) {
+        this.httpsTruststorePassword = httpsTruststorePassword;
+    }
+
+    public String getHttpsTruststore() {
+        return httpsTruststore;
+    }
+
+    public void setHttpsTruststore(String httpsTruststore) {
+        this.httpsTruststore = httpsTruststore;
+    }
+
+
+    public String getMetadataUrl() {
+        return metadataUrl;
+    }
+
+    public void setMetadataUrl(String metadataUrl) {
+        this.metadataUrl = metadataUrl;
     }
 }

@@ -20,7 +20,7 @@ public class HeartbeatIntegrationTest extends TestsBase {
     @Test
     public void heartbeatIsUp() {
         given()
-                .when().get(testEidasClientProperties.getTargetUrl() + "/heartbeat")
+                .when().get(testEidasClientProperties.getMetadataUrl() + "/heartbeat")
                 .then().log().ifValidationFails().statusCode(200)
                 .header("Content-Type", equalTo("application/vnd.spring-boot.actuator.v1+json;charset=UTF-8"))
                 .body("status", equalTo("UP"),
@@ -39,7 +39,7 @@ public class HeartbeatIntegrationTest extends TestsBase {
     @Test
     public void heartbeatAsJsonUrl() {
         given()
-                .when().get(testEidasClientProperties.getTargetUrl() + "/heartbeat.json")
+                .when().get(testEidasClientProperties.getMetadataUrl() + "/heartbeat.json")
                 .then().log().ifValidationFails().statusCode(200)
                 .header("Content-Type", equalTo("application/vnd.spring-boot.actuator.v1+json;charset=UTF-8"))
                 .body("status", equalTo("UP"),
@@ -57,7 +57,7 @@ public class HeartbeatIntegrationTest extends TestsBase {
     @Test
     public void defaultEndpointsDisabled() {
         given()
-                .when().get(testEidasClientProperties.getTargetUrl() + "/health")
+                .when().get(testEidasClientProperties.getMetadataUrl() + "/health")
                 .then().log().ifValidationFails().statusCode(404);
     }
 }

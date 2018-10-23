@@ -3,6 +3,7 @@ package ee.ria.eidas;
 
 import ee.ria.eidas.config.IntegrationTest;
 import io.restassured.RestAssured;
+import io.restassured.config.RestAssuredConfig;
 import org.hamcrest.Matchers;
 import org.junit.Ignore;
 import org.junit.Test;
@@ -23,7 +24,7 @@ public class EndpointsIntegrationTest extends TestsBase {
     public void metEnd1_caseSensitivityOnEndpoint() {
         given()
                 .config(RestAssured.config().encoderConfig(encoderConfig().defaultContentCharset("UTF-8")))
-                .when().get(testEidasClientProperties.getSpMetadataUrl().toUpperCase())
+                .when().get(testEidasClientProperties.getMetadataUrl() + testEidasClientProperties.getSpMetadataUrl().toUpperCase())
                 .then().log().ifValidationFails()
                 .statusCode(404)
                 .body("error",equalTo("Not Found"));
@@ -33,7 +34,7 @@ public class EndpointsIntegrationTest extends TestsBase {
     public void metEnd1_notSupportedHttpOptionsMethodShouldReturnError() {
         given()
                 .config(RestAssured.config().encoderConfig(encoderConfig().defaultContentCharset("UTF-8")))
-                .when().options(testEidasClientProperties.getSpMetadataUrl())
+                .when().options(testEidasClientProperties.getFullSpMetadataUrl())
                 .then().log().ifValidationFails()
                 .statusCode(200)
                 .header("Allow", "GET,HEAD");
@@ -43,7 +44,7 @@ public class EndpointsIntegrationTest extends TestsBase {
     public void metEnd1_notSupportedHttpPostMethodShouldReturnError() {
         given()
                 .config(RestAssured.config().encoderConfig(encoderConfig().defaultContentCharset("UTF-8")))
-                .when().post(testEidasClientProperties.getSpMetadataUrl())
+                .when().post(testEidasClientProperties.getFullSpMetadataUrl())
                 .then().log().ifValidationFails()
                 .statusCode(405)
                 .body("error", Matchers.equalTo("Method Not Allowed"));
@@ -53,7 +54,7 @@ public class EndpointsIntegrationTest extends TestsBase {
     public void metEnd1_notSupportedHttpPutMethodShouldReturnError() {
         given()
                 .config(RestAssured.config().encoderConfig(encoderConfig().defaultContentCharset("UTF-8")))
-                .when().put(testEidasClientProperties.getSpMetadataUrl())
+                .when().put(testEidasClientProperties.getFullSpMetadataUrl())
                 .then().log().ifValidationFails()
                 .statusCode(405)
                 .body("error", Matchers.equalTo("Method Not Allowed"));
@@ -63,7 +64,7 @@ public class EndpointsIntegrationTest extends TestsBase {
     public void metEnd1_notSupportedHttpHeadMethodShouldReturnError() {
         given()
                 .config(RestAssured.config().encoderConfig(encoderConfig().defaultContentCharset("UTF-8")))
-                .when().head(testEidasClientProperties.getSpMetadataUrl())
+                .when().head(testEidasClientProperties.getFullSpMetadataUrl())
                 .then().log().ifValidationFails()
                 .statusCode(200);
     }
@@ -72,7 +73,7 @@ public class EndpointsIntegrationTest extends TestsBase {
     public void metEnd1_notSupportedHttpDeleteMethodShouldReturnError() {
         given()
                 .config(RestAssured.config().encoderConfig(encoderConfig().defaultContentCharset("UTF-8")))
-                .when().delete(testEidasClientProperties.getSpMetadataUrl())
+                .when().delete(testEidasClientProperties.getFullSpMetadataUrl())
                 .then().log().ifValidationFails()
                 .statusCode(405)
                 .body("error", Matchers.equalTo("Method Not Allowed"));
@@ -81,7 +82,7 @@ public class EndpointsIntegrationTest extends TestsBase {
     @Test
     public void autEnd1_caseSensitivityOnGet() {
         given()
-                .config(RestAssured.config().encoderConfig(encoderConfig().defaultContentCharset("UTF-8")))
+                .config(RestAssured.config().encoderConfig(encoderConfig().defaultContentCharset("UTF-8")).sslConfig(sslConfig))
                 .when().get(testEidasClientProperties.getSpStartUrl().toUpperCase())
                 .then().log().ifValidationFails()
                 .statusCode(404)
@@ -95,7 +96,7 @@ public class EndpointsIntegrationTest extends TestsBase {
                 .formParam(LOA,"LOW")
                 .formParam(COUNTRY,DEF_COUNTRY)
                 .contentType("application/x-www-form-urlencoded")
-                .config(RestAssured.config().encoderConfig(encoderConfig().defaultContentCharset("UTF-8")))
+                .config(RestAssured.config().encoderConfig(encoderConfig().defaultContentCharset("UTF-8")).sslConfig(sslConfig))
                 .when().options(testEidasClientProperties.getSpStartUrl())
                 .then().log().ifValidationFails()
                 .statusCode(200)
@@ -109,7 +110,7 @@ public class EndpointsIntegrationTest extends TestsBase {
                 .formParam(LOA,"LOW")
                 .formParam(COUNTRY,DEF_COUNTRY)
                 .contentType("application/x-www-form-urlencoded")
-                .config(RestAssured.config().encoderConfig(encoderConfig().defaultContentCharset("UTF-8")))
+                .config(RestAssured.config().encoderConfig(encoderConfig().defaultContentCharset("UTF-8")).sslConfig(sslConfig))
                 .when().head(testEidasClientProperties.getSpStartUrl())
                 .then().log().ifValidationFails()
                 .statusCode(400);
@@ -122,7 +123,7 @@ public class EndpointsIntegrationTest extends TestsBase {
                 .formParam(LOA,"LOW")
                 .formParam(COUNTRY,DEF_COUNTRY)
                 .contentType("application/x-www-form-urlencoded")
-                .config(RestAssured.config().encoderConfig(encoderConfig().defaultContentCharset("UTF-8")))
+                .config(RestAssured.config().encoderConfig(encoderConfig().defaultContentCharset("UTF-8")).sslConfig(sslConfig))
                 .when().put(testEidasClientProperties.getSpStartUrl())
                 .then().log().ifValidationFails()
                 .statusCode(405)
@@ -136,7 +137,7 @@ public class EndpointsIntegrationTest extends TestsBase {
                 .formParam(LOA,"LOW")
                 .formParam(COUNTRY,DEF_COUNTRY)
                 .contentType("application/x-www-form-urlencoded")
-                .config(RestAssured.config().encoderConfig(encoderConfig().defaultContentCharset("UTF-8")))
+                .config(RestAssured.config().encoderConfig(encoderConfig().defaultContentCharset("UTF-8")).sslConfig(sslConfig))
                 .when().delete(testEidasClientProperties.getSpStartUrl())
                 .then().log().ifValidationFails()
                 .statusCode(405)
@@ -150,7 +151,7 @@ public class EndpointsIntegrationTest extends TestsBase {
                 .formParam(LOA,"LOW")
                 .formParam(COUNTRY,DEF_COUNTRY)
                 .contentType("application/x-www-form-urlencoded")
-                .config(RestAssured.config().encoderConfig(encoderConfig().defaultContentCharset("UTF-8")))
+                .config(RestAssured.config().encoderConfig(encoderConfig().defaultContentCharset("UTF-8")).sslConfig(sslConfig))
                 .when().post(testEidasClientProperties.getSpStartUrl())
                 .then().log().ifValidationFails()
                 .statusCode(405)
@@ -163,7 +164,7 @@ public class EndpointsIntegrationTest extends TestsBase {
                 .formParam(RELAY_STATE,"")
                 .formParam(SAML_RESPONSE,getBase64SamlResponseMinimalAttributes(getAuthenticationReqWithDefault(), "TestFamily", "TestGiven", "TestPNO", "TestDate", null))
                 .contentType("application/x-www-form-urlencoded")
-                .config(RestAssured.config().encoderConfig(encoderConfig().defaultContentCharset("UTF-8")))
+                .config(RestAssured.config().encoderConfig(encoderConfig().defaultContentCharset("UTF-8")).sslConfig(sslConfig))
                 .when().post(testEidasClientProperties.getSpReturnUrl().toUpperCase())
                 .then().log().ifValidationFails()
                 .statusCode(404)
@@ -173,10 +174,10 @@ public class EndpointsIntegrationTest extends TestsBase {
     @Test
     public void resEnd1_notSupportedHttpOptionsMethodShouldReturnError() {
         given()
+                .config(RestAssuredConfig.config().sslConfig(sslConfig))
                 .formParam(RELAY_STATE,"")
                 .formParam(SAML_RESPONSE, getBase64SamlResponseMinimalAttributes(getAuthenticationReqWithDefault(), "TestFamily", "TestGiven", "TestPNO", "TestDate", null))
                 .contentType("application/x-www-form-urlencoded")
-                .config(RestAssured.config().encoderConfig(encoderConfig().defaultContentCharset("UTF-8")))
                 .when().options(testEidasClientProperties.getSpReturnUrl())
                 .then().log().ifValidationFails()
                 .statusCode(200)
@@ -189,7 +190,7 @@ public class EndpointsIntegrationTest extends TestsBase {
                 .formParam(RELAY_STATE,"")
                 .formParam(SAML_RESPONSE, getBase64SamlResponseMinimalAttributes(getAuthenticationReqWithDefault(), "TestFamily", "TestGiven", "TestPNO", "TestDate", null))
                 .contentType("application/x-www-form-urlencoded")
-                .config(RestAssured.config().encoderConfig(encoderConfig().defaultContentCharset("UTF-8")))
+                .config(RestAssured.config().encoderConfig(encoderConfig().defaultContentCharset("UTF-8")).sslConfig(sslConfig))
                 .when().head(testEidasClientProperties.getSpReturnUrl())
                 .then().log().all()
                 .statusCode(405);
@@ -201,7 +202,7 @@ public class EndpointsIntegrationTest extends TestsBase {
                 .formParam(RELAY_STATE,"")
                 .formParam(SAML_RESPONSE,getBase64SamlResponseMinimalAttributes(getAuthenticationReqWithDefault(), "TestFamily", "TestGiven", "TestPNO", "TestDate", null))
                 .contentType("application/x-www-form-urlencoded")
-                .config(RestAssured.config().encoderConfig(encoderConfig().defaultContentCharset("UTF-8")))
+                .config(RestAssured.config().encoderConfig(encoderConfig().defaultContentCharset("UTF-8")).sslConfig(sslConfig))
                 .when().put(testEidasClientProperties.getSpReturnUrl())
                 .then().log().ifValidationFails()
                 .statusCode(405)
@@ -212,7 +213,7 @@ public class EndpointsIntegrationTest extends TestsBase {
     public void resEnd1_notSupportedHttpGetMethodShouldReturnError() {
         given()
                 .contentType("application/x-www-form-urlencoded")
-                .config(RestAssured.config().encoderConfig(encoderConfig().defaultContentCharset("UTF-8")))
+                .config(RestAssured.config().encoderConfig(encoderConfig().defaultContentCharset("UTF-8")).sslConfig(sslConfig))
                 .when().get(testEidasClientProperties.getSpReturnUrl())
                 .then().log().ifValidationFails()
                 .statusCode(405)
@@ -225,7 +226,7 @@ public class EndpointsIntegrationTest extends TestsBase {
                 .formParam(RELAY_STATE,"")
                 .formParam(SAML_RESPONSE,getBase64SamlResponseMinimalAttributes(getAuthenticationReqWithDefault(), "TestFamily", "TestGiven", "TestPNO", "TestDate", null))
                 .contentType("application/x-www-form-urlencoded")
-                .config(RestAssured.config().encoderConfig(encoderConfig().defaultContentCharset("UTF-8")))
+                .config(RestAssured.config().encoderConfig(encoderConfig().defaultContentCharset("UTF-8")).sslConfig(sslConfig))
                 .when().delete(testEidasClientProperties.getSpReturnUrl())
                 .then().log().ifValidationFails()
                 .statusCode(405)
