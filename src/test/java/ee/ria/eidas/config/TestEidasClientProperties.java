@@ -26,7 +26,7 @@ public class TestEidasClientProperties {
     private String httpsTruststorePassword;
     private String httpsTruststore;
     private String metadataUrl;
-
+    private String healthcheckUrl;
 
     public TestEidasClientProperties() {
     }
@@ -198,5 +198,13 @@ public class TestEidasClientProperties {
 
     public void setMetadataUrl(String metadataUrl) {
         this.metadataUrl = metadataUrl;
+    }
+
+    public String getHealthcheckUrl() {
+        return healthcheckUrl;
+    }
+
+    public void setHealthcheckUrl(String healthcheckUrl) {
+        this.healthcheckUrl = healthcheckUrl;
     }
 }

@@ -20,7 +20,7 @@ public class HeartbeatIntegrationTest extends TestsBase {
     @Test
     public void heartbeatIsUp() {
         given()
-                .when().get(testEidasClientProperties.getMetadataUrl() + "/heartbeat")
+                .when().get(testEidasClientProperties.getHealthcheckUrl())
                 .then().log().ifValidationFails().statusCode(200)
                 .header("Content-Type", equalTo("application/vnd.spring-boot.actuator.v1+json;charset=UTF-8"))
                 .body("status", equalTo("UP"),
@@ -30,8 +30,10 @@ public class HeartbeatIntegrationTest extends TestsBase {
                         "startTime", lessThanOrEqualTo(toIntExact(new Date().getTime() / 1000)),
                         //Hope clocks are in sync
                         "currentTime", lessThanOrEqualTo(toIntExact(new Date().getTime() / 1000)),
-                        "dependencies.size()", equalTo(1),
+                        "dependencies.size()", equalTo(2),
                         "dependencies[0].name", equalTo("eIDAS-Node"),
+                        "dependencies[0].status", equalTo("UP"),
+                        "dependencies[1].name", equalTo("hazelcast"),
                         "dependencies[0].status", equalTo("UP")
                 );
     }
@@ -39,7 +41,7 @@ public class HeartbeatIntegrationTest extends TestsBase {
     @Test
     public void heartbeatAsJsonUrl() {
         given()
-                .when().get(testEidasClientProperties.getMetadataUrl() + "/heartbeat.json")
+                .when().get(testEidasClientProperties.getHealthcheckUrl())
                 .then().log().ifValidationFails().statusCode(200)
                 .header("Content-Type", equalTo("application/vnd.spring-boot.actuator.v1+json;charset=UTF-8"))
                 .body("status", equalTo("UP"),
@@ -48,8 +50,10 @@ public class HeartbeatIntegrationTest extends TestsBase {
                         "buildTime", lessThan(toIntExact(new Date().getTime() / 1000)),
                         "startTime", lessThanOrEqualTo(toIntExact(new Date().getTime() / 1000)),
                         "currentTime", lessThanOrEqualTo(toIntExact(new Date().getTime() / 1000)),
-                        "dependencies.size()", equalTo(1),
+                        "dependencies.size()", equalTo(2),
                         "dependencies[0].name", equalTo("eIDAS-Node"),
+                        "dependencies[0].status", equalTo("UP"),
+                        "dependencies[1].name", equalTo("hazelcast"),
                         "dependencies[0].status", equalTo("UP")
                 );
     }
@@ -57,7 +61,7 @@ public class HeartbeatIntegrationTest extends TestsBase {
     @Test
     public void defaultEndpointsDisabled() {
         given()
-                .when().get(testEidasClientProperties.getMetadataUrl() + "/health")
+                .when().get(testEidasClientProperties.getHealthcheckUrl().replaceAll("heartbeat", "health"))
                 .then().log().ifValidationFails().statusCode(404);
     }
 }

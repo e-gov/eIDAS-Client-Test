@@ -100,6 +100,8 @@ public abstract class TestsBase {
             signatureCredentialUntrusted = getCredential(keystoreDefault, "test_cert", "changeit");
             encryptionCredential = getEncryptionCredentialFromMetaData(metadata);
             if (testEidasClientProperties.getTargetUrl().startsWith("https")) {
+                //If client authentication is required then keystore should have the correct private key
+                //If client authentication is not required then keystore can be the same as truststore without any private keys
                 sslConfig = new SSLConfig().
                         keyStore(testEidasClientProperties.getHttpsKeystore(), testEidasClientProperties.getHttpsKeystorePassword()).
                         trustStore(testEidasClientProperties.getHttpsTruststore(), testEidasClientProperties.getHttpsTruststorePassword());

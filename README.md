@@ -42,6 +42,7 @@ Parameetrite kirjeldus:
 | test.client.keystorePass | changeit | Ei | Võtmehoidla parool. |
 | test.client.responseSigningKeyId | test_sign | Ei | Võtmehoidlas oleva võtme alias mida kasutatakse SAML vastuse allkirjastamiseks. eIDAS sõlme vastuse simuleerimiseks. |
 | test.client.responseSigningKeyPass | changeit | Ei | Võtme parool. |
+| test.client.healthcheckUrl | http://localhost:8889/heartbeat | Ei | Elutukse otspuntki URL. |
 
 4. Käivita testid:
 
