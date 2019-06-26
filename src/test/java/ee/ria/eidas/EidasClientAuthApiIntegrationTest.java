@@ -148,7 +148,7 @@ public class EidasClientAuthApiIntegrationTest extends TestsBase {
 
         assertEquals("Status code should be: 400", 400, response.statusCode());
         assertEquals("Bad request error should be returned", BAD_REQUEST, getValueFromJsonResponse(response, STATUS_ERROR));
-        assertThat("Correct error message", getValueFromJsonResponse(response, STATUS_ERROR_MESSAGE), startsWith("Found one or more invalid Attributes value(s). Allowed values are:"));
+        assertThat("Correct error message", getValueFromJsonResponse(response, STATUS_ERROR_MESSAGE), startsWith("Found one or more invalid Attributes value(s). Valid values are:"));
     }
 
     @Test
@@ -163,7 +163,7 @@ public class EidasClientAuthApiIntegrationTest extends TestsBase {
 
         assertEquals("Status code should be: 400", 400, response.statusCode());
         assertEquals("Bad request error should be returned", BAD_REQUEST, getValueFromJsonResponse(response, STATUS_ERROR));
-        assertThat("Correct error message", getValueFromJsonResponse(response, STATUS_ERROR_MESSAGE), startsWith("Found one or more invalid Attributes value(s). Allowed values are:"));
+        assertThat("Correct error message", getValueFromJsonResponse(response, STATUS_ERROR_MESSAGE), startsWith("Found one or more invalid Attributes value(s). Valid values are:"));
     }
 
     @Test
@@ -178,7 +178,7 @@ public class EidasClientAuthApiIntegrationTest extends TestsBase {
 
         assertEquals("Status code should be: 400", 400, response.statusCode());
         assertEquals("Bad request error should be returned", BAD_REQUEST, getValueFromJsonResponse(response, STATUS_ERROR));
-        assertThat("Correct error message", getValueFromJsonResponse(response, STATUS_ERROR_MESSAGE), startsWith("Found one or more invalid Attributes value(s). Allowed values are:"));
+        assertThat("Correct error message", getValueFromJsonResponse(response, STATUS_ERROR_MESSAGE), startsWith("Found one or more invalid Attributes value(s). Valid values are:"));
     }
 
     @Ignore //TODO: Need a way to force the attributes without URL encoding
