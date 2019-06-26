@@ -6,7 +6,6 @@ import io.restassured.path.xml.XmlPath;
 import io.restassured.response.Response;
 import org.hamcrest.text.MatchesPattern;
 import org.junit.Assert;
-import org.junit.Ignore;
 import org.junit.Test;
 import org.junit.experimental.categories.Category;
 import org.springframework.boot.test.context.SpringBootTest;
@@ -79,7 +78,7 @@ public class AuthenticationRequestIntegrationTest extends TestsBase {
     public void auth2_optionalAttributessArePresentAndSetTrueForNaturalPersons() {
         Map<String,String> formParams = new HashMap<String,String>();
         formParams.put(LOA, "HIGH");
-        formParams.put(ADDITIONAL_ATTRIBUTES, "BirthName PlaceOfBirth CurrentAddress Gender");
+        formParams.put(ATTRIBUTES, "FamilyName FirstName DateOfBirth BirthName PersonIdentifier PlaceOfBirth CurrentAddress Gender");
         formParams.put(COUNTRY, DEF_COUNTRY);
         formParams.put(RELAY_STATE, "1234abcd");
 
@@ -106,24 +105,15 @@ public class AuthenticationRequestIntegrationTest extends TestsBase {
     }
 
     @Test
-    public void auth2_mandatoryAttributessArePresentAndSetTrueForLegalPersons() {
+    public void auth2_mandatoryAttributesArePresentAndSetTrueForLegalPersons() {
         Map<String,String> formParams = new HashMap<String,String>();
         formParams.put(LOA, "HIGH");
-        formParams.put(ADDITIONAL_ATTRIBUTES, "LegalPersonIdentifier LegalName");
+        formParams.put(ATTRIBUTES, "LegalPersonIdentifier LegalName");
         formParams.put(COUNTRY, DEF_COUNTRY);
         formParams.put(RELAY_STATE, "1234abcd");
 
         Response response = getAuthenticationReqForm(formParams);
         XmlPath xmlPath = getDecodedSamlRequestBodyXml(response.body().asString());
-
-        assertEquals("Family name must be present and required set to: true", "true",
-                xmlPath.getString("**.findAll { it.@Name == 'http://eidas.europa.eu/attributes/naturalperson/CurrentFamilyName' }.@isRequired"));
-        assertEquals("First name must be present and required set to: true", "true",
-                xmlPath.getString("**.findAll { it.@Name == 'http://eidas.europa.eu/attributes/naturalperson/CurrentGivenName' }.@isRequired"));
-        assertEquals("Date of birth must be present and required set to: true", "true",
-                xmlPath.getString("**.findAll { it.@Name == 'http://eidas.europa.eu/attributes/naturalperson/DateOfBirth' }.@isRequired"));
-        assertEquals("Person identifier must be present and required set to: true", "true",
-                xmlPath.getString("**.findAll { it.@Name == 'http://eidas.europa.eu/attributes/naturalperson/PersonIdentifier' }.@isRequired"));
 
         assertEquals("Identifier must be present and required set to: true", "true",
                 xmlPath.getString("**.findAll { it.@Name == 'http://eidas.europa.eu/attributes/legalperson/LegalPersonIdentifier' }.@isRequired"));
@@ -132,24 +122,16 @@ public class AuthenticationRequestIntegrationTest extends TestsBase {
     }
 
     @Test
-    public void auth2_optionalAttributessArePresentAndSetFalseForLegalPersons() {
+    public void auth2_optionalAttributesArePresentAndSetFalseForLegalPersons() {
         Map<String,String> formParams = new HashMap<String,String>();
         formParams.put(LOA, "HIGH");
-        formParams.put(ADDITIONAL_ATTRIBUTES, "LegalAddress VATRegistration TaxReference LEI EORI SEED SIC D-2012-17-EUIdentifier LegalPersonIdentifier LegalName");
+        formParams.put(ATTRIBUTES, "LegalAddress VATRegistration TaxReference LEI EORI SEED SIC D-2012-17-EUIdentifier LegalPersonIdentifier LegalName");
         formParams.put(COUNTRY, DEF_COUNTRY);
         formParams.put(RELAY_STATE, "1234abcd");
 
         Response response = getAuthenticationReqForm(formParams);
         XmlPath xmlPath = getDecodedSamlRequestBodyXml(response.body().asString());
-
-        assertEquals("Family name must be present and required set to: true", "true",
-                xmlPath.getString("**.findAll { it.@Name == 'http://eidas.europa.eu/attributes/naturalperson/CurrentFamilyName' }.@isRequired"));
-        assertEquals("First name must be present and required set to: true", "true",
-                xmlPath.getString("**.findAll { it.@Name == 'http://eidas.europa.eu/attributes/naturalperson/CurrentGivenName' }.@isRequired"));
-        assertEquals("Date of birth must be present and required set to: true", "true",
-                xmlPath.getString("**.findAll { it.@Name == 'http://eidas.europa.eu/attributes/naturalperson/DateOfBirth' }.@isRequired"));
-        assertEquals("Person identifier must be present and required set to: true", "true",
-                xmlPath.getString("**.findAll { it.@Name == 'http://eidas.europa.eu/attributes/naturalperson/PersonIdentifier' }.@isRequired"));
+        System.out.println(response.body().asString());
 
         assertEquals("Identifier must be present and required set to: false", "false",
                 xmlPath.getString("**.findAll { it.@Name == 'http://eidas.europa.eu/attributes/legalperson/LegalPersonAddress' }.@isRequired"));
@@ -173,7 +155,7 @@ public class AuthenticationRequestIntegrationTest extends TestsBase {
     public void auth2_allAttributessArePresentAndSetCorrectlyForNaturalAndLegalPersons() {
         Map<String,String> formParams = new HashMap<String,String>();
         formParams.put(LOA, "HIGH");
-        formParams.put(ADDITIONAL_ATTRIBUTES, "LegalAddress VATRegistration TaxReference LEI EORI SEED SIC D-2012-17-EUIdentifier LegalPersonIdentifier LegalName BirthName PlaceOfBirth CurrentAddress Gender");
+        formParams.put(ATTRIBUTES, "FamilyName FirstName DateOfBirth PersonIdentifier LegalAddress VATRegistration TaxReference LEI EORI SEED SIC D-2012-17-EUIdentifier LegalPersonIdentifier LegalName BirthName PlaceOfBirth CurrentAddress Gender");
         formParams.put(COUNTRY, DEF_COUNTRY);
         formParams.put(RELAY_STATE, "1234abcd");
 

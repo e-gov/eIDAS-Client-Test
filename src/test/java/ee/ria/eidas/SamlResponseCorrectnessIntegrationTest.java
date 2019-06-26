@@ -2,11 +2,9 @@ package ee.ria.eidas;
 
 
 import ee.ria.eidas.config.IntegrationTest;
-import io.restassured.RestAssured;
 import io.restassured.path.json.JsonPath;
 import io.restassured.path.xml.XmlPath;
 import io.restassured.response.Response;
-import org.hamcrest.Matchers;
 import org.junit.Ignore;
 import org.junit.Test;
 import org.junit.experimental.categories.Category;
@@ -17,9 +15,7 @@ import java.util.Map;
 
 import static ee.ria.eidas.config.EidasTestStrings.*;
 import static io.restassured.RestAssured.given;
-import static io.restassured.config.EncoderConfig.encoderConfig;
 import static org.hamcrest.MatcherAssert.assertThat;
-import static org.hamcrest.Matchers.isEmptyOrNullString;
 import static org.hamcrest.Matchers.startsWith;
 import static org.junit.Assert.assertEquals;
 
@@ -450,7 +446,7 @@ public class SamlResponseCorrectnessIntegrationTest extends TestsBase {
 
         Map<String,String> formParams = new HashMap<String,String>();
         formParams.put(LOA, "HIGH");
-        formParams.put(ADDITIONAL_ATTRIBUTES, "LegalPersonIdentifier LegalName");
+        formParams.put(ATTRIBUTES, "LegalPersonIdentifier LegalName");
         formParams.put(COUNTRY, DEF_COUNTRY);
         formParams.put(RELAY_STATE, "1234abcd");
 
@@ -470,7 +466,7 @@ public class SamlResponseCorrectnessIntegrationTest extends TestsBase {
 
         Map<String,String> formParams = new HashMap<String,String>();
         formParams.put(LOA, "HIGH");
-        formParams.put(ADDITIONAL_ATTRIBUTES, "LegalPersonIdentifier LegalName");
+        formParams.put(ATTRIBUTES, "LegalPersonIdentifier LegalName");
         formParams.put(COUNTRY, DEF_COUNTRY);
         formParams.put(RELAY_STATE, "1234abcd");
 
@@ -486,7 +482,7 @@ public class SamlResponseCorrectnessIntegrationTest extends TestsBase {
 
         Map<String,String> formParams = new HashMap<String,String>();
         formParams.put(LOA, "HIGH");
-        formParams.put(ADDITIONAL_ATTRIBUTES, "LegalName");
+        formParams.put(ATTRIBUTES, "LegalName");
         formParams.put(COUNTRY, DEF_COUNTRY);
         formParams.put(RELAY_STATE, "1234abcd");
 
@@ -502,7 +498,7 @@ public class SamlResponseCorrectnessIntegrationTest extends TestsBase {
 
         Map<String,String> formParams = new HashMap<String,String>();
         formParams.put(LOA, "HIGH");
-        formParams.put(ADDITIONAL_ATTRIBUTES, "LegalPersonIdentifier");
+        formParams.put(ATTRIBUTES, "LegalPersonIdentifier");
         formParams.put(COUNTRY, DEF_COUNTRY);
         formParams.put(RELAY_STATE, "1234abcd");
 
@@ -518,7 +514,7 @@ public class SamlResponseCorrectnessIntegrationTest extends TestsBase {
 
         Map<String,String> formParams = new HashMap<String,String>();
         formParams.put(LOA, "HIGH");
-        formParams.put(ADDITIONAL_ATTRIBUTES, "LegalPersonIdentifier LegalName");
+        formParams.put(ATTRIBUTES, "LegalPersonIdentifier LegalName");
         formParams.put(COUNTRY, DEF_COUNTRY);
         formParams.put(RELAY_STATE, "1234abcd");
 
@@ -534,7 +530,7 @@ public class SamlResponseCorrectnessIntegrationTest extends TestsBase {
 
         Map<String,String> formParams = new HashMap<String,String>();
         formParams.put(LOA, "HIGH");
-        formParams.put(ADDITIONAL_ATTRIBUTES, "LegalPersonIdentifier LegalName");
+        formParams.put(ATTRIBUTES, "LegalPersonIdentifier LegalName");
         formParams.put(COUNTRY, DEF_COUNTRY);
         formParams.put(RELAY_STATE, "1234abcd");
 
@@ -550,7 +546,7 @@ public class SamlResponseCorrectnessIntegrationTest extends TestsBase {
 
         Map<String,String> formParams = new HashMap<String,String>();
         formParams.put(LOA, "HIGH");
-        formParams.put(ADDITIONAL_ATTRIBUTES, "LegalPersonIdentifier LegalName LegalAddress VATRegistration TaxReference LEI EORI SEED SIC D-2012-17-EUIdentifier");
+        formParams.put(ATTRIBUTES, "LegalPersonIdentifier LegalName LegalAddress VATRegistration TaxReference LEI EORI SEED SIC D-2012-17-EUIdentifier");
         formParams.put(COUNTRY, DEF_COUNTRY);
         formParams.put(RELAY_STATE, "1234abcd");
 

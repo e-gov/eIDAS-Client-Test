@@ -5,7 +5,6 @@ import ee.ria.eidas.config.IntegrationTest;
 import io.restassured.path.xml.XmlPath;
 import io.restassured.response.Response;
 import org.apache.commons.lang3.RandomStringUtils;
-import org.junit.Assert;
 import org.junit.Ignore;
 import org.junit.Test;
 import org.junit.experimental.categories.Category;
@@ -141,7 +140,7 @@ public class EidasClientAuthApiIntegrationTest extends TestsBase {
     public void authApi4_notSupportedAdditionalAttributeShouldReturnError() {
         Map<String,String> formParams = new HashMap<String,String>();
         formParams.put(LOA, "HIGH");
-        formParams.put(ADDITIONAL_ATTRIBUTES, "NotExistingAttribute");
+        formParams.put(ATTRIBUTES, "NotExistingAttribute");
         formParams.put(COUNTRY, DEF_COUNTRY);
         formParams.put(RELAY_STATE, "1234abcd");
 
@@ -149,14 +148,14 @@ public class EidasClientAuthApiIntegrationTest extends TestsBase {
 
         assertEquals("Status code should be: 400", 400, response.statusCode());
         assertEquals("Bad request error should be returned", BAD_REQUEST, getValueFromJsonResponse(response, STATUS_ERROR));
-        assertThat("Correct error message", getValueFromJsonResponse(response, STATUS_ERROR_MESSAGE), startsWith("Found one or more invalid AdditionalAttributes value(s). Allowed values are:"));
+        assertThat("Correct error message", getValueFromJsonResponse(response, STATUS_ERROR_MESSAGE), startsWith("Found one or more invalid Attributes value(s). Allowed values are:"));
     }
 
     @Test
     public void authApi4_additionalAttributesNotSeparatedCorrectlyShouldReturnError() {
         Map<String,String> formParams = new HashMap<String,String>();
         formParams.put(LOA, "HIGH");
-        formParams.put(ADDITIONAL_ATTRIBUTES, "LegalPersonIdentifierCurrentAddressGender");
+        formParams.put(ATTRIBUTES, "LegalPersonIdentifierCurrentAddressGender");
         formParams.put(COUNTRY, DEF_COUNTRY);
         formParams.put(RELAY_STATE, "1234abcd");
 
@@ -164,14 +163,14 @@ public class EidasClientAuthApiIntegrationTest extends TestsBase {
 
         assertEquals("Status code should be: 400", 400, response.statusCode());
         assertEquals("Bad request error should be returned", BAD_REQUEST, getValueFromJsonResponse(response, STATUS_ERROR));
-        assertThat("Correct error message", getValueFromJsonResponse(response, STATUS_ERROR_MESSAGE), startsWith("Found one or more invalid AdditionalAttributes value(s). Allowed values are:"));
+        assertThat("Correct error message", getValueFromJsonResponse(response, STATUS_ERROR_MESSAGE), startsWith("Found one or more invalid Attributes value(s). Allowed values are:"));
     }
 
     @Test
     public void authApi4_additionalAttributesSeparatedWithWrongCharacterShouldReturnError() {
         Map<String,String> formParams = new HashMap<String,String>();
         formParams.put(LOA, "HIGH");
-        formParams.put(ADDITIONAL_ATTRIBUTES, "LegalPersonIdentifier&CurrentAddress&Gender");
+        formParams.put(ATTRIBUTES, "LegalPersonIdentifier&CurrentAddress&Gender");
         formParams.put(COUNTRY, DEF_COUNTRY);
         formParams.put(RELAY_STATE, "1234abcd");
 
@@ -179,7 +178,7 @@ public class EidasClientAuthApiIntegrationTest extends TestsBase {
 
         assertEquals("Status code should be: 400", 400, response.statusCode());
         assertEquals("Bad request error should be returned", BAD_REQUEST, getValueFromJsonResponse(response, STATUS_ERROR));
-        assertThat("Correct error message", getValueFromJsonResponse(response, STATUS_ERROR_MESSAGE), startsWith("Found one or more invalid AdditionalAttributes value(s). Allowed values are:"));
+        assertThat("Correct error message", getValueFromJsonResponse(response, STATUS_ERROR_MESSAGE), startsWith("Found one or more invalid Attributes value(s). Allowed values are:"));
     }
 
     @Ignore //TODO: Need a way to force the attributes without URL encoding
@@ -187,7 +186,7 @@ public class EidasClientAuthApiIntegrationTest extends TestsBase {
     public void authApi4_additionalAttributesSeparatedWithoutUrlEncodingShouldReturnError() {
         Map<String,String> formParams = new HashMap<String,String>();
         formParams.put(LOA, "HIGH");
-        formParams.put(ADDITIONAL_ATTRIBUTES, "LegalPersonIdentifier CurrentAddress Gender");
+        formParams.put(ATTRIBUTES, "LegalPersonIdentifier CurrentAddress Gender");
         formParams.put(COUNTRY, DEF_COUNTRY);
         formParams.put(RELAY_STATE, "1234abcd");
 
