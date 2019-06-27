@@ -89,7 +89,7 @@ public class AuthenticationRequestIntegrationTest extends TestsBase {
     }
 
     @Test
-    public void auth2_optionalAttributessArePresentAndSetTrueForNaturalPersons() {
+    public void auth2_optionalAttributesArePresentAndSetTrueForNaturalPersons() {
         Map<String,String> formParams = new HashMap<String,String>();
         formParams.put(LOA, "HIGH");
         formParams.put(ATTRIBUTES, "FamilyName FirstName DateOfBirth BirthName PersonIdentifier PlaceOfBirth CurrentAddress Gender");
@@ -166,7 +166,7 @@ public class AuthenticationRequestIntegrationTest extends TestsBase {
     }
 
     @Test
-    public void auth2_allAttributessArePresentAndSetCorrectlyForNaturalAndLegalPersons() {
+    public void auth2_allAttributesArePresentAndSetCorrectlyForNaturalAndLegalPersons() {
         Map<String,String> formParams = new HashMap<String,String>();
         formParams.put(LOA, "HIGH");
         formParams.put(ATTRIBUTES, "FamilyName FirstName DateOfBirth PersonIdentifier LegalAddress VATRegistration TaxReference LEI EORI SEED SIC D-2012-17-EUIdentifier LegalPersonIdentifier LegalName BirthName PlaceOfBirth CurrentAddress Gender");
