@@ -37,7 +37,7 @@ public class EndpointsIntegrationTest extends TestsBase {
                 .when().options(testEidasClientProperties.getFullSpMetadataUrl())
                 .then().log().ifValidationFails()
                 .statusCode(200)
-                .header("Allow", "GET,HEAD");
+                .header("Allow", "GET,HEAD,OPTIONS");
     }
 
     @Test
@@ -100,7 +100,7 @@ public class EndpointsIntegrationTest extends TestsBase {
                 .when().options(testEidasClientProperties.getSpStartUrl())
                 .then().log().ifValidationFails()
                 .statusCode(200)
-                .header("Allow", "GET,HEAD");
+                .header("Allow", "GET,HEAD,OPTIONS");
     }
 
     @Test
@@ -181,7 +181,7 @@ public class EndpointsIntegrationTest extends TestsBase {
                 .when().options(testEidasClientProperties.getSpReturnUrl())
                 .then().log().ifValidationFails()
                 .statusCode(200)
-                .header("Allow", "POST");
+                .header("Allow", "POST,OPTIONS");
     }
 
     @Test
