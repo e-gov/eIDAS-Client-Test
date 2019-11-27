@@ -22,7 +22,7 @@ public class HeartbeatIntegrationTest extends TestsBase {
         given()
                 .when().get(testEidasClientProperties.getHealthcheckUrl())
                 .then().log().ifValidationFails().statusCode(200)
-                .header("Content-Type", equalTo("application/vnd.spring-boot.actuator.v1+json;charset=UTF-8"))
+                .header("Content-Type", equalTo("application/json"))
                 .body("status", equalTo("UP"),
                         "name", equalTo("eidas-client-webapp"),
                         "version", matchesPattern("^[0-9].[0-9].[0-9](-[a-zA-Z0-9]*)?$"),
@@ -43,7 +43,7 @@ public class HeartbeatIntegrationTest extends TestsBase {
         given()
                 .when().get(testEidasClientProperties.getHealthcheckUrl())
                 .then().log().ifValidationFails().statusCode(200)
-                .header("Content-Type", equalTo("application/vnd.spring-boot.actuator.v1+json;charset=UTF-8"))
+                .header("Content-Type", equalTo("application/json"))
                 .body("status", equalTo("UP"),
                         "name", equalTo("eidas-client-webapp"),
                         "version", matchesPattern("^[0-9].[0-9].[0-9](-[a-zA-Z0-9]*)?$"),

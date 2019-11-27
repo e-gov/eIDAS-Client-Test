@@ -36,8 +36,7 @@ public class EndpointsIntegrationTest extends TestsBase {
                 .config(RestAssured.config().encoderConfig(encoderConfig().defaultContentCharset("UTF-8")))
                 .when().options(testEidasClientProperties.getFullSpMetadataUrl())
                 .then().log().ifValidationFails()
-                .statusCode(200)
-                .header("Allow", "GET,HEAD");
+                .statusCode(405);
     }
 
     @Test
@@ -66,7 +65,7 @@ public class EndpointsIntegrationTest extends TestsBase {
                 .config(RestAssured.config().encoderConfig(encoderConfig().defaultContentCharset("UTF-8")))
                 .when().head(testEidasClientProperties.getFullSpMetadataUrl())
                 .then().log().ifValidationFails()
-                .statusCode(200);
+                .statusCode(405);
     }
 
     @Test
@@ -99,8 +98,8 @@ public class EndpointsIntegrationTest extends TestsBase {
                 .config(RestAssured.config().encoderConfig(encoderConfig().defaultContentCharset("UTF-8")).sslConfig(sslConfig))
                 .when().options(testEidasClientProperties.getSpStartUrl())
                 .then().log().ifValidationFails()
-                .statusCode(200)
-                .header("Allow", "GET,HEAD");
+                .statusCode(405);
+
     }
 
     @Test
@@ -113,7 +112,7 @@ public class EndpointsIntegrationTest extends TestsBase {
                 .config(RestAssured.config().encoderConfig(encoderConfig().defaultContentCharset("UTF-8")).sslConfig(sslConfig))
                 .when().head(testEidasClientProperties.getSpStartUrl())
                 .then().log().ifValidationFails()
-                .statusCode(400);
+                .statusCode(405);
     }
 
     @Test
@@ -180,8 +179,7 @@ public class EndpointsIntegrationTest extends TestsBase {
                 .contentType("application/x-www-form-urlencoded")
                 .when().options(testEidasClientProperties.getSpReturnUrl())
                 .then().log().ifValidationFails()
-                .statusCode(200)
-                .header("Allow", "POST");
+                .statusCode(405);
     }
 
     @Test
