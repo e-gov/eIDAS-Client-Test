@@ -10,7 +10,7 @@ public class EidasTestStrings {
     public static final String SAML_RESPONSE = "SAMLResponse";
 
     //Default test params
-    public static final String DEF_COUNTRY = "EE";
+    public static final String DEF_COUNTRY = "CA";
 
     //SAML response strings
     public static final String LOA_LOW = "http://eidas.europa.eu/LoA/low";

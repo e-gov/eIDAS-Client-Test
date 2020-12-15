@@ -35,7 +35,7 @@ public class EidasClientAuthApiIntegrationTest extends TestsBase {
 
     @Test
     public void authApi1_countryCodeCaseSensitiveShouldPass() {
-        XmlPath samlRequest = getDecodedSamlRequestBodyXml(getAuthenticationReq("eE", "", ""));
+        XmlPath samlRequest = getDecodedSamlRequestBodyXml(getAuthenticationReq(DEF_COUNTRY.toLowerCase(), "", ""));
         assertEquals("Correct LOA is returned", LOA_SUBSTANTIAL, samlRequest.getString(XML_LOA));
     }
 
