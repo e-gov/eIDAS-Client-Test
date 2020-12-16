@@ -27,6 +27,7 @@ public class TestEidasClientProperties {
     private String httpsTruststore;
     private String metadataUrl;
     private String healthcheckUrl;
+    private String supportedCountriesUrl;
 
     public TestEidasClientProperties() {
     }
@@ -206,5 +207,13 @@ public class TestEidasClientProperties {
 
     public void setHealthcheckUrl(String healthcheckUrl) {
         this.healthcheckUrl = healthcheckUrl;
+    }
+
+    public String getSupportedCountriesUrl() {
+        return supportedCountriesUrl;
+    }
+
+    public void setSupportedCountriesUrl(String supportedCountriesUrl) {
+        this.supportedCountriesUrl = supportedCountriesUrl;
     }
 }

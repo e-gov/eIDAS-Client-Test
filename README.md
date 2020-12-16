@@ -43,6 +43,7 @@ Parameetrite kirjeldus:
 | test.client.responseSigningKeyId | test_sign | Ei | Võtmehoidlas oleva võtme alias mida kasutatakse SAML vastuse allkirjastamiseks. eIDAS sõlme vastuse simuleerimiseks. |
 | test.client.responseSigningKeyPass | changeit | Ei | Võtme parool. |
 | test.client.healthcheckUrl | http://localhost:8889/heartbeat | Ei | Elutukse otspuntki URL. |
+| test.client.supportedCountriesUrl | http://localhost:8889/supportedCountries | Ei | Toetatud riikide otspuntki URL. |
 
 4. Käivita testid:
 
