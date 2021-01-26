@@ -6,12 +6,9 @@ import org.junit.Test;
 import org.junit.experimental.categories.Category;
 import org.springframework.boot.test.context.SpringBootTest;
 
-import java.util.Date;
-
 import static io.restassured.RestAssured.given;
-import static java.lang.Math.toIntExact;
 import static org.hamcrest.Matchers.*;
-import static org.hamcrest.text.MatchesPattern.matchesPattern;
+
 
 @SpringBootTest(classes = SupportedCountriesIntegrationTest.class)
 @Category(IntegrationTest.class)
@@ -25,6 +22,6 @@ public class SupportedCountriesIntegrationTest extends TestsBase {
                 .then()
                 .statusCode(200)
                 .header("Content-Type", equalTo("application/json"))
-                .body(equalTo("[\"CA\"]"));
+                .body(containsString("\"CA\""));
     }
 }
