@@ -8,6 +8,8 @@ import ee.ria.eidas.utils.OpenSAMLUtils;
 import ee.ria.eidas.utils.ResponseBuilderUtils;
 import ee.ria.eidas.utils.SystemPropertyActiveProfileResolver;
 import ee.ria.eidas.utils.XmlUtils;
+import io.qameta.allure.restassured.AllureRestAssured;
+import io.restassured.RestAssured;
 import io.restassured.config.SSLConfig;
 import io.restassured.config.XmlConfig;
 import io.restassured.path.json.JsonPath;
@@ -129,6 +131,7 @@ public abstract class TestsBase {
 
     protected String getMetadataBody() {
         return given()
+                .filter(new AllureRestAssured())
                 .config(config().encoderConfig(encoderConfig().defaultContentCharset("UTF-8")))
                 .when()
                 .get(testEidasClientProperties.getFullSpMetadataUrl()).then().log().ifError().statusCode(200).extract().body().asString();
@@ -142,6 +145,7 @@ public abstract class TestsBase {
 
     protected Boolean validateMetadataSchema() {
         given()
+                .filter(new AllureRestAssured())
                 .config(config().xmlConfig(XmlConfig.xmlConfig().disableLoadingOfExternalDtd()).sslConfig(sslConfig))
                 .when()
                 .get(testEidasClientProperties.getSpMetadataUrl())
@@ -172,6 +176,7 @@ public abstract class TestsBase {
 
     protected String getAuthenticationReq(String country, String loa, String relayState) {
         return given()
+                .filter(new AllureRestAssured())
                 .queryParam(RELAY_STATE, relayState)
                 .queryParam(LOA, loa)
                 .queryParam(COUNTRY, country)
@@ -184,6 +189,7 @@ public abstract class TestsBase {
 
     protected io.restassured.response.Response getAuthenticationReqResponse(String country, String loa, String relayState) {
         return given()
+                .filter(new AllureRestAssured())
                 .queryParam(RELAY_STATE, relayState)
                 .queryParam(LOA, loa)
                 .queryParam(COUNTRY, country)
@@ -196,6 +202,7 @@ public abstract class TestsBase {
 
     protected io.restassured.response.Response getAuthenticationReqForm(Map<String, String> values) {
         return given()
+                .filter(new AllureRestAssured())
                 .queryParams(values)
                 .contentType("application/x-www-form-urlencoded")
                 .config(config().encoderConfig(encoderConfig().defaultContentCharset("UTF-8")).sslConfig(sslConfig))
@@ -210,6 +217,7 @@ public abstract class TestsBase {
 
     protected io.restassured.response.Response getAuthenticationReqFormFail(Map<String, String> values) {
         return given()
+                .filter(new AllureRestAssured())
                 .queryParams(values)
                 .contentType("application/x-www-form-urlencoded")
                 .config(config().encoderConfig(encoderConfig().defaultContentCharset("UTF-8")).sslConfig(sslConfig))
@@ -222,6 +230,7 @@ public abstract class TestsBase {
 
     protected JsonPath sendSamlResponse(String relayState, String response) {
         return given()
+                .filter(new AllureRestAssured())
                 .formParam(RELAY_STATE, relayState)
                 .formParam(SAML_RESPONSE, response)
                 .contentType("application/x-www-form-urlencoded")
@@ -236,6 +245,7 @@ public abstract class TestsBase {
 
     protected io.restassured.response.Response sendSamlResponseGetStatus(String relayState, String response) {
         return given()
+                .filter(new AllureRestAssured())
                 .formParam(RELAY_STATE, relayState)
                 .formParam(SAML_RESPONSE, response)
                 .contentType("application/x-www-form-urlencoded")
@@ -248,6 +258,7 @@ public abstract class TestsBase {
 
     protected io.restassured.response.Response sendSamlResponseExtractResponse(String relayState, String response) {
         return given()
+                .filter(new AllureRestAssured())
                 .formParam(RELAY_STATE, relayState)
                 .formParam(SAML_RESPONSE, response)
                 .contentType("application/x-www-form-urlencoded")

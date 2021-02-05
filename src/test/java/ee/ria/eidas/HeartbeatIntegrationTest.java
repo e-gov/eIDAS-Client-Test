@@ -2,6 +2,7 @@ package ee.ria.eidas;
 
 
 import ee.ria.eidas.config.IntegrationTest;
+import io.qameta.allure.restassured.AllureRestAssured;
 import org.junit.Test;
 import org.junit.experimental.categories.Category;
 import org.springframework.boot.test.context.SpringBootTest;
@@ -20,6 +21,7 @@ public class HeartbeatIntegrationTest extends TestsBase {
     @Test
     public void heartbeatIsUp() {
         given()
+                .filter(new AllureRestAssured())
                 .when().get(testEidasClientProperties.getHealthcheckUrl())
                 .then().log().ifValidationFails().statusCode(200)
                 .header("Content-Type", equalTo("application/json"))
@@ -41,6 +43,7 @@ public class HeartbeatIntegrationTest extends TestsBase {
     @Test
     public void heartbeatAsJsonUrl() {
         given()
+                .filter(new AllureRestAssured())
                 .when().get(testEidasClientProperties.getHealthcheckUrl())
                 .then().log().ifValidationFails().statusCode(200)
                 .header("Content-Type", equalTo("application/json"))

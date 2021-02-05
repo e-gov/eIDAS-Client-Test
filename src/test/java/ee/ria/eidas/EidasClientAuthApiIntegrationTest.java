@@ -2,6 +2,7 @@ package ee.ria.eidas;
 
 
 import ee.ria.eidas.config.IntegrationTest;
+import io.qameta.allure.restassured.AllureRestAssured;
 import io.restassured.path.xml.XmlPath;
 import io.restassured.response.Response;
 import org.apache.commons.lang3.RandomStringUtils;
@@ -191,6 +192,7 @@ public class EidasClientAuthApiIntegrationTest extends TestsBase {
         formParams.put(RELAY_STATE, "1234abcd");
 
         Response response = given()
+                .filter(new AllureRestAssured())
                 .queryParams(formParams)
                 .config(config())
 //                .contentType("application/x-www-form-urlencoded") //TODO: what is default behavior in restAssured? Needs to be rechecked when additional Attributes are implemented

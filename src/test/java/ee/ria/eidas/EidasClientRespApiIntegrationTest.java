@@ -2,6 +2,7 @@ package ee.ria.eidas;
 
 
 import ee.ria.eidas.config.IntegrationTest;
+import io.qameta.allure.restassured.AllureRestAssured;
 import io.restassured.path.json.JsonPath;
 import io.restassured.path.xml.XmlPath;
 import io.restassured.response.Response;
@@ -57,6 +58,7 @@ public class EidasClientRespApiIntegrationTest extends TestsBase {
         String base64Response = getBase64SamlResponseMinimalAttributes(getAuthenticationReq(DEF_COUNTRY,"SUBSTANTIAL",""), "TestGiven","TestFamily","TestPNO", "TestDate", LOA_SUBSTANTIAL);
 
         Response response =  given()
+                .filter(new AllureRestAssured())
                 .formParam(RELAY_STATE, "")
                 .formParam(SAML_RESPONSE, base64Response)
                 .contentType("application/x-www-form-urlencoded")
@@ -77,6 +79,7 @@ public class EidasClientRespApiIntegrationTest extends TestsBase {
         String base64Response = getBase64SamlResponseMinimalAttributes(getAuthenticationReqForm(formParams).getBody().asString(), "TestGiven","TestFamily","TestPNO", "TestDate", LOA_SUBSTANTIAL);
 
         Response response =  given()
+                .filter(new AllureRestAssured())
                 .formParam(SAML_RESPONSE, base64Response)
                 .contentType("application/x-www-form-urlencoded")
                 .config(config().encoderConfig(encoderConfig().defaultContentCharset("UTF-8")).sslConfig(sslConfig))
@@ -93,6 +96,7 @@ public class EidasClientRespApiIntegrationTest extends TestsBase {
         String base64Response = getBase64SamlResponseMinimalAttributes(getAuthenticationReqWithDefault(), "TestGiven","TestFamily","TestPNO", "TestDate", LOA_SUBSTANTIAL);
 
         Response response =  given()
+                .filter(new AllureRestAssured())
                 .formParam(RELAY_STATE, "")
                 .contentType("application/x-www-form-urlencoded")
                 .config(config().encoderConfig(encoderConfig().defaultContentCharset("UTF-8")).sslConfig(sslConfig))
@@ -111,6 +115,7 @@ public class EidasClientRespApiIntegrationTest extends TestsBase {
         String base64Response = getBase64SamlResponseMinimalAttributes(getAuthenticationReqWithDefault(), "TestGiven","TestFamily","TestPNO", "TestDate", LOA_SUBSTANTIAL);
 
         Response response =  given()
+                .filter(new AllureRestAssured())
                 .formParam(SAML_RESPONSE, base64Response+"&/!")
                 .contentType("application/x-www-form-urlencoded")
                 .config(config().encoderConfig(encoderConfig().defaultContentCharset("UTF-8")).sslConfig(sslConfig))
@@ -129,6 +134,7 @@ public class EidasClientRespApiIntegrationTest extends TestsBase {
         String base64Response = getBase64SamlResponseMinimalAttributes(getAuthenticationReqWithDefault(), "TestGiven","TestFamily","TestPNO", "TestDate", LOA_SUBSTANTIAL);
 
         Response response =  given()
+                .filter(new AllureRestAssured())
                 .formParam("randomParam", "randomValue")
                 .formParam(SAML_RESPONSE, base64Response)
                 .contentType("application/x-www-form-urlencoded")
@@ -148,6 +154,7 @@ public class EidasClientRespApiIntegrationTest extends TestsBase {
         String base64Response2 = getBase64SamlResponseMinimalAttributes(getAuthenticationReqWithDefault(), "TestGiven2","TestFamily2","TestPNO", "TestDate", LOA_SUBSTANTIAL);
 
         Response response =  given()
+                .filter(new AllureRestAssured())
                 .formParam(SAML_RESPONSE, base64Response)
                 .formParam(SAML_RESPONSE, base64Response2)
                 .contentType("application/x-www-form-urlencoded")

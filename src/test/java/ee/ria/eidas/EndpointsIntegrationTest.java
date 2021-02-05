@@ -2,6 +2,7 @@ package ee.ria.eidas;
 
 
 import ee.ria.eidas.config.IntegrationTest;
+import io.qameta.allure.restassured.AllureRestAssured;
 import io.restassured.RestAssured;
 import io.restassured.config.RestAssuredConfig;
 import org.hamcrest.Matchers;
@@ -23,6 +24,7 @@ public class EndpointsIntegrationTest extends TestsBase {
     @Test
     public void metEnd1_caseSensitivityOnEndpoint() {
         given()
+                .filter(new AllureRestAssured())
                 .config(RestAssured.config().encoderConfig(encoderConfig().defaultContentCharset("UTF-8")))
                 .when().get(testEidasClientProperties.getMetadataUrl() + testEidasClientProperties.getSpMetadataUrl().toUpperCase())
                 .then().log().ifValidationFails()
@@ -33,6 +35,7 @@ public class EndpointsIntegrationTest extends TestsBase {
     @Test
     public void metEnd1_notSupportedHttpOptionsMethodShouldReturnError() {
         given()
+                .filter(new AllureRestAssured())
                 .config(RestAssured.config().encoderConfig(encoderConfig().defaultContentCharset("UTF-8")))
                 .when().options(testEidasClientProperties.getFullSpMetadataUrl())
                 .then().log().ifValidationFails()
@@ -42,6 +45,7 @@ public class EndpointsIntegrationTest extends TestsBase {
     @Test
     public void metEnd1_notSupportedHttpPostMethodShouldReturnError() {
         given()
+                .filter(new AllureRestAssured())
                 .config(RestAssured.config().encoderConfig(encoderConfig().defaultContentCharset("UTF-8")))
                 .when().post(testEidasClientProperties.getFullSpMetadataUrl())
                 .then().log().ifValidationFails()
@@ -52,6 +56,7 @@ public class EndpointsIntegrationTest extends TestsBase {
     @Test
     public void metEnd1_notSupportedHttpPutMethodShouldReturnError() {
         given()
+                .filter(new AllureRestAssured())
                 .config(RestAssured.config().encoderConfig(encoderConfig().defaultContentCharset("UTF-8")))
                 .when().put(testEidasClientProperties.getFullSpMetadataUrl())
                 .then().log().ifValidationFails()
@@ -62,6 +67,7 @@ public class EndpointsIntegrationTest extends TestsBase {
     @Test
     public void metEnd1_notSupportedHttpHeadMethodShouldReturnError() {
         given()
+                .filter(new AllureRestAssured())
                 .config(RestAssured.config().encoderConfig(encoderConfig().defaultContentCharset("UTF-8")))
                 .when().head(testEidasClientProperties.getFullSpMetadataUrl())
                 .then().log().ifValidationFails()
@@ -71,6 +77,7 @@ public class EndpointsIntegrationTest extends TestsBase {
     @Test
     public void metEnd1_notSupportedHttpDeleteMethodShouldReturnError() {
         given()
+                .filter(new AllureRestAssured())
                 .config(RestAssured.config().encoderConfig(encoderConfig().defaultContentCharset("UTF-8")))
                 .when().delete(testEidasClientProperties.getFullSpMetadataUrl())
                 .then().log().ifValidationFails()
@@ -81,6 +88,7 @@ public class EndpointsIntegrationTest extends TestsBase {
     @Test
     public void autEnd1_caseSensitivityOnGet() {
         given()
+                .filter(new AllureRestAssured())
                 .config(RestAssured.config().encoderConfig(encoderConfig().defaultContentCharset("UTF-8")).sslConfig(sslConfig))
                 .when().get(testEidasClientProperties.getSpStartUrl().toUpperCase())
                 .then().log().ifValidationFails()
@@ -91,6 +99,7 @@ public class EndpointsIntegrationTest extends TestsBase {
     @Test
     public void autEnd1_notSupportedHttpOptionsMethodShouldReturnError() {
         given()
+                .filter(new AllureRestAssured())
                 .formParam(RELAY_STATE,"")
                 .formParam(LOA,"LOW")
                 .formParam(COUNTRY,DEF_COUNTRY)
@@ -105,6 +114,7 @@ public class EndpointsIntegrationTest extends TestsBase {
     @Test
     public void autEnd1_notSupportedHttpHeadMethodShouldReturnError() {
         given()
+                .filter(new AllureRestAssured())
                 .formParam(RELAY_STATE,"")
                 .formParam(LOA,"LOW")
                 .formParam(COUNTRY,DEF_COUNTRY)
@@ -118,6 +128,7 @@ public class EndpointsIntegrationTest extends TestsBase {
     @Test
     public void autEnd1_notSupportedHttpPutMethodShouldReturnError() {
         given()
+                .filter(new AllureRestAssured())
                 .formParam(RELAY_STATE,"")
                 .formParam(LOA,"LOW")
                 .formParam(COUNTRY,DEF_COUNTRY)
@@ -132,6 +143,7 @@ public class EndpointsIntegrationTest extends TestsBase {
     @Test
     public void autEnd1_notSupportedHttpDeleteMethodShouldReturnError() {
         given()
+                .filter(new AllureRestAssured())
                 .formParam(RELAY_STATE,"")
                 .formParam(LOA,"LOW")
                 .formParam(COUNTRY,DEF_COUNTRY)
@@ -146,6 +158,7 @@ public class EndpointsIntegrationTest extends TestsBase {
     @Test
     public void autEnd1_notSupportedHttpPostMethodShouldReturnError() {
         given()
+                .filter(new AllureRestAssured())
                 .formParam(RELAY_STATE,"")
                 .formParam(LOA,"LOW")
                 .formParam(COUNTRY,DEF_COUNTRY)
@@ -160,6 +173,7 @@ public class EndpointsIntegrationTest extends TestsBase {
     @Test
     public void resEnd1_caseSensitivityOnEndpoint() {
         given()
+                .filter(new AllureRestAssured())
                 .formParam(RELAY_STATE,"")
                 .formParam(SAML_RESPONSE,getBase64SamlResponseMinimalAttributes(getAuthenticationReqWithDefault(), "TestFamily", "TestGiven", "TestPNO", "TestDate", null))
                 .contentType("application/x-www-form-urlencoded")
@@ -173,6 +187,7 @@ public class EndpointsIntegrationTest extends TestsBase {
     @Test
     public void resEnd1_notSupportedHttpOptionsMethodShouldReturnError() {
         given()
+                .filter(new AllureRestAssured())
                 .config(RestAssuredConfig.config().sslConfig(sslConfig))
                 .formParam(RELAY_STATE,"")
                 .formParam(SAML_RESPONSE, getBase64SamlResponseMinimalAttributes(getAuthenticationReqWithDefault(), "TestFamily", "TestGiven", "TestPNO", "TestDate", null))
@@ -185,6 +200,7 @@ public class EndpointsIntegrationTest extends TestsBase {
     @Test
     public void resEnd1_notSupportedHttpHeadMethodShouldReturnError() {
         given()
+                .filter(new AllureRestAssured())
                 .formParam(RELAY_STATE,"")
                 .formParam(SAML_RESPONSE, getBase64SamlResponseMinimalAttributes(getAuthenticationReqWithDefault(), "TestFamily", "TestGiven", "TestPNO", "TestDate", null))
                 .contentType("application/x-www-form-urlencoded")
@@ -197,6 +213,7 @@ public class EndpointsIntegrationTest extends TestsBase {
     @Test
     public void resEnd1_notSupportedHttpPutMethodShouldReturnError() {
         given()
+                .filter(new AllureRestAssured())
                 .formParam(RELAY_STATE,"")
                 .formParam(SAML_RESPONSE,getBase64SamlResponseMinimalAttributes(getAuthenticationReqWithDefault(), "TestFamily", "TestGiven", "TestPNO", "TestDate", null))
                 .contentType("application/x-www-form-urlencoded")
@@ -210,6 +227,7 @@ public class EndpointsIntegrationTest extends TestsBase {
     @Test
     public void resEnd1_notSupportedHttpGetMethodShouldReturnError() {
         given()
+                .filter(new AllureRestAssured())
                 .contentType("application/x-www-form-urlencoded")
                 .config(RestAssured.config().encoderConfig(encoderConfig().defaultContentCharset("UTF-8")).sslConfig(sslConfig))
                 .when().get(testEidasClientProperties.getSpReturnUrl())
@@ -221,6 +239,7 @@ public class EndpointsIntegrationTest extends TestsBase {
     @Test
     public void resEnd1_notSupportedHttpDeleteMethodShouldReturnError() {
         given()
+                .filter(new AllureRestAssured())
                 .formParam(RELAY_STATE,"")
                 .formParam(SAML_RESPONSE,getBase64SamlResponseMinimalAttributes(getAuthenticationReqWithDefault(), "TestFamily", "TestGiven", "TestPNO", "TestDate", null))
                 .contentType("application/x-www-form-urlencoded")

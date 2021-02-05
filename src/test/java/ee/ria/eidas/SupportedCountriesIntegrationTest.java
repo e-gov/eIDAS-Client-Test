@@ -2,6 +2,7 @@ package ee.ria.eidas;
 
 
 import ee.ria.eidas.config.IntegrationTest;
+import io.qameta.allure.restassured.AllureRestAssured;
 import org.junit.Test;
 import org.junit.experimental.categories.Category;
 import org.springframework.boot.test.context.SpringBootTest;
@@ -17,6 +18,7 @@ public class SupportedCountriesIntegrationTest extends TestsBase {
     @Test
     public void getSupportedCountriesList() {
         given()
+                .filter(new AllureRestAssured())
                 .when()
                 .get(testEidasClientProperties.getSupportedCountriesUrl())
                 .then()
