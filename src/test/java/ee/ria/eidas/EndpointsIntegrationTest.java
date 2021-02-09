@@ -26,7 +26,7 @@ public class EndpointsIntegrationTest extends TestsBase {
         given()
                 .filter(new AllureRestAssured())
                 .config(RestAssured.config().encoderConfig(encoderConfig().defaultContentCharset("UTF-8")))
-                .when().get(testEidasClientProperties.getMetadataUrl() + testEidasClientProperties.getSpMetadataUrl().toUpperCase())
+                .when().get(testEidasClientProperties.getTargetUrl() + testEidasClientProperties.getSpMetadataUrl().toUpperCase())
                 .then().log().ifValidationFails()
                 .statusCode(404)
                 .body("error",equalTo("Not Found"));

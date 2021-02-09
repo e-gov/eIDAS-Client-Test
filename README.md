@@ -23,7 +23,7 @@ b) Andes vastavad parameetrid ette testide käivitamisel (kirjeldus testide käi
 
 Parameetrite kirjeldus:
 
-**sp** - Service Provider, teenus kes kasutab eIDAS autentimise võrgustikku. Praegusel juhul [eIDAS kliendi demo rakendus](https://github.com/e-gov/eIDAS-Client-demo).
+**sp** - Service Provider, teenus kes kasutab eIDAS autentimise võrgustikku.
 
 **idp** - Identity Provider, teenus kes pakub autentimist. Praegusel juhul eIDAS sõlm (eIDAS Node).
 
@@ -68,3 +68,7 @@ b) Surefire pistikprogramm väljastab tulemuste raporti ../target/surefire-repor
 `./mvnw surefire-report:report-only`
 
 Html raport on leitav ../target/site/ kaustast.
+
+c) Lisaks on võimalik genereerida ka Allure testide raport ([vajab eelnevat Allure installeerimist](https://docs.qameta.io/allure/#_installing_a_commandline)). Raporti genereerimiseks:
+
+`allure serve .../eIDAS-Client-Test/allure-results/`

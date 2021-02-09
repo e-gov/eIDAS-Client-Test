@@ -101,7 +101,7 @@ public class TestEidasClientProperties {
     }
 
     public String getFullSpMetadataUrl() {
-        return getMetadataUrl() + spMetadataUrl;
+        return getTargetUrl() + spMetadataUrl;
     }
 
     public String getSpStartUrl() {
@@ -190,15 +190,6 @@ public class TestEidasClientProperties {
 
     public void setHttpsTruststore(String httpsTruststore) {
         this.httpsTruststore = httpsTruststore;
-    }
-
-
-    public String getMetadataUrl() {
-        return metadataUrl;
-    }
-
-    public void setMetadataUrl(String metadataUrl) {
-        this.metadataUrl = metadataUrl;
     }
 
     public String getHealthcheckUrl() {
