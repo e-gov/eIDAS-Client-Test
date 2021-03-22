@@ -107,6 +107,8 @@ public abstract class TestsBase {
                 sslConfig = new SSLConfig().
                         keyStore(testEidasClientProperties.getHttpsKeystore(), testEidasClientProperties.getHttpsKeystorePassword()).
                         trustStore(testEidasClientProperties.getHttpsTruststore(), testEidasClientProperties.getHttpsTruststorePassword());
+            } else {
+                sslConfig = new SSLConfig();
             }
         } catch (Exception e) {
             throw new RuntimeException("Something went wrong initializing credentials:", e);
