@@ -539,12 +539,27 @@ public abstract class TestsBase {
         return new String(Base64.getEncoder().encode(stringResponse.getBytes()));
     }
 
-    public class ClasspathResourceResolver implements LSResourceResolver {
+    public static class ClasspathResourceResolver implements LSResourceResolver {
+
         @Override
         public LSInput resolveResource(String type, String namespaceURI, String publicId, String systemId, String baseURI) {
-            InputStream resource = ClassLoader.getSystemResourceAsStream(systemId);
+            String resourceName = getResourceName(systemId);
+            InputStream resource = ClassLoader.getSystemResourceAsStream(resourceName);
+            if (resource == null) {
+                throw new RuntimeException("Resource not found or error reading resource: " + resourceName);
+            }
             return new DOMInputImpl(publicId, systemId, baseURI, resource, null);
         }
+
+        private static String getResourceName(String systemId) {
+            if (systemId.equals("http://www.w3.org/2001/XMLSchema.dtd")) {
+                return "XMLSchema.dtd";
+            } else if (systemId.contains("://")) {
+                throw new RuntimeException("External resource must be made available locally: " + systemId);
+            }
+            return systemId;
+        }
+
     }
 
     protected String getBase64SamlResponseInResponseTo(String inResponseToResponse, String inResponseToSubject) {
