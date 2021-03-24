@@ -4,7 +4,6 @@ package ee.ria.eidas;
 import ee.ria.eidas.config.IntegrationTest;
 import io.restassured.path.xml.XmlPath;
 import org.junit.Assert;
-import org.junit.Ignore;
 import org.junit.Test;
 import org.junit.experimental.categories.Category;
 import org.springframework.beans.factory.annotation.Value;
@@ -32,7 +31,6 @@ public class CommonMetadataIntegrationTest extends TestsBase {
         }
     }
 
-    @Ignore ("In offline environment schema loading gives errors")
     @Test
     public void metap1_verifySamlMetadataSchema() {
         assertTrue("Metadata must be based on urn:oasis:names:tc:SAML:2.0:metadata schema", validateMetadataSchema());
