@@ -128,9 +128,9 @@ public class SamlResponseCorrectnessIntegrationTest extends TestsBase {
     public void saml8_someOtherErrorStatusErrorShouldBeReturned() {
         String base64Response = getBase64SamlResponseWithErrors(getAuthenticationReqWithDefault(), "SomethingFailed");
         Response loginResponse = sendSamlResponseExtractResponse("", base64Response);
-        assertEquals(500, loginResponse.getStatusCode());
-        assertEquals("Some other reason for failure in authentication, Internal Server Error should be returned", "Internal Server Error", getValueFromJsonResponse(loginResponse, STATUS_ERROR));
-        assertEquals("Some other reason for failure in authentication, Internal Server Error should be returned", "Something went wrong internally. Please consult server logs for further details.", getValueFromJsonResponse(loginResponse, STATUS_ERROR_MESSAGE));
+        assertEquals(401, loginResponse.getStatusCode());
+        assertEquals("User did not authenticate, error should be returned", "Unauthorized", getValueFromJsonResponse(loginResponse, STATUS_ERROR));
+        assertEquals("User did not authenticate, error should be returned", "Not existing keyword for error:SomethingFailed", getValueFromJsonResponse(loginResponse, STATUS_ERROR_MESSAGE));
     }
 
     @Test
