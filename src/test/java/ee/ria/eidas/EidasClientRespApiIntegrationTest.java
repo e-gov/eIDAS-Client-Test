@@ -3,8 +3,6 @@ package ee.ria.eidas;
 
 import ee.ria.eidas.config.IntegrationTest;
 import io.qameta.allure.restassured.AllureRestAssured;
-import io.restassured.path.json.JsonPath;
-import io.restassured.path.xml.XmlPath;
 import io.restassured.response.Response;
 import org.apache.commons.lang3.RandomStringUtils;
 import org.junit.Ignore;
@@ -107,7 +105,7 @@ public class EidasClientRespApiIntegrationTest extends TestsBase {
 
         assertEquals("Status code should be: 400", 400, response.statusCode());
         assertEquals("Bad request error should be returned", BAD_REQUEST, getValueFromJsonResponse(response, STATUS_ERROR));
-        assertThat("Correct error message", getValueFromJsonResponse(response, STATUS_ERROR_MESSAGE), startsWith("Required String parameter 'SAMLResponse' is not present"));
+        assertThat("Correct error message", getValueFromJsonResponse(response, STATUS_ERROR_MESSAGE), startsWith("Required request parameter 'SAMLResponse' for method parameter type String is not present"));
     }
 
     @Test

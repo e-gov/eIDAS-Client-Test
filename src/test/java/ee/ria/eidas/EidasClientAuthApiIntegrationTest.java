@@ -58,7 +58,7 @@ public class EidasClientAuthApiIntegrationTest extends TestsBase {
 
         assertEquals("Status code should be: 400", 400, response.statusCode());
         assertEquals("Bad request error should be returned", BAD_REQUEST, getValueFromJsonResponse(response, STATUS_ERROR));
-        assertEquals("Bad request error should be returned", "Required String parameter 'Country' is not present", getValueFromJsonResponse(response, STATUS_ERROR_MESSAGE));
+        assertEquals("Bad request error should be returned", "Required request parameter 'Country' for method parameter type String is not present", getValueFromJsonResponse(response, STATUS_ERROR_MESSAGE));
     }
 
     @Test
