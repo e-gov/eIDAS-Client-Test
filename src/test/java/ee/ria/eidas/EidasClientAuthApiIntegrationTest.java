@@ -36,7 +36,7 @@ public class EidasClientAuthApiIntegrationTest extends TestsBase {
 
     @Test
     public void authApi1_countryCodeCaseSensitiveShouldPass() {
-        XmlPath samlRequest = getDecodedSamlRequestBodyXml(getAuthenticationReq(DEF_COUNTRY.toLowerCase(), "", ""));
+        XmlPath samlRequest = getDecodedSamlRequestBodyXml(getAuthenticationReq(DEF_COUNTRY.toLowerCase(), "", "", "TEST-REQUESTER-ID", "public"));
         assertEquals("Correct LOA is returned", LOA_SUBSTANTIAL, samlRequest.getString(XML_LOA));
     }
 
@@ -72,7 +72,7 @@ public class EidasClientAuthApiIntegrationTest extends TestsBase {
 
     @Test
     public void authApi2_loaMissingValueShouldReturnDefault() {
-        XmlPath samlRequest = getDecodedSamlRequestBodyXml(getAuthenticationReq(DEF_COUNTRY, "", ""));
+        XmlPath samlRequest = getDecodedSamlRequestBodyXml(getAuthenticationReq(DEF_COUNTRY, "", "", "TEST-REQUESTER-ID", "public"));
 
         assertEquals("Correct LOA is returned", LOA_SUBSTANTIAL, samlRequest.getString(XML_LOA));
     }
@@ -211,7 +211,7 @@ public class EidasClientAuthApiIntegrationTest extends TestsBase {
 
     @Test
     public void authApi5_checkHtmlValues() {
-        String response = getAuthenticationReq(DEF_COUNTRY, "SUBSTANTIAL", "RelayState");
+        String response = getAuthenticationReq(DEF_COUNTRY, "SUBSTANTIAL", "RelayState", "TEST-REQUESTER-ID", "public");
 
         XmlPath html = new XmlPath(XmlPath.CompatibilityMode.HTML, response);
 

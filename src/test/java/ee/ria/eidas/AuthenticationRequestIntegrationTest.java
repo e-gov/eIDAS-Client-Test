@@ -37,7 +37,7 @@ public class AuthenticationRequestIntegrationTest extends TestsBase {
 
     @Test
     public void auth1_parametersArePresent() {
-        XmlPath html = new XmlPath(XmlPath.CompatibilityMode.HTML, getAuthenticationReq(DEF_COUNTRY, "LOW", "relayState"));
+        XmlPath html = new XmlPath(XmlPath.CompatibilityMode.HTML, getAuthenticationReq(DEF_COUNTRY, "LOW", "relayState", "TEST-REQUESTER-ID", "public"));
         assertEquals("Country code is present",DEF_COUNTRY, html.getString("**.findAll { it.@name == 'country' }.@value"));
         assertEquals("RelayState is present","relayState", html.getString("**.findAll { it.@name == 'RelayState' }.@value"));
     }
@@ -80,6 +80,8 @@ public class AuthenticationRequestIntegrationTest extends TestsBase {
         formParams.put(ATTRIBUTES, "PersonIdentifier");
         formParams.put(COUNTRY, DEF_COUNTRY);
         formParams.put(RELAY_STATE, "1234abcd");
+        formParams.put(REQUESTER_ID, "TEST-REQUESTER-ID");
+        formParams.put(SP_TYPE, "public");
 
         Response response = getAuthenticationReqForm(formParams);
         XmlPath xmlPath = getDecodedSamlRequestBodyXml(response.body().asString());
@@ -95,6 +97,8 @@ public class AuthenticationRequestIntegrationTest extends TestsBase {
         formParams.put(ATTRIBUTES, "FamilyName FirstName DateOfBirth BirthName PersonIdentifier PlaceOfBirth CurrentAddress Gender");
         formParams.put(COUNTRY, DEF_COUNTRY);
         formParams.put(RELAY_STATE, "1234abcd");
+        formParams.put(REQUESTER_ID, "TEST-REQUESTER-ID");
+        formParams.put(SP_TYPE, "public");
 
         Response response = getAuthenticationReqForm(formParams);
         XmlPath xmlPath = getDecodedSamlRequestBodyXml(response.body().asString());
@@ -125,6 +129,8 @@ public class AuthenticationRequestIntegrationTest extends TestsBase {
         formParams.put(ATTRIBUTES, "LegalPersonIdentifier LegalName");
         formParams.put(COUNTRY, DEF_COUNTRY);
         formParams.put(RELAY_STATE, "1234abcd");
+        formParams.put(REQUESTER_ID, "TEST-REQUESTER-ID");
+        formParams.put(SP_TYPE, "public");
 
         Response response = getAuthenticationReqForm(formParams);
         XmlPath xmlPath = getDecodedSamlRequestBodyXml(response.body().asString());
@@ -133,6 +139,10 @@ public class AuthenticationRequestIntegrationTest extends TestsBase {
                 xmlPath.getString("**.findAll { it.@Name == 'http://eidas.europa.eu/attributes/legalperson/LegalPersonIdentifier' }.@isRequired"));
         assertEquals("Identifier must be present and required set to: true", "true",
                 xmlPath.getString("**.findAll { it.@Name == 'http://eidas.europa.eu/attributes/legalperson/LegalName' }.@isRequired"));
+        assertEquals("RequesterID must be present and have correct value", "TEST-REQUESTER-ID",
+                xmlPath.getString("AuthnRequest.Extensions.RequesterID"));
+        assertEquals("SPType must be present and have correct value", "public",
+                xmlPath.getString("AuthnRequest.Extensions.SPType"));
     }
 
     @Test
@@ -142,6 +152,8 @@ public class AuthenticationRequestIntegrationTest extends TestsBase {
         formParams.put(ATTRIBUTES, "LegalAddress VATRegistration TaxReference LEI EORI SEED SIC D-2012-17-EUIdentifier LegalPersonIdentifier LegalName");
         formParams.put(COUNTRY, DEF_COUNTRY);
         formParams.put(RELAY_STATE, "1234abcd");
+        formParams.put(REQUESTER_ID, "TEST-REQUESTER-ID");
+        formParams.put(SP_TYPE, "public");
 
         Response response = getAuthenticationReqForm(formParams);
         XmlPath xmlPath = getDecodedSamlRequestBodyXml(response.body().asString());
@@ -172,6 +184,8 @@ public class AuthenticationRequestIntegrationTest extends TestsBase {
         formParams.put(ATTRIBUTES, "FamilyName FirstName DateOfBirth PersonIdentifier LegalAddress VATRegistration TaxReference LEI EORI SEED SIC D-2012-17-EUIdentifier LegalPersonIdentifier LegalName BirthName PlaceOfBirth CurrentAddress Gender");
         formParams.put(COUNTRY, DEF_COUNTRY);
         formParams.put(RELAY_STATE, "1234abcd");
+        formParams.put(REQUESTER_ID, "TEST-REQUESTER-ID");
+        formParams.put(SP_TYPE, "public");
 
         Response response = getAuthenticationReqForm(formParams);
         XmlPath xmlPath = getDecodedSamlRequestBodyXml(response.body().asString());
@@ -221,6 +235,7 @@ public class AuthenticationRequestIntegrationTest extends TestsBase {
     public void auth2_mandatoryValuesArePresent() {
         XmlPath xmlPath = getDecodedSamlRequestBodyXml(getAuthenticationReqWithDefault());
         assertEquals("SPType must be: public", "public", xmlPath.getString("AuthnRequest.Extensions.SPType"));
+        assertEquals("RequesterID must be: TEST-REQUESTER-ID", "TEST-REQUESTER-ID", xmlPath.getString("AuthnRequest.Extensions.RequesterID"));
         assertEquals("The NameID policy must be: unspecified", "urn:oasis:names:tc:SAML:1.1:nameid-format:unspecified", xmlPath.getString("AuthnRequest.NameIDPolicy.@Format"));
         assertThat("Issuer must point to Metadata url", xmlPath.getString("AuthnRequest.Issuer"), endsWith(testEidasClientProperties.getSpMetadataUrl()));
     }
@@ -250,13 +265,13 @@ public class AuthenticationRequestIntegrationTest extends TestsBase {
 
     @Test
     public void auth4_allLoaLevelsAreAccepted() {
-        XmlPath samlRequest = getDecodedSamlRequestBodyXml(getAuthenticationReq(DEF_COUNTRY, "LOW", "relayState"));
+        XmlPath samlRequest = getDecodedSamlRequestBodyXml(getAuthenticationReq(DEF_COUNTRY, "LOW", "relayState", "TEST-REQUESTER-ID", "public"));
         assertEquals("Correct LOA is returned","http://eidas.europa.eu/LoA/low", samlRequest.getString("AuthnRequest.RequestedAuthnContext.AuthnContextClassRef"));
 
-        samlRequest = getDecodedSamlRequestBodyXml(getAuthenticationReq(DEF_COUNTRY, "SUBSTANTIAL", "relayState"));
+        samlRequest = getDecodedSamlRequestBodyXml(getAuthenticationReq(DEF_COUNTRY, "SUBSTANTIAL", "relayState", "TEST-REQUESTER-ID", "public"));
         assertEquals("Correct LOA is returned","http://eidas.europa.eu/LoA/substantial", samlRequest.getString("AuthnRequest.RequestedAuthnContext.AuthnContextClassRef"));
 
-        samlRequest = getDecodedSamlRequestBodyXml(getAuthenticationReq(DEF_COUNTRY, "HIGH", "relayState"));
+        samlRequest = getDecodedSamlRequestBodyXml(getAuthenticationReq(DEF_COUNTRY, "HIGH", "relayState", "TEST-REQUESTER-ID", "public"));
         assertEquals("Correct LOA is returned","http://eidas.europa.eu/LoA/high", samlRequest.getString("AuthnRequest.RequestedAuthnContext.AuthnContextClassRef"));
     }
 }

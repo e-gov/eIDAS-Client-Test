@@ -4,3 +4,6 @@ target
 **/.DS_Store
 allure-results/
 .allure
+
+### Maven ###
+.mvn/wrapper/maven-wrapper.jar

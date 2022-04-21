@@ -5,6 +5,8 @@ public class EidasTestStrings {
     public static final String COUNTRY = "Country";
     public static final String LOA = "LoA";
     public static final String RELAY_STATE = "RelayState";
+    public static final String SP_TYPE = "SPType";
+    public static final String REQUESTER_ID = "RequesterID";
     public static final String ATTRIBUTES = "Attributes";
     public static final String SAML_REQUEST = "SAMLRequest";
     public static final String SAML_RESPONSE = "SAMLResponse";
