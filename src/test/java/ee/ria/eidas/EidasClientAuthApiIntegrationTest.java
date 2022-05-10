@@ -18,6 +18,7 @@ import static io.restassured.RestAssured.config;
 import static io.restassured.RestAssured.given;
 import static io.restassured.config.EncoderConfig.encoderConfig;
 import static org.hamcrest.MatcherAssert.assertThat;
+import static org.hamcrest.Matchers.is;
 import static org.hamcrest.Matchers.startsWith;
 import static org.junit.Assert.assertEquals;
 
@@ -27,7 +28,7 @@ public class EidasClientAuthApiIntegrationTest extends TestsBase {
 
     @Test
     public void authApi1_countryCodeNotInCorrectFormatShouldReturnError() {
-        Response response =  getAuthenticationReqResponse("Est", "", "");
+        Response response =  getAuthenticationReqResponse("Est", "", "", REQUESTER_ID_VALUE, SP_TYPE_PUBLIC);
 
         assertEquals("Status code should be: 400", 400, response.statusCode());
         assertEquals("Bad request error should be returned", BAD_REQUEST, getValueFromJsonResponse(response, STATUS_ERROR));
@@ -36,13 +37,13 @@ public class EidasClientAuthApiIntegrationTest extends TestsBase {
 
     @Test
     public void authApi1_countryCodeCaseSensitiveShouldPass() {
-        XmlPath samlRequest = getDecodedSamlRequestBodyXml(getAuthenticationReq(DEF_COUNTRY.toLowerCase(), "", "", "TEST-REQUESTER-ID", "public"));
+        XmlPath samlRequest = getDecodedSamlRequestBodyXml(getAuthenticationReq(DEF_COUNTRY.toLowerCase(), "", "", REQUESTER_ID_VALUE, SP_TYPE_PUBLIC));
         assertEquals("Correct LOA is returned", LOA_SUBSTANTIAL, samlRequest.getString(XML_LOA));
     }
 
     @Test
     public void authApi1_notSupportedCountryCodeShouldReturnError() {
-        Response response =  getAuthenticationReqResponse("SZ", "", "");
+        Response response =  getAuthenticationReqResponse("SZ", "", "", REQUESTER_ID_VALUE, SP_TYPE_PUBLIC);
 
         assertEquals("Status code should be: 400", 400, response.statusCode());
         assertEquals("Bad request error should be returned", BAD_REQUEST, getValueFromJsonResponse(response, STATUS_ERROR));
@@ -63,7 +64,7 @@ public class EidasClientAuthApiIntegrationTest extends TestsBase {
 
     @Test
     public void authApi2_invalidLoaLevelsAreNotAccepted() {
-        Response response =  getAuthenticationReqResponse(DEF_COUNTRY, "SUPER", "");
+        Response response =  getAuthenticationReqResponse(DEF_COUNTRY, "SUPER", "", REQUESTER_ID_VALUE, SP_TYPE_PUBLIC);
 
         assertEquals("Status code should be: 400", 400, response.statusCode());
         assertEquals("Bad request error should be returned", BAD_REQUEST, getValueFromJsonResponse(response, STATUS_ERROR));
@@ -72,7 +73,7 @@ public class EidasClientAuthApiIntegrationTest extends TestsBase {
 
     @Test
     public void authApi2_loaMissingValueShouldReturnDefault() {
-        XmlPath samlRequest = getDecodedSamlRequestBodyXml(getAuthenticationReq(DEF_COUNTRY, "", "", "TEST-REQUESTER-ID", "public"));
+        XmlPath samlRequest = getDecodedSamlRequestBodyXml(getAuthenticationReq(DEF_COUNTRY, "", "", REQUESTER_ID_VALUE, SP_TYPE_PUBLIC));
 
         assertEquals("Correct LOA is returned", LOA_SUBSTANTIAL, samlRequest.getString(XML_LOA));
     }
@@ -82,6 +83,8 @@ public class EidasClientAuthApiIntegrationTest extends TestsBase {
         Map<String,String> formParams = new HashMap<String,String>();
         formParams.put(COUNTRY, DEF_COUNTRY);
         formParams.put(RELAY_STATE, "1234abcd");
+        formParams.put(REQUESTER_ID, REQUESTER_ID_VALUE);
+        formParams.put(SP_TYPE, SP_TYPE_PUBLIC);
 
         XmlPath samlRequest = getDecodedSamlRequestBodyXml(getAuthenticationReqForm(formParams).getBody().asString());
 
@@ -92,29 +95,29 @@ public class EidasClientAuthApiIntegrationTest extends TestsBase {
     public void authApi3_errorIsReturnedOnTooLongRelayState() {
         String relayState = RandomStringUtils.randomAlphanumeric(81);
 
-        Response response = getAuthenticationReqResponse(DEF_COUNTRY, "", relayState);
+        Response response = getAuthenticationReqResponse(DEF_COUNTRY, "", relayState, REQUESTER_ID_VALUE, SP_TYPE_PUBLIC);
 
         assertEquals("Status code should be: 400", 400, response.statusCode());
         assertEquals("Bad request error should be returned", BAD_REQUEST, getValueFromJsonResponse(response, STATUS_ERROR));
-        assertThat("Correct error message", getValueFromJsonResponse(response, STATUS_ERROR_MESSAGE), startsWith("Invalid RelayState! Must match the following regexp:"));
+        assertThat("Correct error message", getValueFromJsonResponse(response, STATUS_ERROR_MESSAGE), startsWith("Invalid RelayState (" + relayState + ")! Must match the following regexp:"));
     }
 
     @Test
     public void authApi3_errorIsReturnedOnWrongCharactersInRelayState() {
         String relayState = "<>$";
 
-        Response response = getAuthenticationReqResponse(DEF_COUNTRY, "", relayState);
+        Response response = getAuthenticationReqResponse(DEF_COUNTRY, "", relayState, REQUESTER_ID_VALUE, SP_TYPE_PUBLIC);
 
         assertEquals("Status code should be: 400", 400, response.statusCode());
         assertEquals("Bad request error should be returned", BAD_REQUEST, getValueFromJsonResponse(response, STATUS_ERROR));
-        assertThat("Correct error message", getValueFromJsonResponse(response, STATUS_ERROR_MESSAGE), startsWith("Invalid RelayState! Must match the following regexp:"));
+        assertThat("Correct error message", getValueFromJsonResponse(response, STATUS_ERROR_MESSAGE), startsWith("Invalid RelayState (" + relayState + ")! Must match the following regexp:"));
     }
 
     @Test
     public void authApi3_relayStateValueShouldBeReturned() {
         String relayState = RandomStringUtils.randomAlphanumeric(80);
 
-        Response response = getAuthenticationReqResponse(DEF_COUNTRY, "", relayState);
+        Response response = getAuthenticationReqResponse(DEF_COUNTRY, "", relayState, REQUESTER_ID_VALUE, SP_TYPE_PUBLIC);
 
         assertEquals("Status code should be: 200", 200, response.statusCode());
         assertEquals("Correct RelayState is returned", relayState, response.getBody().xmlPath(XmlPath.CompatibilityMode.HTML).getString("**.findAll { it.@name == 'RelayState' }.@value"));
@@ -122,7 +125,7 @@ public class EidasClientAuthApiIntegrationTest extends TestsBase {
 
     @Test
     public void authApi3_relayStateMissingValueShouldReturnOkStatus() {
-        Response response = getAuthenticationReqResponse(DEF_COUNTRY, "", "");
+        Response response = getAuthenticationReqResponse(DEF_COUNTRY, "", "", REQUESTER_ID_VALUE, SP_TYPE_PUBLIC);
 
         assertEquals("Status code should be: 200", 200, response.statusCode());
     }
@@ -131,6 +134,8 @@ public class EidasClientAuthApiIntegrationTest extends TestsBase {
     public void authApi3_relayStateMissingShouldReturnOkStatus() {
         Map<String,String> formParams = new HashMap<String,String>();
         formParams.put(COUNTRY, DEF_COUNTRY);
+        formParams.put(REQUESTER_ID, REQUESTER_ID_VALUE);
+        formParams.put(SP_TYPE, SP_TYPE_PUBLIC);
 
         Response response = getAuthenticationReqForm(formParams);
 
@@ -138,12 +143,86 @@ public class EidasClientAuthApiIntegrationTest extends TestsBase {
     }
 
     @Test
-    public void authApi4_notSupportedAdditionalAttributeShouldReturnError() {
+    public void authApi4_requesterIdEmptyValueShouldReturnError() {
+        Response response =  getAuthenticationReqResponse(DEF_COUNTRY, "", "", "", SP_TYPE_PUBLIC);
+
+        assertEquals("Status code should be: 400", 400, response.statusCode());
+        assertEquals("Bad request error should be returned", BAD_REQUEST, getValueFromJsonResponse(response, STATUS_ERROR));
+        assertThat("Correct error message", getValueFromJsonResponse(response, STATUS_ERROR_MESSAGE), is("Required request parameter 'RequesterID' for method parameter type String is present but converted to null"));
+    }
+
+    @Test
+    public void authApi4_requesterIdWrongCharactersShouldReturnError() {
+        Response response =  getAuthenticationReqResponse(DEF_COUNTRY, "", "", "SPA CE", SP_TYPE_PUBLIC);
+
+        assertEquals("Status code should be: 400", 400, response.statusCode());
+        assertEquals("Bad request error should be returned", BAD_REQUEST, getValueFromJsonResponse(response, STATUS_ERROR));
+        assertThat("Correct error message", getValueFromJsonResponse(response, STATUS_ERROR_MESSAGE), is("Invalid RequesterID (SPA CE)! Must match the following regexp: ^[^\\s]+$"));
+    }
+
+    @Test
+    public void authApi4_requesterIdMissingShouldReturnError() {
+        Map<String,String> formParams = new HashMap<String,String>();
+        formParams.put(COUNTRY, DEF_COUNTRY);
+        formParams.put(SP_TYPE, SP_TYPE_PUBLIC);
+
+        Response response = getAuthenticationReqFormFail(formParams);
+
+        assertThat("Correct error message", getValueFromJsonResponse(response, STATUS_ERROR_MESSAGE), is("Required request parameter 'RequesterID' for method parameter type String is not present"));
+    }
+
+    @Test
+    public void authApi5_spTypeInvalidValueShouldReturnError() {
+        Response response =  getAuthenticationReqResponse(DEF_COUNTRY, "", "", REQUESTER_ID_VALUE, "");
+
+        assertEquals("Status code should be: 400", 400, response.statusCode());
+        assertEquals("Bad request error should be returned", BAD_REQUEST, getValueFromJsonResponse(response, STATUS_ERROR));
+        assertThat("Correct error message", getValueFromJsonResponse(response, STATUS_ERROR_MESSAGE), is("Required request parameter 'SPType' for method parameter type SPType is present but converted to null"));
+    }
+
+    @Test
+    public void authApi5_spTypeWrongCharactersShouldReturnError() {
+        Response response =  getAuthenticationReqResponse(DEF_COUNTRY, "", "", REQUESTER_ID_VALUE, "private&public");
+
+        assertEquals("Status code should be: 400", 400, response.statusCode());
+        assertEquals("Bad request error should be returned", BAD_REQUEST, getValueFromJsonResponse(response, STATUS_ERROR));
+        assertThat("Correct error message", getValueFromJsonResponse(response, STATUS_ERROR_MESSAGE), is("Invalid value for parameter SPType"));
+    }
+
+    @Test
+    public void authApi5_spTypePublicShouldReturnOkStatus() {
+        Response response = getAuthenticationReqResponse(DEF_COUNTRY, "", "", REQUESTER_ID_VALUE, SP_TYPE_PUBLIC);
+
+        assertEquals("Status code should be: 200", 200, response.statusCode());
+    }
+
+    @Test
+    public void authApi5_spTypePrivateShouldReturnOkStatus() {
+        Response response = getAuthenticationReqResponse(DEF_COUNTRY, "", "", REQUESTER_ID_VALUE, SP_TYPE_PRIVATE);
+
+        assertEquals("Status code should be: 200", 200, response.statusCode());
+    }
+
+    @Test
+    public void authApi5_spTypeMissingShouldReturnError() {
+        Map<String,String> formParams = new HashMap<String,String>();
+        formParams.put(COUNTRY, DEF_COUNTRY);
+        formParams.put(REQUESTER_ID, REQUESTER_ID_VALUE);
+
+        Response response = getAuthenticationReqFormFail(formParams);
+
+        assertThat("Correct error message", getValueFromJsonResponse(response, STATUS_ERROR_MESSAGE), is("Required request parameter 'SPType' for method parameter type SPType is not present"));
+    }
+
+    @Test
+    public void authApi6_notSupportedAdditionalAttributeShouldReturnError() {
         Map<String,String> formParams = new HashMap<String,String>();
         formParams.put(LOA, "HIGH");
         formParams.put(ATTRIBUTES, "NotExistingAttribute");
         formParams.put(COUNTRY, DEF_COUNTRY);
         formParams.put(RELAY_STATE, "1234abcd");
+        formParams.put(REQUESTER_ID, REQUESTER_ID_VALUE);
+        formParams.put(SP_TYPE, SP_TYPE_PUBLIC);
 
         Response response = getAuthenticationReqFormFail(formParams);
 
@@ -153,12 +232,14 @@ public class EidasClientAuthApiIntegrationTest extends TestsBase {
     }
 
     @Test
-    public void authApi4_additionalAttributesNotSeparatedCorrectlyShouldReturnError() {
+    public void authApi6_additionalAttributesNotSeparatedCorrectlyShouldReturnError() {
         Map<String,String> formParams = new HashMap<String,String>();
         formParams.put(LOA, "HIGH");
         formParams.put(ATTRIBUTES, "LegalPersonIdentifierCurrentAddressGender");
         formParams.put(COUNTRY, DEF_COUNTRY);
         formParams.put(RELAY_STATE, "1234abcd");
+        formParams.put(REQUESTER_ID, REQUESTER_ID_VALUE);
+        formParams.put(SP_TYPE, SP_TYPE_PUBLIC);
 
         Response response = getAuthenticationReqFormFail(formParams);
 
@@ -168,12 +249,14 @@ public class EidasClientAuthApiIntegrationTest extends TestsBase {
     }
 
     @Test
-    public void authApi4_additionalAttributesSeparatedWithWrongCharacterShouldReturnError() {
+    public void authApi6_additionalAttributesSeparatedWithWrongCharacterShouldReturnError() {
         Map<String,String> formParams = new HashMap<String,String>();
         formParams.put(LOA, "HIGH");
         formParams.put(ATTRIBUTES, "LegalPersonIdentifier&CurrentAddress&Gender");
         formParams.put(COUNTRY, DEF_COUNTRY);
         formParams.put(RELAY_STATE, "1234abcd");
+        formParams.put(REQUESTER_ID, REQUESTER_ID_VALUE);
+        formParams.put(SP_TYPE, SP_TYPE_PUBLIC);
 
         Response response = getAuthenticationReqFormFail(formParams);
 
@@ -184,12 +267,14 @@ public class EidasClientAuthApiIntegrationTest extends TestsBase {
 
     @Ignore //TODO: Need a way to force the attributes without URL encoding
     @Test
-    public void authApi4_additionalAttributesSeparatedWithoutUrlEncodingShouldReturnError() {
+    public void authApi6_additionalAttributesSeparatedWithoutUrlEncodingShouldReturnError() {
         Map<String,String> formParams = new HashMap<String,String>();
         formParams.put(LOA, "HIGH");
         formParams.put(ATTRIBUTES, "LegalPersonIdentifier CurrentAddress Gender");
         formParams.put(COUNTRY, DEF_COUNTRY);
         formParams.put(RELAY_STATE, "1234abcd");
+        formParams.put(REQUESTER_ID, REQUESTER_ID_VALUE);
+        formParams.put(SP_TYPE, SP_TYPE_PUBLIC);
 
         Response response = given()
                 .filter(new AllureRestAssured())
@@ -210,8 +295,8 @@ public class EidasClientAuthApiIntegrationTest extends TestsBase {
     }
 
     @Test
-    public void authApi5_checkHtmlValues() {
-        String response = getAuthenticationReq(DEF_COUNTRY, "SUBSTANTIAL", "RelayState", "TEST-REQUESTER-ID", "public");
+    public void authApi7_checkHtmlValues() {
+        String response = getAuthenticationReq(DEF_COUNTRY, "SUBSTANTIAL", "RelayState", REQUESTER_ID_VALUE, SP_TYPE_PUBLIC);
 
         XmlPath html = new XmlPath(XmlPath.CompatibilityMode.HTML, response);
 
@@ -223,12 +308,14 @@ public class EidasClientAuthApiIntegrationTest extends TestsBase {
     }
 
     @Test
-    public void authApi6_multipleParametersAreNotBlocking() {
+    public void authApi8_multipleParametersAreNotBlocking() {
         Map<String,String> formParams = new HashMap<String,String>();
         formParams.put(LOA, "HIGH");
         formParams.put(LOA, "LOW");
         formParams.put(COUNTRY, DEF_COUNTRY);
         formParams.put(RELAY_STATE, "1234abcd");
+        formParams.put(REQUESTER_ID, REQUESTER_ID_VALUE);
+        formParams.put(SP_TYPE, SP_TYPE_PUBLIC);
 
         XmlPath samlRequest = getDecodedSamlRequestBodyXml(getAuthenticationReqForm(formParams).getBody().asString());
 
@@ -236,12 +323,14 @@ public class EidasClientAuthApiIntegrationTest extends TestsBase {
         }
 
     @Test
-    public void authApi6_invalidParametersAreNotBlocking() {
+    public void authApi8_invalidParametersAreNotBlocking() {
         Map<String,String> formParams = new HashMap<String,String>();
         formParams.put("randomParam", "random");
         formParams.put(LOA, "LOW");
         formParams.put(COUNTRY, DEF_COUNTRY);
         formParams.put(RELAY_STATE, "1234abcd");
+        formParams.put(REQUESTER_ID, REQUESTER_ID_VALUE);
+        formParams.put(SP_TYPE, SP_TYPE_PUBLIC);
 
         Response response = getAuthenticationReqForm(formParams);
 

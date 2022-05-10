@@ -13,6 +13,9 @@ public class EidasTestStrings {
 
     //Default test params
     public static final String DEF_COUNTRY = "CA";
+    public static final String SP_TYPE_PUBLIC = "public";
+    public static final String SP_TYPE_PRIVATE = "private";
+    public static final String REQUESTER_ID_VALUE = "TEST-REQUESTER-ID";
 
     //SAML response strings
     public static final String LOA_LOW = "http://eidas.europa.eu/LoA/low";

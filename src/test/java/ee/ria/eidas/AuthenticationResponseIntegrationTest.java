@@ -67,7 +67,7 @@ public class AuthenticationResponseIntegrationTest extends TestsBase {
 
     @Test
     public void resp4_responseWithLowLoaShouldNotBeAcceptedWhenSubstantialWasRequired() {
-        String base64Response = getBase64SamlResponseMinimalAttributes(getAuthenticationReq(DEF_COUNTRY,"SUBSTANTIAL","", "TEST-REQUESTER-ID", "public"), "TestGiven","TestFamily","TestPNO", "TestDate", LOA_LOW);
+        String base64Response = getBase64SamlResponseMinimalAttributes(getAuthenticationReq(DEF_COUNTRY,"SUBSTANTIAL","", REQUESTER_ID_VALUE, "public"), "TestGiven","TestFamily","TestPNO", "TestDate", LOA_LOW);
         Response response = sendSamlResponseGetStatus("", base64Response );
         assertEquals("Status code should be: 400", 400, response.statusCode());
         assertEquals("Bad request error should be returned", BAD_REQUEST, getValueFromJsonResponse(response, STATUS_ERROR));
@@ -76,7 +76,7 @@ public class AuthenticationResponseIntegrationTest extends TestsBase {
 
     @Test
     public void resp4_responseWithLowLoaShouldNotBeAcceptedWhenHighWasRequired() {
-        String base64Response = getBase64SamlResponseMinimalAttributes(getAuthenticationReq(DEF_COUNTRY,"HIGH","", "TEST-REQUESTER-ID", "public"), "TestGiven","TestFamily","TestPNO", "TestDate", LOA_LOW);
+        String base64Response = getBase64SamlResponseMinimalAttributes(getAuthenticationReq(DEF_COUNTRY,"HIGH","", REQUESTER_ID_VALUE, "public"), "TestGiven","TestFamily","TestPNO", "TestDate", LOA_LOW);
         Response response = sendSamlResponseGetStatus("", base64Response );
         assertEquals("Status code should be: 400", 400, response.statusCode());
         assertEquals("Bad request error should be returned", BAD_REQUEST, getValueFromJsonResponse(response, STATUS_ERROR));
@@ -85,7 +85,7 @@ public class AuthenticationResponseIntegrationTest extends TestsBase {
 
     @Test
     public void resp4_responseWithSubstantialLoaShouldNotBeAcceptedWhenHighWasRequired() {
-        String base64Response = getBase64SamlResponseMinimalAttributes(getAuthenticationReq(DEF_COUNTRY,"HIGH","", "TEST-REQUESTER-ID", "public"), "TestGiven","TestFamily","TestPNO", "TestDate", LOA_SUBSTANTIAL);
+        String base64Response = getBase64SamlResponseMinimalAttributes(getAuthenticationReq(DEF_COUNTRY,"HIGH","", REQUESTER_ID_VALUE, "public"), "TestGiven","TestFamily","TestPNO", "TestDate", LOA_SUBSTANTIAL);
         Response response = sendSamlResponseGetStatus("", base64Response );
         assertEquals("Status code should be: 400", 400, response.statusCode());
         assertEquals("Bad request error should be returned", BAD_REQUEST, getValueFromJsonResponse(response, STATUS_ERROR));
@@ -94,42 +94,42 @@ public class AuthenticationResponseIntegrationTest extends TestsBase {
 
     @Test
     public void resp4_responseWithSameLoaShouldBeAcceptedLow() {
-        String base64Response = getBase64SamlResponseMinimalAttributes(getAuthenticationReq(DEF_COUNTRY,"LOW","", "TEST-REQUESTER-ID", "public"), "TestGiven","TestFamily","TestPNO", "TestDate", LOA_LOW);
+        String base64Response = getBase64SamlResponseMinimalAttributes(getAuthenticationReq(DEF_COUNTRY,"LOW","", REQUESTER_ID_VALUE, "public"), "TestGiven","TestFamily","TestPNO", "TestDate", LOA_LOW);
         JsonPath loginResponseJson = sendSamlResponse("", base64Response );
         assertEquals("Correct loa is returned", LOA_LOW, loginResponseJson.getString(STATUS_LOA));
     }
 
     @Test
     public void resp4_responseWithSameLoaShouldBeAcceptedSubstantial() {
-        String base64Response = getBase64SamlResponseMinimalAttributes(getAuthenticationReq(DEF_COUNTRY,"SUBSTANTIAL","", "TEST-REQUESTER-ID", "public"), "TestGiven","TestFamily","TestPNO", "TestDate", LOA_SUBSTANTIAL);
+        String base64Response = getBase64SamlResponseMinimalAttributes(getAuthenticationReq(DEF_COUNTRY,"SUBSTANTIAL","", REQUESTER_ID_VALUE, "public"), "TestGiven","TestFamily","TestPNO", "TestDate", LOA_SUBSTANTIAL);
         JsonPath loginResponseJson = sendSamlResponse("", base64Response );
         assertEquals("Correct loa is returned", LOA_SUBSTANTIAL, loginResponseJson.getString(STATUS_LOA));
     }
 
     @Test
     public void resp4_responseWithSameLoaShouldBeAcceptedHigh() {
-        String base64Response = getBase64SamlResponseMinimalAttributes(getAuthenticationReq(DEF_COUNTRY,"HIGH","", "TEST-REQUESTER-ID", "public"), "TestGiven","TestFamily","TestPNO", "TestDate", LOA_HIGH);
+        String base64Response = getBase64SamlResponseMinimalAttributes(getAuthenticationReq(DEF_COUNTRY,"HIGH","", REQUESTER_ID_VALUE, "public"), "TestGiven","TestFamily","TestPNO", "TestDate", LOA_HIGH);
         JsonPath loginResponseJson = sendSamlResponse("", base64Response );
         assertEquals("Correct loa is returned", LOA_HIGH, loginResponseJson.getString(STATUS_LOA));
     }
 
     @Test
     public void resp4_responseWithHigherLoaLowShouldBeAcceptedSubstantial() {
-        String base64Response = getBase64SamlResponseMinimalAttributes(getAuthenticationReq(DEF_COUNTRY,"LOW","", "TEST-REQUESTER-ID", "public"), "TestGiven","TestFamily","TestPNO", "TestDate", LOA_SUBSTANTIAL);
+        String base64Response = getBase64SamlResponseMinimalAttributes(getAuthenticationReq(DEF_COUNTRY,"LOW","", REQUESTER_ID_VALUE, "public"), "TestGiven","TestFamily","TestPNO", "TestDate", LOA_SUBSTANTIAL);
         JsonPath loginResponseJson = sendSamlResponse("", base64Response );
         assertEquals("Correct loa is returned", LOA_SUBSTANTIAL, loginResponseJson.getString(STATUS_LOA));
     }
 
     @Test
     public void resp4_responseWithHigherLoaLowShouldBeAcceptedHigh() {
-        String base64Response = getBase64SamlResponseMinimalAttributes(getAuthenticationReq(DEF_COUNTRY,"LOW","", "TEST-REQUESTER-ID", "public"), "TestGiven","TestFamily","TestPNO", "TestDate", LOA_HIGH);
+        String base64Response = getBase64SamlResponseMinimalAttributes(getAuthenticationReq(DEF_COUNTRY,"LOW","", REQUESTER_ID_VALUE, "public"), "TestGiven","TestFamily","TestPNO", "TestDate", LOA_HIGH);
         JsonPath loginResponseJson = sendSamlResponse("", base64Response );
         assertEquals("Correct loa is returned", LOA_HIGH, loginResponseJson.getString(STATUS_LOA));
     }
 
     @Test
     public void resp4_responseWithHigherLoaSubstantialShouldBeAcceptedHigh() {
-        String base64Response = getBase64SamlResponseMinimalAttributes(getAuthenticationReq(DEF_COUNTRY,"SUBSTANTIAL","", "TEST-REQUESTER-ID", "public"), "TestGiven","TestFamily","TestPNO", "TestDate", LOA_HIGH);
+        String base64Response = getBase64SamlResponseMinimalAttributes(getAuthenticationReq(DEF_COUNTRY,"SUBSTANTIAL","", REQUESTER_ID_VALUE, "public"), "TestGiven","TestFamily","TestPNO", "TestDate", LOA_HIGH);
         JsonPath loginResponseJson = sendSamlResponse("", base64Response );
         assertEquals("Correct loa is returned", LOA_HIGH, loginResponseJson.getString(STATUS_LOA));
     }

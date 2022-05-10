@@ -69,12 +69,6 @@ public class CommonMetadataIntegrationTest extends TestsBase {
     }
 
     @Test
-    public void metap2_mandatoryValuesArePresentInExtensions() {
-        XmlPath xmlPath = getMetadataBodyXML();
-        assertEquals("ServiceProvider should be public", "public", xmlPath.getString("EntityDescriptor.Extensions.SPType"));
-    }
-
-    @Test
     public void metap2_mandatoryValuesArePresentInSpssoDescriptor() {
         XmlPath xmlPath = getMetadataBodyXML();
         assertEquals("Authentication requests signing must be: true", "true", xmlPath.getString("EntityDescriptor.SPSSODescriptor.@AuthnRequestsSigned"));

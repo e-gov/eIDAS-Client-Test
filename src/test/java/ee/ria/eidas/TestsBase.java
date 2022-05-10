@@ -173,7 +173,7 @@ public abstract class TestsBase {
     }
 
     protected String getAuthenticationReqWithDefault() {
-        return getAuthenticationReq(DEF_COUNTRY, "", "", "TEST-REQUESTER-ID", "public");
+        return getAuthenticationReq(DEF_COUNTRY, "", "", REQUESTER_ID_VALUE, "public");
     }
 
     protected String getAuthenticationReq(String country, String loa, String relayState, String requesterId, String spType) {
@@ -191,12 +191,14 @@ public abstract class TestsBase {
                 .extract().body().asString();
     }
 
-    protected io.restassured.response.Response getAuthenticationReqResponse(String country, String loa, String relayState) {
+    protected io.restassured.response.Response getAuthenticationReqResponse(String country, String loa, String relayState, String requesterId, String spType) {
         return given()
                 .filter(new AllureRestAssured())
                 .queryParam(RELAY_STATE, relayState)
                 .queryParam(LOA, loa)
                 .queryParam(COUNTRY, country)
+                .queryParam(REQUESTER_ID, requesterId)
+                .queryParam(SP_TYPE, spType)
                 .config(config().encoderConfig(encoderConfig().defaultContentCharset("UTF-8")).sslConfig(sslConfig))
                 .when()
                 .get(testEidasClientProperties.getSpStartUrl())
