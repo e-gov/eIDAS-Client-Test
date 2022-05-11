@@ -41,7 +41,7 @@ public class MetadataIntegrationTest extends TestsBase {
     }
 
     @Test
-    public void metap3_validUtnilIsPresentInEntityDescriptor() {
+    public void metap3_validUntilIsPresentInEntityDescriptor() {
         Instant currentTime = Instant.now();
         XmlPath xmlPath = getMetadataBodyXML();
         Instant validUntil = Instant.parse(xmlPath.getString("EntityDescriptor.@validUntil"));

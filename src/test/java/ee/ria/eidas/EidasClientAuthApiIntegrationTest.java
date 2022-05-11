@@ -152,7 +152,7 @@ public class EidasClientAuthApiIntegrationTest extends TestsBase {
     }
 
     @Test
-    public void authApi4_requesterIdWrongCharactersShouldReturnError() {
+    public void authApi4_requesterIdIllegalCharactersShouldReturnError() {
         Response response =  getAuthenticationReqResponse(DEF_COUNTRY, "", "", "SPA CE", SP_TYPE_PUBLIC);
 
         assertEquals("Status code should be: 400", 400, response.statusCode());
@@ -172,7 +172,7 @@ public class EidasClientAuthApiIntegrationTest extends TestsBase {
     }
 
     @Test
-    public void authApi5_spTypeInvalidValueShouldReturnError() {
+    public void authApi5_spTypeEmptyValueShouldReturnError() {
         Response response =  getAuthenticationReqResponse(DEF_COUNTRY, "", "", REQUESTER_ID_VALUE, "");
 
         assertEquals("Status code should be: 400", 400, response.statusCode());
@@ -181,7 +181,7 @@ public class EidasClientAuthApiIntegrationTest extends TestsBase {
     }
 
     @Test
-    public void authApi5_spTypeWrongCharactersShouldReturnError() {
+    public void authApi5_spTypeInvalidValueShouldReturnError() {
         Response response =  getAuthenticationReqResponse(DEF_COUNTRY, "", "", REQUESTER_ID_VALUE, "private&public");
 
         assertEquals("Status code should be: 400", 400, response.statusCode());

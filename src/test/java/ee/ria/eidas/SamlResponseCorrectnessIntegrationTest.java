@@ -449,6 +449,8 @@ public class SamlResponseCorrectnessIntegrationTest extends TestsBase {
         formParams.put(ATTRIBUTES, "LegalPersonIdentifier LegalName");
         formParams.put(COUNTRY, DEF_COUNTRY);
         formParams.put(RELAY_STATE, "1234abcd");
+        formParams.put(REQUESTER_ID, REQUESTER_ID_VALUE);
+        formParams.put(SP_TYPE, SP_TYPE_PRIVATE);
 
         String base64Response = getBase64SamlResponseLegalMinimalAttributes(getAuthenticationReqForm(formParams).getBody().asString(), DEFATTR_FIRST, DEFATTR_FAMILY, DEFATTR_PNO, DEFATTR_DATE, DEFATTR_LEGAL_NAME, DEFATTR_LEGAL_PNO);
         JsonPath loginResponse = sendSamlResponse("", base64Response);
@@ -469,6 +471,8 @@ public class SamlResponseCorrectnessIntegrationTest extends TestsBase {
         formParams.put(ATTRIBUTES, "LegalPersonIdentifier LegalName");
         formParams.put(COUNTRY, DEF_COUNTRY);
         formParams.put(RELAY_STATE, "1234abcd");
+        formParams.put(REQUESTER_ID, REQUESTER_ID_VALUE);
+        formParams.put(SP_TYPE, SP_TYPE_PRIVATE);
 
         String base64Response = getBase64SamlResponseMinimalAttributes(getAuthenticationReqForm(formParams).getBody().asString(), DEFATTR_FIRST, DEFATTR_FAMILY, DEFATTR_PNO, DEFATTR_DATE, LOA_HIGH);
         Response response = sendSamlResponseGetStatus("", base64Response );
@@ -485,6 +489,8 @@ public class SamlResponseCorrectnessIntegrationTest extends TestsBase {
         formParams.put(ATTRIBUTES, "LegalName");
         formParams.put(COUNTRY, DEF_COUNTRY);
         formParams.put(RELAY_STATE, "1234abcd");
+        formParams.put(REQUESTER_ID, REQUESTER_ID_VALUE);
+        formParams.put(SP_TYPE, SP_TYPE_PRIVATE);
 
         String base64Response = getBase64SamlResponseMinimalAttributes(getAuthenticationReqForm(formParams).getBody().asString(), DEFATTR_FIRST, DEFATTR_FAMILY, DEFATTR_PNO, DEFATTR_DATE, LOA_HIGH);
         Response response = sendSamlResponseGetStatus("", base64Response );
@@ -501,6 +507,8 @@ public class SamlResponseCorrectnessIntegrationTest extends TestsBase {
         formParams.put(ATTRIBUTES, "LegalPersonIdentifier");
         formParams.put(COUNTRY, DEF_COUNTRY);
         formParams.put(RELAY_STATE, "1234abcd");
+        formParams.put(REQUESTER_ID, REQUESTER_ID_VALUE);
+        formParams.put(SP_TYPE, SP_TYPE_PRIVATE);
 
         String base64Response = getBase64SamlResponseMinimalAttributes(getAuthenticationReqForm(formParams).getBody().asString(), DEFATTR_FIRST, DEFATTR_FAMILY, DEFATTR_PNO, DEFATTR_DATE, LOA_HIGH);
         Response response = sendSamlResponseGetStatus("", base64Response );
@@ -517,6 +525,8 @@ public class SamlResponseCorrectnessIntegrationTest extends TestsBase {
         formParams.put(ATTRIBUTES, "LegalPersonIdentifier LegalName");
         formParams.put(COUNTRY, DEF_COUNTRY);
         formParams.put(RELAY_STATE, "1234abcd");
+        formParams.put(REQUESTER_ID, REQUESTER_ID_VALUE);
+        formParams.put(SP_TYPE, SP_TYPE_PRIVATE);
 
         String base64Response = getBase64SamlResponseLegalMinimalAttributes(getAuthenticationReqForm(formParams).getBody().asString(), DEFATTR_FIRST, DEFATTR_FAMILY, DEFATTR_PNO, DEFATTR_DATE, null, DEFATTR_LEGAL_PNO);
         Response response = sendSamlResponseGetStatus("", base64Response );
@@ -533,6 +543,8 @@ public class SamlResponseCorrectnessIntegrationTest extends TestsBase {
         formParams.put(ATTRIBUTES, "LegalPersonIdentifier LegalName");
         formParams.put(COUNTRY, DEF_COUNTRY);
         formParams.put(RELAY_STATE, "1234abcd");
+        formParams.put(REQUESTER_ID, REQUESTER_ID_VALUE);
+        formParams.put(SP_TYPE, SP_TYPE_PRIVATE);
 
         String base64Response = getBase64SamlResponseLegalMinimalAttributes(getAuthenticationReqForm(formParams).getBody().asString(), DEFATTR_FIRST, DEFATTR_FAMILY, DEFATTR_PNO, DEFATTR_DATE, DEFATTR_LEGAL_NAME, null);
         Response response = sendSamlResponseGetStatus("", base64Response );
@@ -549,6 +561,8 @@ public class SamlResponseCorrectnessIntegrationTest extends TestsBase {
         formParams.put(ATTRIBUTES, "LegalPersonIdentifier LegalName LegalAddress VATRegistration TaxReference LEI EORI SEED SIC D-2012-17-EUIdentifier");
         formParams.put(COUNTRY, DEF_COUNTRY);
         formParams.put(RELAY_STATE, "1234abcd");
+        formParams.put(REQUESTER_ID, REQUESTER_ID_VALUE);
+        formParams.put(SP_TYPE, SP_TYPE_PUBLIC);
 
         String req = getAuthenticationReqForm(formParams).getBody().asString();
 

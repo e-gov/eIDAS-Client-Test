@@ -9,7 +9,6 @@ import ee.ria.eidas.utils.ResponseBuilderUtils;
 import ee.ria.eidas.utils.SystemPropertyActiveProfileResolver;
 import ee.ria.eidas.utils.XmlUtils;
 import io.qameta.allure.restassured.AllureRestAssured;
-import io.restassured.RestAssured;
 import io.restassured.config.SSLConfig;
 import io.restassured.config.XmlConfig;
 import io.restassured.path.json.JsonPath;
@@ -173,7 +172,7 @@ public abstract class TestsBase {
     }
 
     protected String getAuthenticationReqWithDefault() {
-        return getAuthenticationReq(DEF_COUNTRY, "", "", REQUESTER_ID_VALUE, "public");
+        return getAuthenticationReq(DEF_COUNTRY, "", "", REQUESTER_ID_VALUE, SP_TYPE_PUBLIC);
     }
 
     protected String getAuthenticationReq(String country, String loa, String relayState, String requesterId, String spType) {
