@@ -42,12 +42,21 @@ public class EidasClientAuthApiIntegrationTest extends TestsBase {
     }
 
     @Test
-    public void authApi1_notSupportedCountryCodeShouldReturnError() {
+    public void authApi1_notSupportedCountryCodeForPublicShouldReturnError() {
         Response response =  getAuthenticationReqResponse("SZ", "", "", REQUESTER_ID_VALUE, SP_TYPE_PUBLIC);
 
         assertEquals("Status code should be: 400", 400, response.statusCode());
         assertEquals("Bad request error should be returned", BAD_REQUEST, getValueFromJsonResponse(response, STATUS_ERROR));
         assertThat("Correct error message", getValueFromJsonResponse(response, STATUS_ERROR_MESSAGE), startsWith("Invalid country for PUBLIC sector! Valid countries:"));
+    }
+
+    @Test
+    public void authApi1_notSupportedCountryCodeForPrivateShouldReturnError() {
+        Response response =  getAuthenticationReqResponse("SZ", "", "", REQUESTER_ID_VALUE, SP_TYPE_PRIVATE);
+
+        assertEquals("Status code should be: 400", 400, response.statusCode());
+        assertEquals("Bad request error should be returned", BAD_REQUEST, getValueFromJsonResponse(response, STATUS_ERROR));
+        assertThat("Correct error message", getValueFromJsonResponse(response, STATUS_ERROR_MESSAGE), startsWith("Invalid country for PRIVATE sector! Valid countries:"));
     }
 
     @Test
@@ -138,6 +147,20 @@ public class EidasClientAuthApiIntegrationTest extends TestsBase {
         formParams.put(SP_TYPE, SP_TYPE_PUBLIC);
 
         Response response = getAuthenticationReqForm(formParams);
+
+        assertEquals("Status code should be: 200", 200, response.statusCode());
+    }
+
+    @Test
+    public void authApi4_requesterIdFormatOkShouldReturnOkStatus() {
+        Response response = getAuthenticationReqResponse(DEF_COUNTRY, "", "", "prefix:suffix", SP_TYPE_PRIVATE);
+
+        assertEquals("Status code should be: 200", 200, response.statusCode());
+    }
+
+    @Test
+    public void authApi4_requesterIdFormatNotOkShouldReturnOkStatus() {
+        Response response = getAuthenticationReqResponse(DEF_COUNTRY, "", "", "urn:uri:@", SP_TYPE_PRIVATE);
 
         assertEquals("Status code should be: 200", 200, response.statusCode());
     }
