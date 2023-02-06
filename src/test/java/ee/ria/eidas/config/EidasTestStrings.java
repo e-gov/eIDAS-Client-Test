@@ -18,6 +18,7 @@ public class EidasTestStrings {
     public static final String REQUESTER_ID_VALUE = "urn:uuid:132a40a2-d4f2-11ec-a693-2f14f32004a4";
 
     //SAML response strings
+    public static final String LOA_NON_NOTIFIED = "http://non.eidas.eu/NotNotified/LoA/1";
     public static final String LOA_LOW = "http://eidas.europa.eu/LoA/low";
     public static final String LOA_SUBSTANTIAL = "http://eidas.europa.eu/LoA/substantial";
     public static final String LOA_HIGH = "http://eidas.europa.eu/LoA/high";

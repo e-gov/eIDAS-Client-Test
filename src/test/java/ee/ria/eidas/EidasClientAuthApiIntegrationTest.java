@@ -342,7 +342,7 @@ public class EidasClientAuthApiIntegrationTest extends TestsBase {
 
         XmlPath samlRequest = getDecodedSamlRequestBodyXml(getAuthenticationReqForm(formParams).getBody().asString());
 
-        assertEquals("Correct LOA is returned", LOA_LOW, samlRequest.getString(XML_LOA));
+        assertEquals("Correct LOA is returned", LOA_NON_NOTIFIED, samlRequest.getString(XML_LOA));
         }
 
     @Test

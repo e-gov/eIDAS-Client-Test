@@ -254,7 +254,7 @@ public class AuthenticationRequestIntegrationTest extends TestsBase {
         XmlPath xmlPath = getDecodedSamlRequestBodyXml(getAuthenticationReqWithDefault());
         List<String> loa = xmlPath.getList("AuthnRequest.RequestedAuthnContext.AuthnContextClassRef");
         assertThat("One of the accepted authentication levels must be present", loa,
-                anyOf(hasItem("http://eidas.europa.eu/LoA/low"), hasItem("http://eidas.europa.eu/LoA/substantial"), hasItem("http://eidas.europa.eu/LoA/high")));
+                anyOf(hasItem(LOA_LOW), hasItem(LOA_SUBSTANTIAL), hasItem(LOA_HIGH)));
     }
 
     @Test
@@ -275,12 +275,12 @@ public class AuthenticationRequestIntegrationTest extends TestsBase {
     @Test
     public void auth4_allLoaLevelsAreAccepted() {
         XmlPath samlRequest = getDecodedSamlRequestBodyXml(getAuthenticationReq(DEF_COUNTRY, "LOW", "relayState", REQUESTER_ID_VALUE, SP_TYPE_PUBLIC));
-        assertEquals("Correct LOA is returned","http://eidas.europa.eu/LoA/low", samlRequest.getString("AuthnRequest.RequestedAuthnContext.AuthnContextClassRef"));
+        assertEquals("Correct LOA is returned", LOA_NON_NOTIFIED, samlRequest.getString("AuthnRequest.RequestedAuthnContext.AuthnContextClassRef"));
 
         samlRequest = getDecodedSamlRequestBodyXml(getAuthenticationReq(DEF_COUNTRY, "SUBSTANTIAL", "relayState", REQUESTER_ID_VALUE, SP_TYPE_PUBLIC));
-        assertEquals("Correct LOA is returned","http://eidas.europa.eu/LoA/substantial", samlRequest.getString("AuthnRequest.RequestedAuthnContext.AuthnContextClassRef"));
+        assertEquals("Correct LOA is returned", LOA_SUBSTANTIAL, samlRequest.getString("AuthnRequest.RequestedAuthnContext.AuthnContextClassRef"));
 
         samlRequest = getDecodedSamlRequestBodyXml(getAuthenticationReq(DEF_COUNTRY, "HIGH", "relayState", REQUESTER_ID_VALUE, SP_TYPE_PUBLIC));
-        assertEquals("Correct LOA is returned","http://eidas.europa.eu/LoA/high", samlRequest.getString("AuthnRequest.RequestedAuthnContext.AuthnContextClassRef"));
+        assertEquals("Correct LOA is returned", LOA_HIGH, samlRequest.getString("AuthnRequest.RequestedAuthnContext.AuthnContextClassRef"));
     }
 }
