@@ -275,7 +275,7 @@ public class AuthenticationRequestIntegrationTest extends TestsBase {
     @Test
     public void auth4_allLoaLevelsAreAccepted() {
         XmlPath samlRequest = getDecodedSamlRequestBodyXml(getAuthenticationReq(DEF_COUNTRY, "LOW", "relayState", REQUESTER_ID_VALUE, SP_TYPE_PUBLIC));
-        assertEquals("Correct LOA is returned", LOA_NON_NOTIFIED, samlRequest.getString("AuthnRequest.RequestedAuthnContext.AuthnContextClassRef"));
+        assertEquals("Correct LOA is returned", LOA_LOW, samlRequest.getString("AuthnRequest.RequestedAuthnContext.AuthnContextClassRef"));
 
         samlRequest = getDecodedSamlRequestBodyXml(getAuthenticationReq(DEF_COUNTRY, "SUBSTANTIAL", "relayState", REQUESTER_ID_VALUE, SP_TYPE_PUBLIC));
         assertEquals("Correct LOA is returned", LOA_SUBSTANTIAL, samlRequest.getString("AuthnRequest.RequestedAuthnContext.AuthnContextClassRef"));
