@@ -1,6 +1,5 @@
 package ee.ria.eidas;
 
-import com.sun.org.apache.xerces.internal.dom.DOMInputImpl;
 import ee.ria.eidas.config.IntegrationTest;
 import ee.ria.eidas.config.TestConfiguration;
 import ee.ria.eidas.config.TestEidasClientProperties;
@@ -39,12 +38,13 @@ import org.springframework.core.io.ResourceLoader;
 import org.springframework.test.context.ActiveProfiles;
 import org.springframework.test.context.ContextConfiguration;
 import org.springframework.test.context.junit4.SpringRunner;
+import org.w3c.dom.bootstrap.DOMImplementationRegistry;
+import org.w3c.dom.ls.DOMImplementationLS;
 import org.w3c.dom.ls.LSInput;
 import org.w3c.dom.ls.LSResourceResolver;
 
 import java.io.InputStream;
-import java.net.MalformedURLException;
-import java.net.URL;
+import java.net.URI;
 import java.nio.charset.StandardCharsets;
 import java.security.KeyStore;
 import java.security.Security;
@@ -78,10 +78,10 @@ public abstract class TestsBase {
     protected SSLConfig sslConfig;
 
     @Before
-    public void setUp() throws MalformedURLException, InitializationException {
-        URL url = new URL(testEidasClientProperties.getTargetUrl());
+    public void setUp() throws InitializationException {
+        URI url = URI.create(testEidasClientProperties.getTargetUrl());
         port = url.getPort();
-        baseURI = url.getProtocol() + "://" + url.getHost();
+        baseURI = url.getScheme() + "://" + url.getHost();
 
         Security.addProvider(new BouncyCastleProvider());
         InitializationService.initialize();
@@ -140,8 +140,7 @@ public abstract class TestsBase {
 
     protected XmlPath getMetadataBodyXML() {
         String metadataResponse = getMetadataBody();
-        XmlPath metadataXml = new XmlPath(metadataResponse);
-        return metadataXml;
+        return new XmlPath(metadataResponse);
     }
 
     protected Boolean validateMetadataSchema() {
@@ -158,17 +157,15 @@ public abstract class TestsBase {
 
     protected XmlPath getDecodedSamlRequestBodyXml(String body) {
         XmlPath html = new XmlPath(XmlPath.CompatibilityMode.HTML, body);
-        String SAMLRequestString = html.getString("**.findAll { it.@name == 'SAMLRequest' }.@value");
-        String decodedRequest = new String(Base64.getDecoder().decode(SAMLRequestString), StandardCharsets.UTF_8);
-        XmlPath decodedSAMLrequest = new XmlPath(decodedRequest);
-        return decodedSAMLrequest;
+        String samlRequestString = html.getString("**.findAll { it.@name == 'SAMLRequest' }.@value");
+        String decodedRequest = new String(Base64.getDecoder().decode(samlRequestString), StandardCharsets.UTF_8);
+        return new XmlPath(decodedRequest);
     }
 
     protected String getDecodedSamlRequestBody(String body) {
         XmlPath html = new XmlPath(XmlPath.CompatibilityMode.HTML, body);
-        String SAMLRequestString = html.getString("**.findAll { it.@name == 'SAMLRequest' }.@value");
-        String decodedSAMLrequest = new String(Base64.getDecoder().decode(SAMLRequestString), StandardCharsets.UTF_8);
-        return decodedSAMLrequest;
+        String samlRequestString = html.getString("**.findAll { it.@name == 'SAMLRequest' }.@value");
+        return new String(Base64.getDecoder().decode(samlRequestString), StandardCharsets.UTF_8);
     }
 
     protected String getAuthenticationReqWithDefault() {
@@ -313,10 +310,7 @@ public abstract class TestsBase {
             SignatureValidator.validate(signableObj.getSignature(), credential);
         } catch (SignatureException e) {
             throw new RuntimeException("Signature validation in validateSignature() failed: " + e.getMessage(), e);
-        } catch (CertificateNotYetValidException e) {
-            //Expired certificates are used in test environment
-            return;
-        } catch (CertificateExpiredException e) {
+        } catch (CertificateNotYetValidException | CertificateExpiredException e) {
             //Expired certificates are used in test environment
             return;
         }
@@ -348,14 +342,12 @@ public abstract class TestsBase {
     }
 
     protected java.security.cert.X509Certificate getEncryptionCertificate(XmlPath body) throws CertificateException {
-        java.security.cert.X509Certificate x509 = X509Support.decodeCertificate(body.getString("**.findAll {it.@use == 'encryption'}.KeyInfo.X509Data.X509Certificate"));
-        return x509;
+        return X509Support.decodeCertificate(body.getString("**.findAll {it.@use == 'encryption'}.KeyInfo.X509Data.X509Certificate"));
     }
 
     protected Credential getEncryptionCredentialFromMetaData(XmlPath body) throws CertificateException {
         java.security.cert.X509Certificate x509Certificate = getEncryptionCertificate(body);
-        BasicX509Credential encryptionCredential = new BasicX509Credential(x509Certificate);
-        return encryptionCredential;
+        return new BasicX509Credential(x509Certificate);
     }
 
     protected String getValueFromJsonResponse(io.restassured.response.Response response, String key) {
@@ -553,7 +545,20 @@ public abstract class TestsBase {
             if (resource == null) {
                 throw new RuntimeException("Resource not found or error reading resource: " + resourceName);
             }
-            return new DOMInputImpl(publicId, systemId, baseURI, resource, null);
+            try {
+                DOMImplementationRegistry registry = DOMImplementationRegistry.newInstance();
+                DOMImplementationLS impl = (DOMImplementationLS) registry.getDOMImplementation("LS");
+
+                LSInput input = impl.createLSInput();
+                input.setPublicId(publicId);
+                input.setSystemId(systemId);
+                input.setBaseURI(baseURI);
+                input.setByteStream(resource);
+
+                return input;
+            } catch (ClassNotFoundException | InstantiationException | IllegalAccessException | ClassCastException e) {
+                throw new RuntimeException("Could not create LSInput", e);
+            }
         }
 
         private static String getResourceName(String systemId) {
