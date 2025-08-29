@@ -6,7 +6,7 @@
 
 ## Testide seadistamine ja käivitamine
 
-Vajalik on Java VM eelnev installatsioon. Arenduseks on kasutatud Oracle Java jdk 1.8.0_161 versiooni.
+Vajalik on Java VM eelnev installatsioon. Testide arenduseks on kasutatud OpenJDK Temurin-21.
 
 1. Hangi eIDAS kliendi lähtekood ning käivita eIDAS klient (vajalik eIDAS kliendi makettrakendus testimiseks). eIDAS kliendi makettrakenduse koodi ja käivitamise juhendid leiab [GitHubist](https://github.com/e-gov/eIDAS-Client). NB! eIDAS klient vajab käivitamisel ka juurdepääsu eIDAS sõlmele (eIDAS Node). Kui kasutate teste enda klient lahenduse testimiseks peab klientrakendus töötama ning olema kättesaadav.
 2. Hangi eIDAS kliendi testid:
